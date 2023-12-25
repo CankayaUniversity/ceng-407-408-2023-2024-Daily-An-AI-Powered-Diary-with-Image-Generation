@@ -15,6 +15,7 @@ web-build/
 *.p12
 *.key
 *.mobileprovision
+package-lock.json
 
 # Metro
 .metro-health-check*
