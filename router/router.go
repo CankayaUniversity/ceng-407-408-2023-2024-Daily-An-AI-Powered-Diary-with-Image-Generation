@@ -15,7 +15,7 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.New()
 	api := router.Group("/api")
-	api.POST("/user", handler.CreateUser)
+	api.POST("/users", handler.CreateUser)
 	api.GET("/users", handler.GetUsers)
 	return router
 }
