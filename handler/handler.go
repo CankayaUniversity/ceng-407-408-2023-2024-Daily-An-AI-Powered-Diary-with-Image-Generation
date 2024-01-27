@@ -39,7 +39,7 @@ func CreateUser(c *gin.Context) {
 
 func GetUsers(c *gin.Context) {
 	var users []model.User
-	cursor, err := database.Users.Find(c, bson.D{})
+	cursor, err := database.Users.Find(c, bson.D{}) //test içindir
 	// cursor, err := database.Users.Find(c, bson.D{{"favoutireDailies", "a"}}) get users with "a" in favoutireDailies array
 	//_, err := database.Users.UpdateMany(c, bson.D{{"favoutireDailies", "a"}}, bson.M{"$push": bson.M{"favoutireDailies": "b"}}) //update users with "a" in favoutireDailies array, adding b
 	//_, err := database.Users.UpdateMany(c, bson.D{{"favoutireDailies", "a"}}, bson.M{"$set": bson.M{"favoutireDailies.$": "b"}}) //update users with "a" in favoutireDailies array, change a as b
