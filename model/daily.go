@@ -16,8 +16,8 @@ type Daily struct {
 }
 
 type Emotion struct {
-	anger int
-	happy int
-	sad   int
-	shock int
+	Anger     int `json:"anger" bson:"anger"`
+	Happiness int `json:"happiness" bson:"happiness"`
+	Sadness   int `json:"sadness" bson:"sadness"`
+	Shock     int `json:"shock" bson:"shock"`
 }

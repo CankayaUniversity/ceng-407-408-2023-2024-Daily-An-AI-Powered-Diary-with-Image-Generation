@@ -17,5 +17,7 @@ func New() *gin.Engine {
 	api := router.Group("/api")
 	api.POST("/users", handler.CreateUser)
 	api.GET("/users", handler.GetUsers)
+	api.POST("/dailies", handler.CreateDaily)
+	api.GET("/dailies", handler.GetDailies)
 	return router
 }

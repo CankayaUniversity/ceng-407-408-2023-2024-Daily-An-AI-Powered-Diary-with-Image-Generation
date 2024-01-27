@@ -8,4 +8,5 @@ type User struct {
 	Password         string               `json:"password" bson:"password" binding:"required"`
 	FavouriteDailies []primitive.ObjectID `json:"favouriteDailies" bson:"favouriteDailies"`
 	CreatedAt        primitive.DateTime   `json:"createdAt" bson:"createdAt"`
+	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies"`
 }
