@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/Final-Projectors/daily-server/handler"
+	"github.com/Final-Projectors/daily-server/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,8 +16,9 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.New()
 	api := router.Group("/api")
-	api.POST("/users", handler.CreateUser)
-	api.GET("/users", handler.GetUsers)
+	api.POST("/register", handler.Register)
+	api.POST("/login", handler.Login)
+	api.Use(middleware.JwtAuthMiddleware())
 	api.POST("/dailies", handler.CreateDaily)
 	api.GET("/dailies", handler.GetDailies)
 	return router
