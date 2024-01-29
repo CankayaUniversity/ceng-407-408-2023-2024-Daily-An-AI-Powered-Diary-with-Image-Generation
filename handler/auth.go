@@ -16,11 +16,12 @@ import (
 
 func Register(c *gin.Context) {
 	var user model.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var userRequest model.UserLoginRegisterRequest
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	err := database.Users.FindOne(c, bson.M{"email": user.Email}).Err()
+	err := database.Users.FindOne(c, bson.M{"email": userRequest.Email}).Err()
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			return
@@ -30,8 +31,9 @@ func Register(c *gin.Context) {
 		return
 	}
 	user.ID = primitive.NewObjectID()
+	user.Email = userRequest.Email
 	user.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return
 	}
@@ -45,17 +47,18 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var user, result model.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var userRequest model.UserLoginRegisterRequest
+	var result model.User
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	err := database.Users.FindOne(c, bson.M{"email": user.Email}).Decode(&result)
+	err := database.Users.FindOne(c, bson.M{"email": userRequest.Email}).Decode(&result)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(userRequest.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message1": err.Error()})
 		return

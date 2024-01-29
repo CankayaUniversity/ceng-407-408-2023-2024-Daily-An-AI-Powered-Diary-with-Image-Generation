@@ -10,3 +10,8 @@ type User struct {
 	CreatedAt        primitive.DateTime   `json:"createdAt" bson:"createdAt"`
 	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies"`
 }
+
+type UserLoginRegisterRequest struct {
+	Email    string `json:"email" bson:"email" binding:"required"`
+	Password string `json:"password" bson:"password" binding:"required"`
+}
