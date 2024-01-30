@@ -42,3 +42,5 @@ func GetDailies(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, dailies)
 }
+
+//buraya eklenecek
