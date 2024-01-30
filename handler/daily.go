@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -13,13 +14,28 @@ import (
 
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
-	err := c.ShouldBindJSON(&daily)
+	var dailyDTO model.CreateDailyDTO
+	err := c.ShouldBindJSON(&dailyDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	daily.ID = primitive.NewObjectID()
+	daily.Text = dailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+
+	// getting the user_id from context and running checks
+	author, _ := c.Get("user_id")
+
+	if auth, ok := author.(primitive.ObjectID); ok {
+		daily.Author = auth
+	} else {
+		fmt.Println("author is not a primitive.ObjectID")
+		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		return
+	}
+
+	daily.IsShared = *dailyDTO.IsShared
 	_, err = database.Dailies.InsertOne(c, daily)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
