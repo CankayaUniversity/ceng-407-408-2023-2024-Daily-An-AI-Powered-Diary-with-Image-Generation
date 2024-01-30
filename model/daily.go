@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Daily struct {
 	ID         primitive.ObjectID   `json:"id" bson:"_id"`
-	Text       string               `json:"text" bson:"text"`
+	Text       string               `json:"text" bson:"text" binding:"required"`
 	Author     primitive.ObjectID   `json:"author" bson:"author"`
 	Keywords   []string             `json:"keywords" bson:"keywords"`
 	Emotions   Emotion              `json:"emotions" bson:"emotions"`
