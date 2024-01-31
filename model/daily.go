@@ -11,7 +11,7 @@ type Daily struct {
 	Image      string               `json:"image" bson:"image"`
 	Favourites int                  `json:"favourites" bson:"favourites"`
 	CreatedAt  primitive.DateTime   `json:"createdAt" bson:"createdAt"`
-	Viewers    []primitive.ObjectID `json:"viewers" bson:"viewers"`
+	Viewers    []primitive.ObjectID `json:"viewers" bson:"viewers,omitempty"`
 	IsShared   bool                 `json:"isShared" bson:"isShared"`
 }
 
@@ -20,4 +20,8 @@ type Emotion struct {
 	Happiness int `json:"happiness" bson:"happiness"`
 	Sadness   int `json:"sadness" bson:"sadness"`
 	Shock     int `json:"shock" bson:"shock"`
+}
+
+type DailyRequestDTO struct {
+	ID primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
 }

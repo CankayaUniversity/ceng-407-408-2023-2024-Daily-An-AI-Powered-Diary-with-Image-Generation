@@ -19,7 +19,9 @@ func New() *gin.Engine {
 	api.POST("/register", handler.Register)
 	api.POST("/login", handler.Login)
 	api.Use(middleware.JwtAuthMiddleware())
-	api.POST("/dailies", handler.CreateDaily)
-	api.GET("/dailies", handler.GetDailies)
+	api.POST("/createDaily", handler.CreateDaily)
+	api.GET("/getDailies", handler.GetDailies)
+	api.PUT("/favDaily", handler.FavDaily)
+	api.PUT("/viewDaily", handler.ViewDaily)
 	return router
 }
