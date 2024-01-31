@@ -9,6 +9,7 @@ type User struct {
 	FavouriteDailies []primitive.ObjectID `json:"favouriteDailies" bson:"favouriteDailies"`
 	CreatedAt        primitive.DateTime   `json:"createdAt" bson:"createdAt"`
 	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies"`
+	Role             string               `json:"role" bson:"role"`
 }
 
 type UserLoginRegisterRequest struct {

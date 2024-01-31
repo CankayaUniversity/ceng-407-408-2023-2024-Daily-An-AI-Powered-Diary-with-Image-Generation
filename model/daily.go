@@ -26,3 +26,6 @@ type CreateDailyDTO struct {
 	Text     string `json:"text" bson:"text" binding:"required"`
 	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
 }
+
+type DeleteDailyDTO struct {
+}

@@ -14,14 +14,14 @@ import (
 
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
-	var dailyDTO model.CreateDailyDTO
-	err := c.ShouldBindJSON(&dailyDTO)
+	var createDailyDTO model.CreateDailyDTO
+	err := c.ShouldBindJSON(&createDailyDTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	daily.ID = primitive.NewObjectID()
-	daily.Text = dailyDTO.Text
+	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 
 	// getting the user_id from context and running checks
@@ -35,7 +35,7 @@ func CreateDaily(c *gin.Context) {
 		return
 	}
 
-	daily.IsShared = *dailyDTO.IsShared
+	daily.IsShared = *createDailyDTO.IsShared
 	_, err = database.Dailies.InsertOne(c, daily)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
@@ -57,4 +57,22 @@ func GetDailies(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, dailies)
+}
+
+func DeleteDaily(c *gin.Context) {
+	var deleteDailyDTO model.DeleteDailyDTO
+	err := c.ShouldBindJSON(&deleteDailyDTO)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": deleteDailyDTO.ID})
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	if res.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "no document was deleted"})
+	}
+	c.JSON(http.StatusOK, res)
 }
