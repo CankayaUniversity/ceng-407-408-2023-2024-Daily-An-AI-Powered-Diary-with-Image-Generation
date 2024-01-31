@@ -23,5 +23,6 @@ func New() *gin.Engine {
 	api.GET("/getDailies", handler.GetDailies)
 	api.PUT("/favDaily", handler.FavDaily)
 	api.PUT("/viewDaily", handler.ViewDaily)
+	api.POST("/reportDaily", handler.ReportDaily)
 	return router
 }

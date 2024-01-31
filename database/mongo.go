@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	client         *mongo.Client
-	Users, Dailies *mongo.Collection
+	client                          *mongo.Client
+	Users, Dailies, ReportedDailies *mongo.Collection
 )
 
 func Init() {
@@ -28,6 +28,7 @@ func Init() {
 	client = localClient
 	Users = client.Database("daily-ai").Collection("users")
 	Dailies = client.Database("daily-ai").Collection("dailies")
+	ReportedDailies = client.Database("daily-ai").Collection("reportedDailies")
 }
 
 func Close() error {
