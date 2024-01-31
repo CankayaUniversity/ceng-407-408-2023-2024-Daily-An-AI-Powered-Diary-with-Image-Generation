@@ -66,7 +66,7 @@ func DeleteDaily(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": deleteDailyDTO.ID})
+	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": *deleteDailyDTO.ID})
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return

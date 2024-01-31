@@ -25,7 +25,7 @@ func New() *gin.Engine {
 	api.GET("/dailies", handler.GetDailies)
 
 	// admin rights here
-	api.Use(middleware.JwtAuthMiddleware())
+	api.Use(middleware.JwtAuthMiddlewareAdmin())
 	api.DELETE("/dailies", handler.DeleteDaily)
 
 	return router

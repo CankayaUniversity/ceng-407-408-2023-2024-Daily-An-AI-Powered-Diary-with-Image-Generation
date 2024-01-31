@@ -28,4 +28,5 @@ type CreateDailyDTO struct {
 }
 
 type DeleteDailyDTO struct {
+	ID *primitive.ObjectID `json:"id" bson:"_id"`
 }

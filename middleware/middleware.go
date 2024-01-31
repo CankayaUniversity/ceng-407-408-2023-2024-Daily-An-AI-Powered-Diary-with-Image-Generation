@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
@@ -44,14 +43,12 @@ func JwtAuthMiddlewareAdmin() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
 			c.Abort()
-			log.Fatal(err)
 			return
 		}
 		objectId, err := primitive.ObjectIDFromHex(userId)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
 			c.Abort()
-			log.Fatal(err)
 			return
 		}
 		c.Set("user_id", objectId)
@@ -60,13 +57,11 @@ func JwtAuthMiddlewareAdmin() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 			c.Abort()
-			log.Fatal(err)
 			return
 		}
 		if strings.TrimSpace(strings.ToLower(result.Role)) != "admin" {
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized, user is not an admin"})
 			c.Abort()
-			log.Fatal(err)
 			return
 		}
 	}
