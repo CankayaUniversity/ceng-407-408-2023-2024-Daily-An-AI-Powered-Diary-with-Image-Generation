@@ -4,7 +4,7 @@ import Header from '../components/Header';
 
 const Home = ({navigation}) => {
    return (
-      <Header>
+      <Header previous="Home" homepage={true}>
       <View style={{height:"25%",paddingStart:10,paddingEnd:10,paddingTop:10 ,borderTopStartRadius:16,borderTopEndRadius:16}}>
       <TouchableOpacity style={{ position:'relative',width:'100%',borderWidth:0.5,borderColor:'gray', height:'100%',opacity:0.85,justifyContent:'flex-start',float:'center',borderRadius:10,backgroundColor:'#0D1326'}} onPress={()=>navigation.navigate("Statistics")}>
           <Text style={styles.text}>statistics</Text>

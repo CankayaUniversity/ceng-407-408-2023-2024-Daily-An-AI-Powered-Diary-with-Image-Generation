@@ -9,7 +9,7 @@ import WriteADaily from './screens/WriteADaily';
 
 const Stack = createNativeStackNavigator();
 
-const App= () => {
+const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home' screenOptions={{headerShown:false}}>
