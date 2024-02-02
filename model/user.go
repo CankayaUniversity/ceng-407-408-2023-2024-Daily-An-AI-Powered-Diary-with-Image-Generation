@@ -15,10 +15,17 @@ type User struct {
 type UserRegisterRequest struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
-	Role     string `json:"role" bson:"role" binding:"required"`
 }
 
 type UserLoginRequest struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
+}
+
+type UserDeleteRequest struct {
+	Email string `json:"email" bson:"email" binding:"required"`
+}
+
+type UserMakeAdminRequest struct {
+	Email string `json:"email" bson:"email" binding:"required"`
 }

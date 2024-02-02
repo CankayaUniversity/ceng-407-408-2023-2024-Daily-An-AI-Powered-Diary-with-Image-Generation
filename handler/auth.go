@@ -32,7 +32,7 @@ func Register(c *gin.Context) {
 	}
 	user.ID = primitive.NewObjectID()
 	user.Email = userRequest.Email
-	user.Role = userRequest.Role
+	user.Role = "user"
 	user.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 	if err != nil {

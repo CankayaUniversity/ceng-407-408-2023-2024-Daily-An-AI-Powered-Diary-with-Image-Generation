@@ -16,6 +16,7 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.New()
 	api := router.Group("/api")
+	admin := router.Group("/admin")
 	api.POST("/register", handler.Register)
 	api.POST("/login", handler.Login)
 
@@ -23,10 +24,17 @@ func New() *gin.Engine {
 	api.Use(middleware.JwtAuthMiddleware())
 	api.POST("/dailies", handler.CreateDaily)
 	api.GET("/dailies", handler.GetDailies)
+	api.DELETE("/users", handler.DeleteUser)
+	api.DELETE("/dailies", handler.DeleteDaily)
+
+	// moderator rights here
+	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
+	admin.DELETE("/users", handler.DeleteUserAdmin)
 
 	// admin rights here
-	api.Use(middleware.JwtAuthMiddlewareAdmin())
-	api.DELETE("/dailies", handler.DeleteDaily)
+	admin.Use(middleware.JwtAuthMiddlewareRole("admin"))
+	admin.POST("/users", handler.GrantModRights)
+	admin.PUT("/users", handler.TakeModRights)
 
 	return router
 }

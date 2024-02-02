@@ -60,12 +60,45 @@ func GetDailies(c *gin.Context) {
 }
 
 func DeleteDaily(c *gin.Context) {
-	var deleteDailyDTO model.DeleteDailyDTO
-	err := c.ShouldBindJSON(&deleteDailyDTO)
+	var dailies []model.Daily
+	user, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "user was not found"})
+		return
+	}
+	// get all dailies of the user
+	cursor, err := database.Dailies.Find(c, bson.M{"author": user})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	err = cursor.All(c, &dailies) // all dailies of the user are now in the "dailies" slice
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	// get the daily id
+	var deleteDailyDTO model.DeleteDailyDTO
+	err = c.ShouldBindJSON(&deleteDailyDTO)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	// check if user has a daily with given id
+	var seen bool
+	for _, daily := range dailies {
+		if daily.ID == *deleteDailyDTO.ID {
+			seen = true
+		}
+	}
+	if !seen {
+		c.JSON(http.StatusNotFound, gin.H{"message": "user does not have a daily with this id"})
+		return
+	}
+
+	// if seen, delete the daily
 	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": *deleteDailyDTO.ID})
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
