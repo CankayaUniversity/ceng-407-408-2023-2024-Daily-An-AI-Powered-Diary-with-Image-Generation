@@ -23,10 +23,9 @@ func CreateDaily(c *gin.Context) {
 	daily.ID = primitive.NewObjectID()
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-
+	daily.Author = c.Keys["user_id"].(primitive.ObjectID)
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
-
 	if auth, ok := author.(primitive.ObjectID); ok {
 		daily.Author = auth
 	} else {
@@ -34,7 +33,6 @@ func CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-
 	daily.IsShared = *createDailyDTO.IsShared
 	_, err = database.Dailies.InsertOne(c, daily)
 	if err != nil {
@@ -59,6 +57,89 @@ func GetDailies(c *gin.Context) {
 	c.JSON(http.StatusOK, dailies)
 }
 
+
+func FavDaily(c *gin.Context) {
+	var daily model.DailyRequestDTO
+	if err := c.ShouldBindJSON(&daily); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
+		return
+	}
+
+	getDaily := bson.M{"_id": daily.ID}
+	dailyOperation := bson.M{"$inc": bson.M{"favourites": 1}}
+	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+		return
+	}
+
+	getUser := bson.M{"_id": c.Keys["user_id"]}
+	userOperation := bson.M{"$push": bson.M{"favouriteDailies": daily.ID}}
+	if _, err := database.Users.UpdateOne(c, getUser, userOperation); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user", "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Favourites updated successfully"})
+}
+
+func ViewDaily(c *gin.Context) {
+	var daily model.DailyRequestDTO
+	if err := c.ShouldBindJSON(&daily); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
+		return
+	}
+
+	getDaily := bson.M{"_id": daily.ID}
+	dailyOperation := bson.M{"$push": bson.M{"viewers": c.Keys["user_id"]}}
+	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+		return
+	}
+
+	getUser := bson.M{"_id": c.Keys["user_id"]}
+	userOperation := bson.M{"$push": bson.M{"viewedDailies": daily.ID}}
+	if _, err := database.Users.UpdateOne(c, getUser, userOperation); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user", "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Views updated successfully"})
+}
+
+func ReportDaily(c *gin.Context) {
+	var reportedDaily model.ReportedDaily
+	if err := c.ShouldBindJSON(&reportedDaily); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	var dbReportedDaily model.ReportedDaily
+	result := database.ReportedDailies.FindOne(c, bson.M{"dailyId": reportedDaily.DailyID})
+	if result.Err() != nil {
+		reportedDaily.ID = primitive.NewObjectID()
+		reportedDaily.DailyID = reportedDaily.DailyID
+		reportedDaily.ReportedAt = primitive.NewDateTimeFromTime(time.Now())
+		reportedDaily.Reports = 1
+		reportedDaily.Title = reportedDaily.Title
+		reportedDaily.Content = reportedDaily.Content
+
+		var err error
+		_, err = database.ReportedDailies.InsertOne(c, reportedDaily)
+		if err != nil {
+			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "create success"})
+		return
+	}
+	if err := result.Decode(&dbReportedDaily); err == nil {
+		reportOperation := bson.M{"$inc": bson.M{"reports": 1}}
+		if _, err := database.ReportedDailies.UpdateOne(c, dbReportedDaily, reportOperation); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update reported daily", "error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "increment success"})
+		return
+	}
+}  
 func DeleteDaily(c *gin.Context) {
 	var dailies []model.Daily
 	user, exists := c.Get("user_id")
@@ -108,4 +189,5 @@ func DeleteDaily(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "no document was deleted"})
 	}
 	c.JSON(http.StatusOK, res)
+
 }
