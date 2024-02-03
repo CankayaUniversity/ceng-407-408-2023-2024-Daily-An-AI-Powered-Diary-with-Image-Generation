@@ -6,7 +6,7 @@ type Daily struct {
 	ID         primitive.ObjectID   `json:"id" bson:"_id"`
 	Text       string               `json:"text" bson:"text" binding:"required"`
 	Author     primitive.ObjectID   `json:"author" bson:"author"`
-	Keywords   []string             `json:"keywords" bson:"keywords"`
+	Keywords   []string             `json:"keywords" bson:"keywords,omitempty"`
 	Emotions   Emotion              `json:"emotions" bson:"emotions"`
 	Image      string               `json:"image" bson:"image"`
 	Favourites int                  `json:"favourites" bson:"favourites"`
@@ -21,7 +21,6 @@ type Emotion struct {
 	Sadness   int `json:"sadness" bson:"sadness"`
 	Shock     int `json:"shock" bson:"shock"`
 }
-
 
 type DailyRequestDTO struct {
 	ID primitive.ObjectID `json:"id" bson:"_id" binding:"required"`

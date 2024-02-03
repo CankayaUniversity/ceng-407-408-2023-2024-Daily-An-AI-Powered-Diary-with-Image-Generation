@@ -23,7 +23,6 @@ func CreateDaily(c *gin.Context) {
 	daily.ID = primitive.NewObjectID()
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	daily.Author = c.Keys["user_id"].(primitive.ObjectID)
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
 	if auth, ok := author.(primitive.ObjectID); ok {
@@ -56,7 +55,6 @@ func GetDailies(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, dailies)
 }
-
 
 func FavDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
@@ -115,12 +113,8 @@ func ReportDaily(c *gin.Context) {
 	result := database.ReportedDailies.FindOne(c, bson.M{"dailyId": reportedDaily.DailyID})
 	if result.Err() != nil {
 		reportedDaily.ID = primitive.NewObjectID()
-		reportedDaily.DailyID = reportedDaily.DailyID
 		reportedDaily.ReportedAt = primitive.NewDateTimeFromTime(time.Now())
 		reportedDaily.Reports = 1
-		reportedDaily.Title = reportedDaily.Title
-		reportedDaily.Content = reportedDaily.Content
-
 		var err error
 		_, err = database.ReportedDailies.InsertOne(c, reportedDaily)
 		if err != nil {
@@ -139,7 +133,7 @@ func ReportDaily(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "increment success"})
 		return
 	}
-}  
+}
 func DeleteDaily(c *gin.Context) {
 	var dailies []model.Daily
 	user, exists := c.Get("user_id")
