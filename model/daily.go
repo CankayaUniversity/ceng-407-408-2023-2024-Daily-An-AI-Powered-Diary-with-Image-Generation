@@ -22,6 +22,16 @@ type Emotion struct {
 	Shock     int `json:"shock" bson:"shock"`
 }
 
+
 type DailyRequestDTO struct {
 	ID primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
+}
+
+type CreateDailyDTO struct {
+	Text     string `json:"text" bson:"text" binding:"required"`
+	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
+}
+
+type DeleteDailyDTO struct {
+	ID *primitive.ObjectID `json:"id" bson:"_id"`
 }

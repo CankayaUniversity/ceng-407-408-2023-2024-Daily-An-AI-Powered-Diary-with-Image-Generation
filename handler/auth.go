@@ -16,7 +16,7 @@ import (
 
 func Register(c *gin.Context) {
 	var user model.User
-	var userRequest model.UserLoginRegisterRequest
+	var userRequest model.UserRegisterRequest
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -32,6 +32,7 @@ func Register(c *gin.Context) {
 	}
 	user.ID = primitive.NewObjectID()
 	user.Email = userRequest.Email
+	user.Role = "user"
 	user.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -47,7 +48,7 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var userRequest model.UserLoginRegisterRequest
+	var userRequest model.UserLoginRequest
 	var result model.User
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
