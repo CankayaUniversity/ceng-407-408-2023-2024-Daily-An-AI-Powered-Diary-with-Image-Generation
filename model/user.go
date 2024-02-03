@@ -9,9 +9,23 @@ type User struct {
 	FavouriteDailies []primitive.ObjectID `json:"favouriteDailies" bson:"favouriteDailies"`
 	CreatedAt        primitive.DateTime   `json:"createdAt" bson:"createdAt"`
 	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies"`
+	Role             string               `json:"role" bson:"role"`
 }
 
-type UserLoginRegisterRequest struct {
+type UserRegisterRequest struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
+}
+
+type UserLoginRequest struct {
+	Email    string `json:"email" bson:"email" binding:"required"`
+	Password string `json:"password" bson:"password" binding:"required"`
+}
+
+type UserDeleteRequest struct {
+	Email string `json:"email" bson:"email" binding:"required"`
+}
+
+type UserMakeAdminRequest struct {
+	Email string `json:"email" bson:"email" binding:"required"`
 }

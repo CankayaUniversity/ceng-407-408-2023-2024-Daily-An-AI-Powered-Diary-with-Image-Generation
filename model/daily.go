@@ -21,3 +21,12 @@ type Emotion struct {
 	Sadness   int `json:"sadness" bson:"sadness"`
 	Shock     int `json:"shock" bson:"shock"`
 }
+
+type CreateDailyDTO struct {
+	Text     string `json:"text" bson:"text" binding:"required"`
+	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
+}
+
+type DeleteDailyDTO struct {
+	ID *primitive.ObjectID `json:"id" bson:"_id"`
+}
