@@ -29,12 +29,12 @@ func New() *gin.Engine {
 	api.POST("/reportDaily", handler.ReportDaily)
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
-	admin.DELETE("/users", handler.DeleteUserAdmin)
+	admin.DELETE("/deleteUser", handler.DeleteUserAdmin)
 
 	// admin rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("admin"))
-	admin.POST("/users", handler.GrantModRights)
-	admin.PUT("/users", handler.TakeModRights)
+	admin.POST("/grantMod", handler.GrantModRights)
+	admin.PUT("/takeMod", handler.TakeModRights)
 
 	return router
 }

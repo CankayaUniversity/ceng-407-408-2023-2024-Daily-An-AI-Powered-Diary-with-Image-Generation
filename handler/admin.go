@@ -88,5 +88,5 @@ func TakeModRights(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "user not found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "user role granted"})
+	c.JSON(http.StatusOK, gin.H{"message": "user role took"})
 }
