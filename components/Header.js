@@ -4,31 +4,33 @@ import {View, StyleSheet,TouchableOpacity,Text,ImageBackground} from 'react-nati
 const Header = ({navigation, children, previous, homepage}) => {
    return (
       <View style={styles.container}>
-         <View style={styles.defaultpage}>
-            <View style={styles.background}>
+         <View style={styles.background}>
+            <View style={styles.defaultpage}>
                <View style={{flexDirection:'row',borderWidth:2,justifyContent:'space-between'}}>
                   {
                      homepage &&
                      <TouchableOpacity>
-                        <Text style={{marginStart:10,fontSize:60,fontWeight:'400',color:'white'}}>≡</Text>
+                        <Text style={{fontSize:60,fontWeight:'400',color:'white'}}>≡</Text>
                      </TouchableOpacity>
                   }
                   {
                      !homepage &&
                      <TouchableOpacity onPress={()=>navigation.navigate(previous)}>
-                        <Text style={{marginStart:10,fontSize:60,fontWeight:'400',color:'white'}}>←</Text>
+                        <Text style={{fontSize:60,fontWeight:'400',color:'white'}}>←</Text>
                      </TouchableOpacity>
                   }
 
                   <TouchableOpacity onPress={()=>Alert.alert("selam")}>
-                     <Text style={{marginStart:10,fontSize:60,fontWeight:'400',color:'white'}}>d</Text>
+                     <Text style={{fontSize:60,fontWeight:'400',color:'white'}}>d</Text>
                   </TouchableOpacity>
                </View>
-               <ImageBackground source={require('../assets/background-main.png')} resizeMode="cover" imageStyle={{borderTopLeftRadius:16,borderTopRightRadius:16}} style={{marginTop:60,height: '100%',width: '100%',position: 'absolute',paddingBottom:20}}>
-               {children}
-               </ImageBackground>
+               <View style={{height:'100%', justifyContent: 'center'}}>
+                  <ImageBackground source={require('../assets/background-main.png')} resizeMode="cover" imageStyle={{borderTopLeftRadius:16,borderTopRightRadius:16}} style={{height: '100%', width: '100%',position: 'absolute'}}>
+                  {children}
+                  </ImageBackground>
+               </View>
             </View>
-      </View>
+         </View>
       </View>
    );
 }
@@ -36,18 +38,20 @@ const Header = ({navigation, children, previous, homepage}) => {
 const styles = StyleSheet.create({
    container: {
      flex: 1,
-     alignItems: 'center',
+     width: '100%',
+     height: '100%',
    },
    defaultpage: {
      maxWidth: 500,
      height: '100%',
      width: '100%',
-     alignItems: 'center',
-     padding: 20,
      // Additional homepage styles...
    },
    background: {
-     position: 'absolute',
+     alignContent: 'center',
+     alignItems: 'center',
+     width: '100%',
+     position: 'fixed',
      top: 0,
      left: 0,
      right: 0,
