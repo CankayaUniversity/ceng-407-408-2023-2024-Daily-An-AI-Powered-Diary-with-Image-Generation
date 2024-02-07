@@ -223,8 +223,7 @@ func EditDailyImage(c *gin.Context) {
 		return
 	}
 	getDaily := bson.M{"_id": daily.ID}
-	var newImage = utils.ImageToBase64(daily.Image)
-	dailyOperation := bson.M{"$set": bson.M{"image": newImage}}
+	dailyOperation := bson.M{"$set": bson.M{"image": daily.Image}}
 	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
 		return

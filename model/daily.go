@@ -38,5 +38,5 @@ type DeleteDailyDTO struct {
 
 type EditDailyImageDTO struct {
 	ID    primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
-	Image []byte             `json:"image" bson:"image"`
+	Image string             `json:"image" bson:"image"`
 }
