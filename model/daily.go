@@ -28,7 +28,7 @@ type DailyRequestDTO struct {
 
 type CreateDailyDTO struct {
 	Text     string `json:"text" bson:"text" binding:"required"`
-	Image    []byte `json:"image" bson:"image"`
+	Image    string `json:"image" bson:"image"`
 	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
 }
 

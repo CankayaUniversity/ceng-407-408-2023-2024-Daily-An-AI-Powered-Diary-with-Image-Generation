@@ -25,7 +25,7 @@ func CreateDaily(c *gin.Context) {
 	daily.ID = primitive.NewObjectID()
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	if createDailyDTO.Image == nil {
+	if createDailyDTO.Image == "" {
 		response, err := http.Get("https://d2opxh93rbxzdn.cloudfront.net/original/2X/4/40cfa8ca1f24ac29cfebcb1460b5cafb213b6105.png")
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
@@ -35,7 +35,8 @@ func CreateDaily(c *gin.Context) {
 		image, err := io.ReadAll(response.Body)
 		daily.Image = utils.ImageToBase64(image)
 	} else {
-		daily.Image = utils.ImageToBase64(createDailyDTO.Image)
+		//assuming that createDailyDTO.Image is a propper base64 data
+		daily.Image = createDailyDTO.Image
 	}
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
