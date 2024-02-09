@@ -2,11 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
+	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,6 +25,19 @@ func CreateDaily(c *gin.Context) {
 	daily.ID = primitive.NewObjectID()
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	if createDailyDTO.Image == "" {
+		response, err := http.Get("https://d2opxh93rbxzdn.cloudfront.net/original/2X/4/40cfa8ca1f24ac29cfebcb1460b5cafb213b6105.png")
+		if err != nil {
+			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+			return
+		}
+		defer response.Body.Close()
+		image, err := io.ReadAll(response.Body)
+		daily.Image = utils.ImageToBase64(image)
+	} else {
+		//assuming that createDailyDTO.Image is a propper base64 data
+		daily.Image = createDailyDTO.Image
+	}
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
 	if auth, ok := author.(primitive.ObjectID); ok {
@@ -39,6 +54,21 @@ func CreateDaily(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
+}
+
+func GetDaily(c *gin.Context) {
+	var daily model.DailyRequestDTO
+	var getDaily model.Daily
+	if err := c.ShouldBindJSON(&daily); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
+		return
+	}
+	err := database.Dailies.FindOne(c, bson.M{"_id": daily.ID}).Decode(&getDaily)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, getDaily)
 }
 
 func GetDailies(c *gin.Context) {
@@ -134,6 +164,7 @@ func ReportDaily(c *gin.Context) {
 		return
 	}
 }
+
 func DeleteDaily(c *gin.Context) {
 	var dailies []model.Daily
 	user, exists := c.Get("user_id")
@@ -183,5 +214,18 @@ func DeleteDaily(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "no document was deleted"})
 	}
 	c.JSON(http.StatusOK, res)
+}
 
+func EditDailyImage(c *gin.Context) {
+	var daily model.EditDailyImageDTO
+	if err := c.ShouldBindJSON(&daily); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
+		return
+	}
+	getDaily := bson.M{"_id": daily.ID}
+	dailyOperation := bson.M{"$set": bson.M{"image": daily.Image}}
+	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+		return
+	}
 }

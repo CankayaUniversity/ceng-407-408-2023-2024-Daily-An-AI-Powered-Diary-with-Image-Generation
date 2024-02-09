@@ -28,9 +28,15 @@ type DailyRequestDTO struct {
 
 type CreateDailyDTO struct {
 	Text     string `json:"text" bson:"text" binding:"required"`
+	Image    string `json:"image" bson:"image"`
 	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
 }
 
 type DeleteDailyDTO struct {
 	ID *primitive.ObjectID `json:"id" bson:"_id"`
+}
+
+type EditDailyImageDTO struct {
+	ID    primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
+	Image string             `json:"image" bson:"image"`
 }
