@@ -56,6 +56,17 @@ func CreateDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
+// GetDaily return a specific daily via daily.ID
+// @Summary return a daily
+// @Description return a specific daily via daily.ID
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
+// @Success 200 {object} model.Daily
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "mongo: no documents in result"}"
+// @Router /api/getDaily [get]
 func GetDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	var getDaily model.Daily

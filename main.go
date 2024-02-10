@@ -8,13 +8,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//http://localhost:9090/docs/index.html
-
 // @title Daily API
 // @version 1.0
 // @host localhost:9090
 // @BasePath /api
-
 func init() {
 	err := godotenv.Load()
 	if err != nil {

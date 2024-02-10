@@ -7,5 +7,126 @@
     },
     "host": "localhost:9090",
     "basePath": "/api",
-    "paths": {}
+    "paths": {
+        "/api/getDaily": {
+            "get": {
+                "description": "return a specific daily via daily.ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "return a daily",
+                "parameters": [
+                    {
+                        "description": "DailyRequestDTO",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DailyRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Daily"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"mongo: no documents in result\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Daily": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "integer"
+                },
+                "emotions": {
+                    "$ref": "#/definitions/model.Emotion"
+                },
+                "favourites": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "isShared": {
+                    "type": "boolean"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
+                "viewers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.DailyRequestDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Emotion": {
+            "type": "object",
+            "properties": {
+                "anger": {
+                    "type": "integer"
+                },
+                "happiness": {
+                    "type": "integer"
+                },
+                "sadness": {
+                    "type": "integer"
+                },
+                "shock": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }

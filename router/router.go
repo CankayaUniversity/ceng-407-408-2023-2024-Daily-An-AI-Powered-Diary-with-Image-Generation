@@ -18,8 +18,11 @@ func Init() {
 
 func New() *gin.Engine {
 	router := gin.New()
-	docs.SwaggerInfo.BasePath = "/api"
+
+	//http://localhost:9090/docs/index.html
+	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	api := router.Group("/api")
 	admin := router.Group("/admin")
 	api.POST("/register", handler.Register)

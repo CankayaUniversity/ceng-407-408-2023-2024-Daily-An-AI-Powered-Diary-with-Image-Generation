@@ -1,8 +1,86 @@
 basePath: /api
+definitions:
+  model.Daily:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: integer
+      emotions:
+        $ref: '#/definitions/model.Emotion'
+      favourites:
+        type: integer
+      id:
+        type: string
+      image:
+        type: string
+      isShared:
+        type: boolean
+      keywords:
+        items:
+          type: string
+        type: array
+      text:
+        type: string
+      viewers:
+        items:
+          type: string
+        type: array
+    required:
+    - text
+    type: object
+  model.DailyRequestDTO:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  model.Emotion:
+    properties:
+      anger:
+        type: integer
+      happiness:
+        type: integer
+      sadness:
+        type: integer
+      shock:
+        type: integer
+    type: object
 host: localhost:9090
 info:
   contact: {}
   title: Daily API
   version: "1.0"
-paths: {}
+paths:
+  /api/getDaily:
+    get:
+      consumes:
+      - application/json
+      description: return a specific daily via daily.ID
+      parameters:
+      - description: DailyRequestDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.DailyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "mongo: no documents in result"}'
+          schema:
+            type: object
+      summary: return a daily
+      tags:
+      - Daily
 swagger: "2.0"
