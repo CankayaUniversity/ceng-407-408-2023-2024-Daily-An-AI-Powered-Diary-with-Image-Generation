@@ -13,13 +13,13 @@ import (
 
 func Init() {
 	router := New()
-	docs.SwaggerInfo.BasePath = "/api"
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(os.Getenv("PORT"))
 }
 
 func New() *gin.Engine {
 	router := gin.New()
+	docs.SwaggerInfo.BasePath = "/api"
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	api := router.Group("/api")
 	admin := router.Group("/admin")
 	api.POST("/register", handler.Register)
