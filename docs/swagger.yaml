@@ -1,0 +1,8 @@
+basePath: /api
+host: localhost:9090
+info:
+  contact: {}
+  title: Daily API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
