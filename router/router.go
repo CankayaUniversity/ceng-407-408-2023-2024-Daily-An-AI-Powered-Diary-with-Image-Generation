@@ -3,13 +3,18 @@ package router
 import (
 	"os"
 
+	docs "github.com/Final-Projectors/daily-server/docs"
 	"github.com/Final-Projectors/daily-server/handler"
 	"github.com/Final-Projectors/daily-server/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Init() {
 	router := New()
+	docs.SwaggerInfo.BasePath = "/api"
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(os.Getenv("PORT"))
 }
 
