@@ -11,7 +11,7 @@ import (
 )
 
 func DeleteUserAdmin(c *gin.Context) {
-	var userRequest model.UserDeleteRequest
+	var userRequest model.UserDeleteDTO
 	var user model.User
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -39,7 +39,7 @@ func DeleteUserAdmin(c *gin.Context) {
 }
 
 func GrantModRights(c *gin.Context) {
-	var userRequest model.UserMakeAdminRequest
+	var userRequest model.UserMakeAdminDTO
 	var user model.User
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -65,7 +65,7 @@ func GrantModRights(c *gin.Context) {
 }
 
 func TakeModRights(c *gin.Context) {
-	var userRequest model.UserMakeAdminRequest
+	var userRequest model.UserMakeAdminDTO
 	var user model.User
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})

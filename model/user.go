@@ -12,20 +12,20 @@ type User struct {
 	Role             string               `json:"role" bson:"role"`
 }
 
-type UserRegisterRequest struct {
+type UserRegisterDTO struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
 }
 
-type UserLoginRequest struct {
+type UserLoginDTO struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
 }
 
-type UserDeleteRequest struct {
+type UserDeleteDTO struct {
 	Email string `json:"email" bson:"email" binding:"required"`
 }
 
-type UserMakeAdminRequest struct {
+type UserMakeAdminDTO struct {
 	Email string `json:"email" bson:"email" binding:"required"`
 }

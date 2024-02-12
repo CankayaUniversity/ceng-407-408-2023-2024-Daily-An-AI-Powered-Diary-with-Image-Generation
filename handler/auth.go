@@ -27,7 +27,7 @@ import (
 // @Router api/register [post]
 func Register(c *gin.Context) {
 	var user model.User
-	var userRequest model.UserRegisterRequest
+	var userRequest model.UserRegisterDTO
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -69,7 +69,7 @@ func Register(c *gin.Context) {
 // @Failure 400 {object} "Bad Request"
 // @Router api/login [post]
 func Login(c *gin.Context) {
-	var userRequest model.UserLoginRequest
+	var userRequest model.UserLoginDTO
 	var result model.User
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
