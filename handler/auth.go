@@ -15,10 +15,8 @@ import (
 )
 
 // Register handles the user registration process.
-//
 // @Summary Register a new user
 // @Description Create a new user with the given email and password, if they don't exist already.
-// User passwords are hashed before saving for security.
 // @Tags Users
 // @Accept json
 // @Produce json
@@ -61,7 +59,6 @@ func Register(c *gin.Context) {
 }
 
 // Login authenticates a user and provides a token.
-//
 // @Summary User login
 // @Description Authenticate a user using the provided email and password, and return a token on successful authentication.
 // @Tags Users
