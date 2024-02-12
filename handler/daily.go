@@ -24,7 +24,7 @@ import (
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
-// @Router /api/CreateDaily [POST]
+// @Router /api/CreateDaily [post]
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
@@ -93,16 +93,25 @@ func GetDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, getDaily)
 }
 
+// GetDailies returns a list of dailies of the user based on user_id
+// @Summary returns a list of dailies
+// @Description returns a list of dailies
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Daily
+// @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
+// @Router /api/GetDailies [get]
 func GetDailies(c *gin.Context) {
 	var dailies []model.Daily
 	cursor, err := database.Dailies.Find(c, bson.M{"author": c.Keys["user_id"]})
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	err = cursor.All(c, &dailies)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, dailies)

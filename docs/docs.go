@@ -61,6 +61,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/GetDailies": {
+            "get": {
+                "description": "returns a list of dailies",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns a list of dailies",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Daily"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/api/getDaily": {
             "get": {
                 "description": "return a specific daily via daily.ID",

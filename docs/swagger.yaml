@@ -95,6 +95,27 @@ paths:
       summary: returns the created daily
       tags:
       - Daily
+  /api/GetDailies:
+    get:
+      consumes:
+      - application/json
+      description: returns a list of dailies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Daily'
+            type: array
+        "500":
+          description: 'Bad Gateway {"message'': "Couldn''t fetch the image"}'
+          schema:
+            type: object
+      summary: returns a list of dailies
+      tags:
+      - Daily
   /api/getDaily:
     get:
       consumes:
