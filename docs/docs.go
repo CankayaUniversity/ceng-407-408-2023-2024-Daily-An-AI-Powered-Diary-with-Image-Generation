@@ -66,6 +66,108 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/daily/fav": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "fav a daily",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "update daily \u0026 user to apply fav feature",
+                "parameters": [
+                    {
+                        "description": "DailyRequestDTO",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DailyRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily / user\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/image": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "edit a daily's image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "update daily image",
+                "parameters": [
+                    {
+                        "description": "EditDailyImageDTO",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.EditDailyImageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/api/daily/list": {
             "get": {
                 "security": [
@@ -103,14 +205,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/daily/{id}": {
-            "get": {
+        "/api/daily/report": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "return a specific daily via daily.ID",
+                "description": "report a daily",
                 "consumes": [
                     "application/json"
                 ],
@@ -120,7 +222,109 @@ const docTemplate = `{
                 "tags": [
                     "Daily"
                 ],
-                "summary": "return a daily",
+                "summary": "update daily to apply report feature",
+                "parameters": [
+                    {
+                        "description": "ReportedDaily",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ReportedDaily"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/view": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "view a daily",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "update daily \u0026 user to apply view feature",
+                "parameters": [
+                    {
+                        "description": "DailyRequestDTO",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DailyRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily / user\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "returns a specific daily via daily.ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns a daily",
                 "parameters": [
                     {
                         "type": "string",
@@ -305,6 +509,31 @@ const docTemplate = `{
                 }
             }
         },
+        "model.DailyRequestDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.EditDailyImageDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Emotion": {
             "type": "object",
             "properties": {
@@ -319,6 +548,33 @@ const docTemplate = `{
                 },
                 "shock": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.ReportedDaily": {
+            "type": "object",
+            "required": [
+                "dailyId",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "dailyId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reportedAt": {
+                    "type": "integer"
+                },
+                "reports": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

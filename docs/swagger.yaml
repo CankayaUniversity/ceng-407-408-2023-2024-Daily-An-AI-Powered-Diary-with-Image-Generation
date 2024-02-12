@@ -41,6 +41,22 @@ definitions:
     required:
     - text
     type: object
+  model.DailyRequestDTO:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  model.EditDailyImageDTO:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+    required:
+    - id
+    type: object
   model.Emotion:
     properties:
       anger:
@@ -51,6 +67,24 @@ definitions:
         type: integer
       shock:
         type: integer
+    type: object
+  model.ReportedDaily:
+    properties:
+      content:
+        type: string
+      dailyId:
+        type: string
+      id:
+        type: string
+      reportedAt:
+        type: integer
+      reports:
+        type: integer
+      title:
+        type: string
+    required:
+    - dailyId
+    - title
     type: object
   model.User:
     properties:
@@ -138,7 +172,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: return a specific daily via daily.ID
+      description: returns a specific daily via daily.ID
       parameters:
       - description: Daily ID
         in: path
@@ -162,7 +196,72 @@ paths:
             type: object
       security:
       - ApiKeyAuth: []
-      summary: return a daily
+      summary: returns a daily
+      tags:
+      - Daily
+  /api/daily/fav:
+    put:
+      consumes:
+      - application/json
+      description: fav a daily
+      parameters:
+      - description: DailyRequestDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.DailyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily
+            / user"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily & user to apply fav feature
+      tags:
+      - Daily
+  /api/daily/image:
+    put:
+      consumes:
+      - application/json
+      description: edit a daily's image
+      parameters:
+      - description: EditDailyImageDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.EditDailyImageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily image
       tags:
       - Daily
   /api/daily/list:
@@ -186,6 +285,71 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: returns a list of dailies
+      tags:
+      - Daily
+  /api/daily/report:
+    post:
+      consumes:
+      - application/json
+      description: report a daily
+      parameters:
+      - description: ReportedDaily
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.ReportedDaily'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily to apply report feature
+      tags:
+      - Daily
+  /api/daily/view:
+    put:
+      consumes:
+      - application/json
+      description: view a daily
+      parameters:
+      - description: DailyRequestDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.DailyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily
+            / user"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily & user to apply view feature
       tags:
       - Daily
   /api/login:

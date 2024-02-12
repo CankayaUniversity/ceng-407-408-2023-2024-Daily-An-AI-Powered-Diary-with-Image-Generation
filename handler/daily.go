@@ -68,9 +68,9 @@ func CreateDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, daily)
 }
 
-// GetDaily return a specific daily via daily.ID
-// @Summary return a daily
-// @Description return a specific daily via daily.ID
+// GetDaily returns a specific daily via daily.ID
+// @Summary returns a daily
+// @Description returns a specific daily via daily.ID
 // @Tags Daily
 // @Accept json
 // @Produce json
@@ -121,6 +121,18 @@ func GetDailies(c *gin.Context) {
 	c.JSON(http.StatusOK, dailies)
 }
 
+// FavDaily accepts a body request to update a daily & user
+// @Summary update daily & user to apply fav feature
+// @Description fav a daily
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
+// @Router /api/daily/fav [put]
+// @Security ApiKeyAuth
 func FavDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
@@ -144,6 +156,18 @@ func FavDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Favourites updated successfully"})
 }
 
+// ViewDaily accepts a body request to update a daily & user
+// @Summary update daily & user to apply view feature
+// @Description view a daily
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
+// @Router /api/daily/view [put]
+// @Security ApiKeyAuth
 func ViewDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
@@ -167,10 +191,22 @@ func ViewDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Views updated successfully"})
 }
 
+// ReportDaily accepts a body request to update a daily
+// @Summary update daily to apply report feature
+// @Description report a daily
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.ReportedDaily true "ReportedDaily"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Router /api/daily/report [post]
+// @Security ApiKeyAuth
 func ReportDaily(c *gin.Context) {
 	var reportedDaily model.ReportedDaily
 	if err := c.ShouldBindJSON(&reportedDaily); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
 
@@ -251,6 +287,18 @@ func DeleteDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// FavDaily accepts a body request to update a daily's image
+// @Summary update daily image
+// @Description edit a daily's image
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.EditDailyImageDTO true "EditDailyImageDTO"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Router /api/daily/image [put]
+// @Security ApiKeyAuth
 func EditDailyImage(c *gin.Context) {
 	var daily model.EditDailyImageDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
