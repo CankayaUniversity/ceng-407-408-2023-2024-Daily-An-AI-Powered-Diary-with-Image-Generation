@@ -15,6 +15,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/CreateDaily": {
+            "post": {
+                "description": "creates a new daily resource",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns the created daily",
+                "parameters": [
+                    {
+                        "description": "CreateDailyDTO",
+                        "name": "daily",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateDailyDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Daily"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/api/getDaily": {
             "get": {
                 "description": "return a specific daily via daily.ID",
@@ -63,6 +109,24 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.CreateDailyDTO": {
+            "type": "object",
+            "required": [
+                "isShared",
+                "text"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "isShared": {
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Daily": {
             "type": "object",
             "required": [

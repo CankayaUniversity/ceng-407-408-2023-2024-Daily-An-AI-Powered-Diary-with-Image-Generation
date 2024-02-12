@@ -1,5 +1,17 @@
 basePath: /api
 definitions:
+  model.CreateDailyDTO:
+    properties:
+      image:
+        type: string
+      isShared:
+        type: boolean
+      text:
+        type: string
+    required:
+    - isShared
+    - text
+    type: object
   model.Daily:
     properties:
       author:
@@ -53,6 +65,36 @@ info:
   title: Daily API
   version: "1.0"
 paths:
+  /api/CreateDaily:
+    post:
+      consumes:
+      - application/json
+      description: creates a new daily resource
+      parameters:
+      - description: CreateDailyDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateDailyDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "Couldn''t fetch the image"}'
+          schema:
+            type: object
+      summary: returns the created daily
+      tags:
+      - Daily
   /api/getDaily:
     get:
       consumes:

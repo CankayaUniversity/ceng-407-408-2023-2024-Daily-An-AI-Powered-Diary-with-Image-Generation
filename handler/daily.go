@@ -14,6 +14,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// CreateDaily accepts a body request to POST a daily
+// @Summary returns the created daily
+// @Description creates a new daily resource
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param daily body model.CreateDailyDTO true "CreateDailyDTO"
+// @Success 200 {object} model.Daily
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
+// @Router /api/CreateDaily [POST]
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
@@ -28,11 +39,11 @@ func CreateDaily(c *gin.Context) {
 	if createDailyDTO.Image == "" {
 		response, err := http.Get("https://d2opxh93rbxzdn.cloudfront.net/original/2X/4/40cfa8ca1f24ac29cfebcb1460b5cafb213b6105.png")
 		if err != nil {
-			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 		defer response.Body.Close()
-		image, err := io.ReadAll(response.Body)
+		image, _ := io.ReadAll(response.Body)
 		daily.Image = utils.ImageToBase64(image)
 	} else {
 		//assuming that createDailyDTO.Image is a propper base64 data
@@ -53,7 +64,7 @@ func CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	c.JSON(http.StatusOK, daily)
 }
 
 // GetDaily return a specific daily via daily.ID
