@@ -20,11 +20,11 @@ import (
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body model.UserRegisterRequest true "User Registration"
+// @Param user body model.UserRegisterDTO true "User Registration"
 // @Success 200 {object} model.User
-// @Failure 400 {object} "Bad Request {"message": "User exists OR bad request"}"
-// @Failure 502 {object} "Bad Gateway {"message": "Database Error"}"
-// @Router api/register [post]
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
+// @Router /api/register [post]
 func Register(c *gin.Context) {
 	var user model.User
 	var userRequest model.UserRegisterDTO
@@ -64,10 +64,10 @@ func Register(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body model.UserLoginRequest true "User login details"
+// @Param user body model.UserLoginDTO true "User login details"
 // @Success 200 {object} map[string]string "Token"
-// @Failure 400 {object} "Bad Request"
-// @Router api/login [post]
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Router /api/login [post]
 func Login(c *gin.Context) {
 	var userRequest model.UserLoginDTO
 	var result model.User

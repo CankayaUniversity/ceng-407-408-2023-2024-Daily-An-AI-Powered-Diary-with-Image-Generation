@@ -22,8 +22,8 @@ import (
 // @Produce json
 // @Param daily body model.CreateDailyDTO true "CreateDailyDTO"
 // @Success 200 {object} model.Daily
-// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message": "Couldn't fetch the image"}"
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
 // @Router /api/CreateDaily [post]
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
@@ -75,8 +75,8 @@ func CreateDaily(c *gin.Context) {
 // @Produce json
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
 // @Success 200 {object} model.Daily
-// @Failure 400 {object} "Bad Request {"message": "Invalid JSON data"}"
-// @Failure 502 {object} "Bad Gateway {"message": "mongo: no documents in result"}"
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "mongo: no documents in result"}"
 // @Router /api/getDaily [get]
 func GetDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
@@ -100,7 +100,7 @@ func GetDaily(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {array} model.Daily
-// @Failure 500 {object} object "Bad Gateway {"message" "Couldn't fetch the image"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
 // @Router /api/GetDailies [get]
 func GetDailies(c *gin.Context) {
 	var dailies []model.Daily

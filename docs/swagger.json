@@ -40,7 +40,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -125,6 +125,95 @@
                     },
                     "502": {
                         "description": "Bad Gateway {\"message': \"mongo: no documents in result\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "description": "Authenticate a user using the provided email and password, and return a token on successful authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "User login details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserLoginDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "description": "Create a new user with the given email and password, if they don't exist already.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User Registration",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserRegisterDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -221,6 +310,72 @@
                 },
                 "shock": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "createdAt": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "favouriteDailies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "viewedDailies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.UserLoginDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserRegisterDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         }
