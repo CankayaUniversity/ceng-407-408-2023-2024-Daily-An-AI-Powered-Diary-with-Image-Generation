@@ -14,6 +14,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Register handles the user registration process.
+//
+// @Summary Register a new user
+// @Description Create a new user with the given email and password, if they don't exist already.
+// User passwords are hashed before saving for security.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body model.UserRegisterRequest true "User Registration"
+// @Success 200 {object} model.User
+// @Failure 400 {object} "Bad Request {"message": "User exists OR bad request"}"
+// @Failure 502 {object} "Bad Gateway {"message": "Database Error"}"
+// @Router api/register [post]
 func Register(c *gin.Context) {
 	var user model.User
 	var userRequest model.UserRegisterRequest
@@ -44,9 +57,20 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	c.JSON(http.StatusOK, user)
 }
 
+// Login authenticates a user and provides a token.
+//
+// @Summary User login
+// @Description Authenticate a user using the provided email and password, and return a token on successful authentication.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body model.UserLoginRequest true "User login details"
+// @Success 200 {object} map[string]string "Token"
+// @Failure 400 {object} "Bad Request"
+// @Router api/login [post]
 func Login(c *gin.Context) {
 	var userRequest model.UserLoginRequest
 	var result model.User
