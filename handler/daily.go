@@ -24,7 +24,8 @@ import (
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
-// @Router /api/CreateDaily [post]
+// @Router /api/daily [post]
+// @Security ApiKeyAuth
 func CreateDaily(c *gin.Context) {
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
@@ -73,21 +74,23 @@ func CreateDaily(c *gin.Context) {
 // @Tags Daily
 // @Accept json
 // @Produce json
-// @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
+// @Param id path string true "Daily ID"
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "mongo: no documents in result"}"
-// @Router /api/getDaily [get]
+// @Router /api/daily/{id} [get]
+// @Security ApiKeyAuth
 func GetDaily(c *gin.Context) {
-	var daily model.DailyRequestDTO
 	var getDaily model.Daily
-	if err := c.ShouldBindJSON(&daily); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
+	id := c.Param("id")                            // Extract the id from the URL.
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
 		return
 	}
-	err := database.Dailies.FindOne(c, bson.M{"_id": daily.ID}).Decode(&getDaily)
+	err = database.Dailies.FindOne(c, bson.M{"_id": objectID}).Decode(&getDaily)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error() + objectID.String()})
 		return
 	}
 	c.JSON(http.StatusOK, getDaily)
@@ -101,7 +104,8 @@ func GetDaily(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} model.Daily
 // @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
-// @Router /api/GetDailies [get]
+// @Router /api/daily/list [get]
+// @Security ApiKeyAuth
 func GetDailies(c *gin.Context) {
 	var dailies []model.Daily
 	cursor, err := database.Dailies.Find(c, bson.M{"author": c.Keys["user_id"]})

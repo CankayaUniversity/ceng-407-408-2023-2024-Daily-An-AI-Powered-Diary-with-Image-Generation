@@ -8,8 +8,13 @@
     "host": "localhost:9090",
     "basePath": "/api",
     "paths": {
-        "/api/CreateDaily": {
+        "/api/daily": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "creates a new daily resource",
                 "consumes": [
                     "application/json"
@@ -54,8 +59,13 @@
                 }
             }
         },
-        "/api/GetDailies": {
+        "/api/daily/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "returns a list of dailies",
                 "consumes": [
                     "application/json"
@@ -86,8 +96,13 @@
                 }
             }
         },
-        "/api/getDaily": {
+        "/api/daily/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "return a specific daily via daily.ID",
                 "consumes": [
                     "application/json"
@@ -101,13 +116,11 @@
                 "summary": "return a daily",
                 "parameters": [
                     {
-                        "description": "DailyRequestDTO",
-                        "name": "daily",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DailyRequestDTO"
-                        }
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -285,17 +298,6 @@
                 }
             }
         },
-        "model.DailyRequestDTO": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Emotion": {
             "type": "object",
             "properties": {
@@ -378,6 +380,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

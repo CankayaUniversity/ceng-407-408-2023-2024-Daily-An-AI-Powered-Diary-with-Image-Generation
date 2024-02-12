@@ -30,13 +30,13 @@ func New() *gin.Engine {
 
 	// user and admin rights here
 	api.Use(middleware.JwtAuthMiddleware())
-	api.POST("/createDaily", handler.CreateDaily)
-	api.GET("/getDaily", handler.GetDaily)
-	api.GET("/getDailies", handler.GetDailies)
-	api.PUT("/favDaily", handler.FavDaily)
-	api.PUT("/viewDaily", handler.ViewDaily)
-	api.POST("/reportDaily", handler.ReportDaily)
-	api.PUT("/editDailyImage", handler.EditDailyImage)
+	api.POST("/daily", handler.CreateDaily)
+	api.GET("/daily/:id", handler.GetDaily)
+	api.GET("/daily/list", handler.GetDailies)
+	api.PUT("/daily/fav", handler.FavDaily)
+	api.PUT("/daily/view", handler.ViewDaily)
+	api.POST("/daily/report", handler.ReportDaily)
+	api.PUT("/daily/image", handler.EditDailyImage)
 
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))

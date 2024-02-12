@@ -41,13 +41,6 @@ definitions:
     required:
     - text
     type: object
-  model.DailyRequestDTO:
-    properties:
-      id:
-        type: string
-    required:
-    - id
-    type: object
   model.Emotion:
     properties:
       anger:
@@ -109,7 +102,7 @@ info:
   title: Daily API
   version: "1.0"
 paths:
-  /api/CreateDaily:
+  /api/daily:
     post:
       consumes:
       - application/json
@@ -136,10 +129,43 @@ paths:
           description: 'Bad Gateway {"message'': "Couldn''t fetch the image"}'
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: returns the created daily
       tags:
       - Daily
-  /api/GetDailies:
+  /api/daily/{id}:
+    get:
+      consumes:
+      - application/json
+      description: return a specific daily via daily.ID
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "mongo: no documents in result"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: return a daily
+      tags:
+      - Daily
+  /api/daily/list:
     get:
       consumes:
       - application/json
@@ -157,37 +183,9 @@ paths:
           description: 'Bad Gateway {"message'': "Couldn''t fetch the image"}'
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: returns a list of dailies
-      tags:
-      - Daily
-  /api/getDaily:
-    get:
-      consumes:
-      - application/json
-      description: return a specific daily via daily.ID
-      parameters:
-      - description: DailyRequestDTO
-        in: body
-        name: daily
-        required: true
-        schema:
-          $ref: '#/definitions/model.DailyRequestDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Daily'
-        "400":
-          description: 'Bad Request {"message": "Invalid JSON data"}'
-          schema:
-            type: object
-        "502":
-          description: 'Bad Gateway {"message'': "mongo: no documents in result"}'
-          schema:
-            type: object
-      summary: return a daily
       tags:
       - Daily
   /api/login:
@@ -250,4 +248,9 @@ paths:
       summary: Register a new user
       tags:
       - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

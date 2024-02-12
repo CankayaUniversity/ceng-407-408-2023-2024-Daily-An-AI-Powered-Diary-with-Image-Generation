@@ -15,8 +15,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/CreateDaily": {
+        "/api/daily": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "creates a new daily resource",
                 "consumes": [
                     "application/json"
@@ -61,8 +66,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/GetDailies": {
+        "/api/daily/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "returns a list of dailies",
                 "consumes": [
                     "application/json"
@@ -93,8 +103,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/getDaily": {
+        "/api/daily/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "return a specific daily via daily.ID",
                 "consumes": [
                     "application/json"
@@ -108,13 +123,11 @@ const docTemplate = `{
                 "summary": "return a daily",
                 "parameters": [
                     {
-                        "description": "DailyRequestDTO",
-                        "name": "daily",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DailyRequestDTO"
-                        }
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -292,17 +305,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.DailyRequestDTO": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Emotion": {
             "type": "object",
             "properties": {
@@ -385,6 +387,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

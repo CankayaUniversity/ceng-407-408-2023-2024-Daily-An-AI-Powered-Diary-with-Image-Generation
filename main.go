@@ -19,6 +19,9 @@ func init() {
 	}
 }
 
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	database.Init()
 	router.Init()
