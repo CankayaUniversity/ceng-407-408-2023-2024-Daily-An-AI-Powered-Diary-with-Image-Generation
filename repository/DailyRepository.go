@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -29,8 +28,7 @@ import (
 */
 
 type DailyRepository struct {
-	dailies         *mongo.Collection
-	reportedDailies *mongo.Collection
+	dailies *mongo.Collection
 }
 
 func NewDailyRepository(_dailies *mongo.Collection) *DailyRepository {
@@ -44,10 +42,7 @@ func (r *DailyRepository) Create(daily *model.Daily) error {
 	defer cancel()
 
 	_, err := r.dailies.InsertOne(ctx, daily)
-	if err != nil {
-		return errors.New("create_error")
-	}
-	return nil
+	return err
 }
 
 func (r *DailyRepository) FindById(id primitive.ObjectID) (model.Daily, error) {
@@ -56,10 +51,7 @@ func (r *DailyRepository) FindById(id primitive.ObjectID) (model.Daily, error) {
 	defer cancel()
 
 	err := r.dailies.FindOne(ctx, bson.M{"_id": id}).Decode(&daily)
-	if err != nil {
-		return daily, err
-	}
-	return daily, nil
+	return daily, err
 }
 
 func (r *DailyRepository) List(author_id primitive.ObjectID) ([]model.Daily, error) {
@@ -96,5 +88,13 @@ func (r *DailyRepository) UpdateImage(id primitive.ObjectID, newImage string) er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"image": newImage}})
+	return err
+}
+
+func (r *DailyRepository) IncrementVievers(id primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$inc": bson.M{"favorites": 1}})
 	return err
 }
