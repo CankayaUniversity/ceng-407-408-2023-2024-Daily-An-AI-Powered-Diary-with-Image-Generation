@@ -169,6 +169,36 @@ paths:
       tags:
       - Daily
   /api/daily/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: report a daily
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: delete the given daily
+      tags:
+      - Daily
     get:
       consumes:
       - application/json

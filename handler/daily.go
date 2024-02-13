@@ -236,44 +236,29 @@ func ReportDaily(c *gin.Context) {
 	}
 }
 
+// DeleteDaily accepts a body request to update a daily
+// @Summary delete the given daily
+// @Description report a daily
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param id path string true "Daily ID"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Router /api/daily/{id} [delete]
+// @Security ApiKeyAuth
 func DeleteDaily(c *gin.Context) {
-	var dailies []model.Daily
 	user, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "user was not found"})
 		return
 	}
-	// get all dailies of the user
-	cursor, err := database.Dailies.Find(c, bson.M{"author": user})
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-	err = cursor.All(c, &dailies) // all dailies of the user are now in the "dailies" slice
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
 
-	// get the daily id
-	var deleteDailyDTO model.DeleteDailyDTO
-	err = c.ShouldBindJSON(&deleteDailyDTO)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
+	id := c.Param("id")                            // Extract the id from the URL.
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 
 	// check if user has a daily with given id
-	var seen bool
-	for _, daily := range dailies {
-		if daily.ID == *deleteDailyDTO.ID {
-			seen = true
-		}
-	}
-	if !seen {
-		c.JSON(http.StatusNotFound, gin.H{"message": "user does not have a daily with this id"})
-		return
-	}
 
 	// if seen, delete the daily
 	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": *deleteDailyDTO.ID})
@@ -287,7 +272,7 @@ func DeleteDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// FavDaily accepts a body request to update a daily's image
+// EditDailyImage accepts a body request to update a daily's image
 // @Summary update daily image
 // @Description edit a daily's image
 // @Tags Daily

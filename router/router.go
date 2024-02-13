@@ -37,6 +37,7 @@ func New() *gin.Engine {
 	api.PUT("/daily/view", handler.ViewDaily)
 	api.POST("/daily/report", handler.ReportDaily)
 	api.PUT("/daily/image", handler.EditDailyImage)
+	api.DELETE("/daily/:id", handler.DeleteDaily)
 
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))

@@ -347,6 +347,53 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "report a daily",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "delete the given daily",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
             }
         },
         "/api/login": {
