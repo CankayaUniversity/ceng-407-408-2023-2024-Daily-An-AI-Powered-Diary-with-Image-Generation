@@ -91,10 +91,27 @@ func (r *DailyRepository) UpdateImage(id primitive.ObjectID, newImage string) er
 	return err
 }
 
-func (r *DailyRepository) IncrementVievers(id primitive.ObjectID) error {
+func (r *DailyRepository) AddViewer(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$inc": bson.M{"favorites": 1}})
+	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, bson.M{"$inc": bson.M{"favourites": 1}})
+	if err != nil {
+		return err
+	}
+
+	update := bson.D{{Key: "$addToSet", Value: bson.D{{Key: "viewers", Value: viewerID}}}}
+	_, err = r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, update)
+
+	return err
+}
+
+func (r *DailyRepository) UpdateKeywords(dailyID primitive.ObjectID, keywords []string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "keywords", Value: keywords}}}}
+	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, update)
+
 	return err
 }
