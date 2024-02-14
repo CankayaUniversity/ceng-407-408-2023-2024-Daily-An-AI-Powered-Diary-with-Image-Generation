@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,9 +16,9 @@ type ReportedDailyRepository struct {
 	reportedDailies *mongo.Collection
 }
 
-func NewReportedDailyRepository(_reportedDailies *mongo.Collection) *ReportedDailyRepository {
+func NewReportedDailyRepository() *ReportedDailyRepository {
 	return &ReportedDailyRepository{
-		reportedDailies: _reportedDailies,
+		reportedDailies: database.ReportedDailies,
 	}
 }
 

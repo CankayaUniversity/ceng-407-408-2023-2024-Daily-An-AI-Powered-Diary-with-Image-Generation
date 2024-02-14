@@ -8,11 +8,24 @@ import (
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
+	"github.com/Final-Projectors/daily-server/repository"
 	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type DailyController struct {
+	DailyRepository  repository.DailyRepository
+	ReportRepository repository.ReportedDailyRepository
+}
+
+func NewDailyController(_repository repository.DailyRepository, _reports repository.ReportedDailyRepository) *DailyController {
+	return &DailyController{
+		DailyRepository:  _repository,
+		ReportRepository: _reports,
+	}
+}
 
 // CreateDaily accepts a body request to POST a daily
 // @Summary returns the created daily
@@ -26,7 +39,7 @@ import (
 // @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
 // @Router /api/daily [post]
 // @Security ApiKeyAuth
-func CreateDaily(c *gin.Context) {
+func (d *DailyController) CreateDaily(c *gin.Context) {
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
 	err := c.ShouldBindJSON(&createDailyDTO)
@@ -80,7 +93,7 @@ func CreateDaily(c *gin.Context) {
 // @Failure 502 {object} object "Bad Gateway {"message': "mongo: no documents in result"}"
 // @Router /api/daily/{id} [get]
 // @Security ApiKeyAuth
-func GetDaily(c *gin.Context) {
+func (d *DailyController) GetDaily(c *gin.Context) {
 	var getDaily model.Daily
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
@@ -106,7 +119,7 @@ func GetDaily(c *gin.Context) {
 // @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
 // @Router /api/daily/list [get]
 // @Security ApiKeyAuth
-func GetDailies(c *gin.Context) {
+func (d *DailyController) GetDailies(c *gin.Context) {
 	var dailies []model.Daily
 	cursor, err := database.Dailies.Find(c, bson.M{"author": c.Keys["user_id"]})
 	if err != nil {
@@ -133,7 +146,7 @@ func GetDailies(c *gin.Context) {
 // @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
-func FavDaily(c *gin.Context) {
+func (d *DailyController) FavDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
@@ -168,7 +181,7 @@ func FavDaily(c *gin.Context) {
 // @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
-func ViewDaily(c *gin.Context) {
+func (d *DailyController) ViewDaily(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
@@ -203,7 +216,7 @@ func ViewDaily(c *gin.Context) {
 // @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
 // @Router /api/daily/report [post]
 // @Security ApiKeyAuth
-func ReportDaily(c *gin.Context) {
+func (d *DailyController) ReportDaily(c *gin.Context) {
 	var reportedDaily model.ReportedDaily
 	if err := c.ShouldBindJSON(&reportedDaily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
@@ -248,28 +261,34 @@ func ReportDaily(c *gin.Context) {
 // @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
 // @Router /api/daily/{id} [delete]
 // @Security ApiKeyAuth
-func DeleteDaily(c *gin.Context) {
+func (d *DailyController) DeleteDaily(c *gin.Context) {
 	user, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "user was not found"})
 		return
 	}
+	var daily2delete model.Daily
+	id := c.Param("id")                          // Extract the id from the URL.
+	objectID, _ := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 
-	id := c.Param("id")                            // Extract the id from the URL.
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
-
-	// check if user has a daily with given id
-
-	// if seen, delete the daily
-	res, err := database.Dailies.DeleteOne(c, bson.M{"_id": *deleteDailyDTO.ID})
+	daily2delete, err := d.DailyRepository.FindById(objectID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "daily could not be fetched"})
 		return
 	}
-	if res.DeletedCount == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "no document was deleted"})
+	// check if user has a daily with given id
+	if daily2delete.Author != user {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "unatuhorized to delete"})
+		return
 	}
-	c.JSON(http.StatusOK, res)
+
+	err = d.DailyRepository.Delete(daily2delete.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
 // EditDailyImage accepts a body request to update a daily's image
@@ -281,10 +300,10 @@ func DeleteDaily(c *gin.Context) {
 // @Param daily body model.EditDailyImageDTO true "EditDailyImageDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
 // @Router /api/daily/image [put]
 // @Security ApiKeyAuth
-func EditDailyImage(c *gin.Context) {
+func (d *DailyController) EditDailyImage(c *gin.Context) {
 	var daily model.EditDailyImageDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})

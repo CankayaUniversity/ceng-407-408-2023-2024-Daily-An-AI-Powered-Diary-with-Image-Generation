@@ -31,9 +31,9 @@ type DailyRepository struct {
 	dailies *mongo.Collection
 }
 
-func NewDailyRepository(_dailies *mongo.Collection) *DailyRepository {
+func NewDailyRepository() *DailyRepository {
 	return &DailyRepository{
-		dailies: _dailies,
+		dailies: database.Dailies,
 	}
 }
 

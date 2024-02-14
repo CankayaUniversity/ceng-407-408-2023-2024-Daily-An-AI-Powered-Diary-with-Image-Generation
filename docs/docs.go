@@ -159,7 +159,7 @@ const docTemplate = `{
                             "type": "object"
                         }
                     },
-                    "502": {
+                    "500": {
                         "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
                         "schema": {
                             "type": "object"
