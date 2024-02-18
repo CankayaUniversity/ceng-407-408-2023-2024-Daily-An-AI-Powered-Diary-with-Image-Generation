@@ -36,7 +36,7 @@ func New() *gin.Engine {
 	api.POST("/daily", dailyHandler.CreateDaily)
 	api.GET("/daily/:id", dailyHandler.GetDaily)
 	api.GET("/daily/list", dailyHandler.GetDailies)
-	api.PUT("/daily/fav", dailyHandler.FavDaily)
+	api.PUT("/daily/fav", dailyHandler.Favourite)
 	api.PUT("/daily/view", dailyHandler.ViewDaily)
 	api.POST("/daily/report", dailyHandler.ReportDaily)
 	api.PUT("/daily/image", dailyHandler.EditDailyImage)

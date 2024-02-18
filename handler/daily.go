@@ -146,30 +146,29 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
+// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
-func (d *DailyController) FavDaily(c *gin.Context) {
+func (d *DailyController) Favourite(c *gin.Context) {
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
-
-	getDaily := bson.M{"_id": daily.ID}
-	dailyOperation := bson.M{"$inc": bson.M{"favourites": 1}}
-	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+	userId, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Wrong user id"})
 		return
 	}
 
-	getUser := bson.M{"_id": c.Keys["user_id"]}
-	userOperation := bson.M{"$push": bson.M{"favouriteDailies": daily.ID}}
-	if _, err := database.Users.UpdateOne(c, getUser, userOperation); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user", "error": err.Error()})
+	err = d.DailyRepository.FavouriteDaily(daily.ID, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Favourites updated successfully"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Favourite success"})
 }
 
 // ViewDaily accepts a body request to update a daily & user
