@@ -20,7 +20,7 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.New()
 
-	dailyHandler := handler.NewDailyController(*repository.NewDailyRepository(), *repository.NewReportedDailyRepository())
+	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
 
 	//http://localhost:9090/docs/index.html
 	docs.SwaggerInfo.BasePath = ""

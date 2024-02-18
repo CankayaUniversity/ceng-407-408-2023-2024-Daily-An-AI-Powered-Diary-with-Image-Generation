@@ -29,11 +29,13 @@ import (
 
 type DailyRepository struct {
 	dailies *mongo.Collection
+	users   *UserRepository
 }
 
-func NewDailyRepository() *DailyRepository {
+func NewDailyRepository(_userRepository *UserRepository) *DailyRepository {
 	return &DailyRepository{
 		dailies: database.Dailies,
+		users:   _userRepository,
 	}
 }
 
@@ -91,18 +93,57 @@ func (r *DailyRepository) UpdateImage(id primitive.ObjectID, newImage string) er
 	return err
 }
 
-func (r *DailyRepository) AddViewer(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID primitive.ObjectID) error {
+	// Wrap the operations together in a transaction
+	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
+		updateViewers := bson.M{"$inc": bson.M{"favourites": 1}}
+		if _, err := r.dailies.UpdateOne(sessCtx, bson.M{"_id": dailyID}, updateViewers); err != nil {
+			return nil, err
+		}
 
-	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, bson.M{"$inc": bson.M{"favourites": 1}})
+		if err := r.users.AddToFav(userID, dailyID); err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+	}
+
+	// Start a session
+	session, err := r.dailies.Database().Client().StartSession()
 	if err != nil {
 		return err
 	}
+	defer session.EndSession(context.Background())
 
-	update := bson.D{{Key: "$addToSet", Value: bson.D{{Key: "viewers", Value: viewerID}}}}
-	_, err = r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, update)
+	// Use WithTransaction to start a transaction, execute the callback, and commit (or abort on error)
+	_, err = session.WithTransaction(context.Background(), callback)
+	return err
+}
 
+func (r *DailyRepository) AddViewer(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
+	// Wrap the operations together in a transaction
+	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
+		updateViewers := bson.M{"$addToSet": bson.M{"viewers": viewerID}}
+		if _, err := r.dailies.UpdateOne(sessCtx, bson.M{"_id": dailyID}, updateViewers); err != nil {
+			return nil, err
+		}
+
+		if err := r.users.AddToViewed(viewerID, dailyID); err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+	}
+
+	// Start a session
+	session, err := r.dailies.Database().Client().StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(context.Background())
+
+	// Use WithTransaction to start a transaction, execute the callback, and commit (or abort on error)
+	_, err = session.WithTransaction(context.Background(), callback)
 	return err
 }
 

@@ -16,18 +16,20 @@ import (
 )
 
 type DailyController struct {
-	DailyRepository  repository.DailyRepository
-	ReportRepository repository.ReportedDailyRepository
+	DailyRepository  *repository.DailyRepository
+	ReportRepository *repository.ReportedDailyRepository
+	UserRepository   *repository.UserRepository
 }
 
-func NewDailyController(_repository repository.DailyRepository, _reports repository.ReportedDailyRepository) *DailyController {
+func NewDailyController(_userRepository *repository.UserRepository, _repository *repository.DailyRepository, _reports *repository.ReportedDailyRepository) *DailyController {
 	return &DailyController{
+		UserRepository:   _userRepository,
 		DailyRepository:  _repository,
 		ReportRepository: _reports,
 	}
 }
 
-// CreateDaily accepts a body request to POST a daily
+// Create accepts a body request to POST a daily
 // @Summary returns the created daily
 // @Description creates a new daily resource
 // @Tags Daily
@@ -36,7 +38,8 @@ func NewDailyController(_repository repository.DailyRepository, _reports reposit
 // @Param daily body model.CreateDailyDTO true "CreateDailyDTO"
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
+// @Failure 500 {object} object "Internal Server Error {"message': "Couldn't fetch the image"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image / DB error"}"
 // @Router /api/daily [post]
 // @Security ApiKeyAuth
 func (d *DailyController) CreateDaily(c *gin.Context) {
@@ -44,7 +47,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	var createDailyDTO model.CreateDailyDTO
 	err := c.ShouldBindJSON(&createDailyDTO)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
 	daily.ID = primitive.NewObjectID()
@@ -53,7 +56,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	if createDailyDTO.Image == "" {
 		response, err := http.Get("https://d2opxh93rbxzdn.cloudfront.net/original/2X/4/40cfa8ca1f24ac29cfebcb1460b5cafb213b6105.png")
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Couldn't fetch image"})
 			return
 		}
 		defer response.Body.Close()
@@ -63,17 +66,19 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		//assuming that createDailyDTO.Image is a propper base64 data
 		daily.Image = createDailyDTO.Image
 	}
+
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
 	if auth, ok := author.(primitive.ObjectID); ok {
 		daily.Author = auth
 	} else {
 		fmt.Println("author is not a primitive.ObjectID")
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
 		return
 	}
 	daily.IsShared = *createDailyDTO.IsShared
-	_, err = database.Dailies.InsertOne(c, daily)
+
+	err = d.DailyRepository.Create(&daily)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
@@ -90,23 +95,22 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 // @Param id path string true "Daily ID"
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "mongo: no documents in result"}"
+// @Failure 500 {object} object "Internal Server Error {"message': "mongo: no documents in result"}"
 // @Router /api/daily/{id} [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetDaily(c *gin.Context) {
-	var getDaily model.Daily
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
 		return
 	}
-	err = database.Dailies.FindOne(c, bson.M{"_id": objectID}).Decode(&getDaily)
+	daily, err := d.DailyRepository.FindById(objectID)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error() + objectID.String()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error() + objectID.String()})
 		return
 	}
-	c.JSON(http.StatusOK, getDaily)
+	c.JSON(http.StatusOK, daily)
 }
 
 // GetDailies returns a list of dailies of the user based on user_id
@@ -116,17 +120,16 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {array} model.Daily
-// @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch the image"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch daily list"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "No user"}"
 // @Router /api/daily/list [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetDailies(c *gin.Context) {
-	var dailies []model.Daily
-	cursor, err := database.Dailies.Find(c, bson.M{"author": c.Keys["user_id"]})
+	id, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 	}
-	err = cursor.All(c, &dailies)
+	dailies, err := d.DailyRepository.List(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
