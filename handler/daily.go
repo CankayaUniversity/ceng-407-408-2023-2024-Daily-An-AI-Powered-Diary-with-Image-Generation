@@ -180,7 +180,8 @@ func (d *DailyController) Favourite(c *gin.Context) {
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily / user"}"
+// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
 func (d *DailyController) ViewDaily(c *gin.Context) {
@@ -189,21 +190,19 @@ func (d *DailyController) ViewDaily(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
-
-	getDaily := bson.M{"_id": daily.ID}
-	dailyOperation := bson.M{"$push": bson.M{"viewers": c.Keys["user_id"]}}
-	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+	userId, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Wrong user id"})
 		return
 	}
 
-	getUser := bson.M{"_id": c.Keys["user_id"]}
-	userOperation := bson.M{"$push": bson.M{"viewedDailies": daily.ID}}
-	if _, err := database.Users.UpdateOne(c, getUser, userOperation); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user", "error": err.Error()})
+	err = d.DailyRepository.View(daily.ID, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Views updated successfully"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
 // ReportDaily accepts a body request to update a daily
@@ -289,7 +288,6 @@ func (d *DailyController) DeleteDaily(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
@@ -302,7 +300,7 @@ func (d *DailyController) DeleteDaily(c *gin.Context) {
 // @Param daily body model.EditDailyImageDTO true "EditDailyImageDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 500 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database Error"}"
 // @Router /api/daily/image [put]
 // @Security ApiKeyAuth
 func (d *DailyController) EditDailyImage(c *gin.Context) {
@@ -311,10 +309,10 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
-	getDaily := bson.M{"_id": daily.ID}
-	dailyOperation := bson.M{"$set": bson.M{"image": daily.Image}}
-	if _, err := database.Dailies.UpdateOne(c, getDaily, dailyOperation); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update daily", "error": err.Error()})
+	err := d.DailyRepository.EditDailyImage(daily.ID, daily.Image)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database Error"})
 		return
 	}
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }

@@ -120,7 +120,7 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 	return err
 }
 
-func (r *DailyRepository) AddViewer(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
+func (r *DailyRepository) View(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
 	// Wrap the operations together in a transaction
 	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
 		updateViewers := bson.M{"$addToSet": bson.M{"viewers": viewerID}}
@@ -154,5 +154,15 @@ func (r *DailyRepository) UpdateKeywords(dailyID primitive.ObjectID, keywords []
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "keywords", Value: keywords}}}}
 	_, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, update)
 
+	return err
+}
+
+func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	getDaily := bson.M{"_id": dailyID}
+	dailyOperation := bson.M{"$set": bson.M{"image": image}}
+	_, err := database.Dailies.UpdateOne(ctx, getDaily, dailyOperation)
 	return err
 }
