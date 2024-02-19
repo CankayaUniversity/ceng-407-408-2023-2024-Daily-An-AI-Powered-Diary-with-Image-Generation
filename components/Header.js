@@ -20,7 +20,7 @@ const Header = ({navigation, children, previous, homepage}) => {
                      </TouchableOpacity>
                   }
 
-                  <TouchableOpacity onPress={()=>Alert.alert("selam")}>
+                  <TouchableOpacity onPress={()=>navigation.navigate("Home")}>
                      <Text style={{fontSize:60,fontWeight:'400',color:'white'}}>d</Text>
                   </TouchableOpacity>
                </View>
