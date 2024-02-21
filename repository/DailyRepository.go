@@ -61,7 +61,7 @@ func (r *DailyRepository) List(author_id primitive.ObjectID) ([]model.Daily, err
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := database.Dailies.Find(ctx, bson.M{"author": author_id})
+	cursor, err := r.dailies.Find(ctx, bson.M{"author": author_id})
 	if err != nil {
 		return dailies, err
 	}
@@ -163,6 +163,6 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 
 	getDaily := bson.M{"_id": dailyID}
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
-	_, err := database.Dailies.UpdateOne(ctx, getDaily, dailyOperation)
+	_, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
 	return err
 }

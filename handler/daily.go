@@ -38,6 +38,7 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 // @Param daily body model.CreateDailyDTO true "CreateDailyDTO"
 // @Success 200 {object} model.Daily
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
+// @Failure 401 {object} object "Unauthorized {"message': "Unauthorized"}"
 // @Failure 500 {object} object "Internal Server Error {"message': "Couldn't fetch the image"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "Couldn't fetch the image / DB error"}"
 // @Router /api/daily [post]
@@ -73,7 +74,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		daily.Author = auth
 	} else {
 		fmt.Println("author is not a primitive.ObjectID")
-		c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 	daily.IsShared = *createDailyDTO.IsShared
@@ -146,7 +147,7 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user"}"
+// @Failure 401 {object} object "Bad Gateway {"message': "message": "Unauthorized"}"
 // @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
@@ -158,7 +159,7 @@ func (d *DailyController) Favourite(c *gin.Context) {
 	}
 	userId, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Wrong user id"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
@@ -180,7 +181,7 @@ func (d *DailyController) Favourite(c *gin.Context) {
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
 // @Success 200 {object} object
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user"}"
+// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user id"}"
 // @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
@@ -258,8 +259,9 @@ func (d *DailyController) ReportDaily(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Daily ID"
 // @Success 200 {object} object
-// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data | user was not found"}"
+// @Failure 400 {object} object "Unauthorized {"message': "Unauthorized"}"
+// @Failure 502 {object} object "Internal Server Error"
 // @Router /api/daily/{id} [delete]
 // @Security ApiKeyAuth
 func (d *DailyController) DeleteDaily(c *gin.Context) {
@@ -279,7 +281,7 @@ func (d *DailyController) DeleteDaily(c *gin.Context) {
 	}
 	// check if user has a daily with given id
 	if daily2delete.Author != user {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "unatuhorized to delete"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
