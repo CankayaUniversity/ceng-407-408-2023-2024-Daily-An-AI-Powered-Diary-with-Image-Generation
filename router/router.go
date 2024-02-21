@@ -6,6 +6,8 @@ import (
 	docs "github.com/Final-Projectors/daily-server/docs"
 	"github.com/Final-Projectors/daily-server/handler"
 	"github.com/Final-Projectors/daily-server/middleware"
+	"github.com/Final-Projectors/daily-server/repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,8 +19,12 @@ func Init() {
 }
 
 func New() *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 
+	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
+
+	// Cors middleware
+	router.Use(cors.Default())
 	//http://localhost:9090/docs/index.html
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -30,13 +36,14 @@ func New() *gin.Engine {
 
 	// user and admin rights here
 	api.Use(middleware.JwtAuthMiddleware())
-	api.POST("/daily", handler.CreateDaily)
-	api.GET("/daily/:id", handler.GetDaily)
-	api.GET("/daily/list", handler.GetDailies)
-	api.PUT("/daily/fav", handler.FavDaily)
-	api.PUT("/daily/view", handler.ViewDaily)
-	api.POST("/daily/report", handler.ReportDaily)
-	api.PUT("/daily/image", handler.EditDailyImage)
+	api.POST("/daily", dailyHandler.CreateDaily)
+	api.GET("/daily/:id", dailyHandler.GetDaily)
+	api.GET("/daily/list", dailyHandler.GetDailies)
+	api.PUT("/daily/fav", dailyHandler.Favourite)
+	api.PUT("/daily/view", dailyHandler.ViewDaily)
+	api.POST("/daily/report", dailyHandler.ReportDaily)
+	api.PUT("/daily/image", dailyHandler.EditDailyImage)
+	api.DELETE("/daily/:id", dailyHandler.DeleteDaily)
 
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
