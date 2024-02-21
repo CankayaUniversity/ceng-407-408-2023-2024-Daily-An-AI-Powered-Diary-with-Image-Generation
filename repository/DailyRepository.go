@@ -66,7 +66,7 @@ func (r *DailyRepository) List(author_id primitive.ObjectID) ([]model.Daily, err
 		return dailies, err
 	}
 
-	err = cursor.All(ctx, dailies)
+	err = cursor.All(ctx, &dailies)
 	return dailies, err
 }
 
@@ -94,56 +94,30 @@ func (r *DailyRepository) UpdateImage(id primitive.ObjectID, newImage string) er
 }
 
 func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID primitive.ObjectID) error {
-	// Wrap the operations together in a transaction
-	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
-		updateViewers := bson.M{"$inc": bson.M{"favourites": 1}}
-		if _, err := r.dailies.UpdateOne(sessCtx, bson.M{"_id": dailyID}, updateViewers); err != nil {
-			return nil, err
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-		if err := r.users.AddToFav(userID, dailyID); err != nil {
-			return nil, err
-		}
-
-		return nil, nil
-	}
-
-	// Start a session
-	session, err := r.dailies.Database().Client().StartSession()
-	if err != nil {
+	updateFavourites := bson.M{"$inc": bson.M{"favourites": 1}}
+	if _, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, updateFavourites); err != nil {
 		return err
 	}
-	defer session.EndSession(context.Background())
 
-	// Use WithTransaction to start a transaction, execute the callback, and commit (or abort on error)
-	_, err = session.WithTransaction(context.Background(), callback)
+	err := r.users.AddToFav(userID, dailyID) // Assuming AddToFav is implemented correctly
 	return err
 }
 
 func (r *DailyRepository) View(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
-	// Wrap the operations together in a transaction
-	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
-		updateViewers := bson.M{"$addToSet": bson.M{"viewers": viewerID}}
-		if _, err := r.dailies.UpdateOne(sessCtx, bson.M{"_id": dailyID}, updateViewers); err != nil {
-			return nil, err
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-		if err := r.users.AddToViewed(viewerID, dailyID); err != nil {
-			return nil, err
-		}
-
-		return nil, nil
-	}
-
-	// Start a session
-	session, err := r.dailies.Database().Client().StartSession()
-	if err != nil {
+	// Add the viewer to the daily
+	updateViewers := bson.M{"$addToSet": bson.M{"viewers": viewerID}}
+	if _, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, updateViewers); err != nil {
 		return err
 	}
-	defer session.EndSession(context.Background())
 
-	// Use WithTransaction to start a transaction, execute the callback, and commit (or abort on error)
-	_, err = session.WithTransaction(context.Background(), callback)
+	// Add the daily to the user's viewed list
+	err := r.users.AddToViewed(viewerID, dailyID) // Assuming AddToViewed is implemented correctly
 	return err
 }
 

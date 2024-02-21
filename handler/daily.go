@@ -51,6 +51,11 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
+	daily.Keywords = []string{} // assuming Keywords is a string slice.
+	daily.Emotions = model.Emotion{}
+	daily.Favourites = 0                   // assuming Favourites is an integer.
+	daily.Viewers = []primitive.ObjectID{} // assuming Viewers is an integer.
+
 	daily.ID = primitive.NewObjectID()
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
@@ -126,13 +131,21 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 // @Router /api/daily/list [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetDailies(c *gin.Context) {
-	id, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
-	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+	author, _ := c.Get("user_id")
+	if _, ok := author.(primitive.ObjectID); !ok {
+		fmt.Println("author is not a primitive.ObjectID")
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
 	}
-	dailies, err := d.DailyRepository.List(id)
+
+	dailies, err := d.DailyRepository.List(author.(primitive.ObjectID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		// Assuming err would not be nil if there's an error, you can expose the error message.
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to fetch Dailies: %s", err.Error())})
+		return
+	}
+	if len(dailies) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No Dailies found for User"})
 		return
 	}
 	c.JSON(http.StatusOK, dailies)
@@ -152,18 +165,20 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
 func (d *DailyController) Favourite(c *gin.Context) {
+	user, _ := c.Get("user_id")
+	if _, ok := user.(primitive.ObjectID); !ok {
+		fmt.Println("author is not a primitive.ObjectID")
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
+
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
-	userId, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
 
-	err = d.DailyRepository.FavouriteDaily(daily.ID, userId)
+	err := d.DailyRepository.FavouriteDaily(daily.ID, user.(primitive.ObjectID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -186,18 +201,20 @@ func (d *DailyController) Favourite(c *gin.Context) {
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
 func (d *DailyController) ViewDaily(c *gin.Context) {
+	user, _ := c.Get("user_id")
+	if _, ok := user.(primitive.ObjectID); !ok {
+		fmt.Println("author is not a primitive.ObjectID")
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
+
 	var daily model.DailyRequestDTO
 	if err := c.ShouldBindJSON(&daily); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
-	userId, err := primitive.ObjectIDFromHex(c.Keys["user_id"].(string))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Wrong user id"})
-		return
-	}
 
-	err = d.DailyRepository.View(daily.ID, userId)
+	err := d.DailyRepository.View(daily.ID, user.(primitive.ObjectID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

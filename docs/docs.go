@@ -57,8 +57,20 @@ const docTemplate = `{
                             "type": "object"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized {\"message': \"Unauthorized\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error {\"message': \"Couldn't fetch the image\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
                     "502": {
-                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image\"}",
+                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image / DB error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -108,8 +120,14 @@ const docTemplate = `{
                             "type": "object"
                         }
                     },
-                    "502": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily / user\"}",
+                    "401": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Unauthorized\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Database error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -160,7 +178,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "description": "Bad Gateway {\"message': \"message\": \"Database Error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -197,7 +215,13 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message': \"Couldn't fetch the image\"}",
+                        "description": "Bad Gateway {\"message': \"Couldn't fetch daily list\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"No user\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -298,8 +322,14 @@ const docTemplate = `{
                             "type": "object"
                         }
                     },
-                    "502": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily / user\"}",
+                    "401": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Wrong user id\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Bad Gateway {\"message': \"message\": \"Database error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -347,8 +377,8 @@ const docTemplate = `{
                             "type": "object"
                         }
                     },
-                    "502": {
-                        "description": "Bad Gateway {\"message': \"mongo: no documents in result\"}",
+                    "500": {
+                        "description": "Internal Server Error {\"message': \"mongo: no documents in result\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -389,13 +419,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "description": "Unauthorized {\"message': \"Unauthorized\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "502": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object"
                         }

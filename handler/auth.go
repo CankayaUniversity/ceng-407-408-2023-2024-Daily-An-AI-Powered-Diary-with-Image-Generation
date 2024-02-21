@@ -50,6 +50,8 @@ func Register(c *gin.Context) {
 		return
 	}
 	user.Password = string(hashedPassword)
+	user.FavouriteDailies = []primitive.ObjectID{} // initialize as empty slice
+	user.ViewedDailies = []primitive.ObjectID{}
 	_, err = database.Users.InsertOne(c, user)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})

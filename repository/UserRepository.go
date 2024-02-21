@@ -25,8 +25,18 @@ func (r *UserRepository) AddToFav(userId primitive.ObjectID, dailyId primitive.O
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	var userRecord model.User
+	err := r.users.FindOne(ctx, bson.M{"_id": userId, "favouriteDailies": bson.M{"$exists": false}}).Decode(&userRecord)
+	if err == mongo.ErrNoDocuments {
+		// If viewedDailies doesn't exist, initialize it
+		_, err = r.users.UpdateOne(ctx, bson.M{"_id": userId}, bson.M{"$set": bson.M{"favouriteDailies": []primitive.ObjectID{}}})
+		if err != nil {
+			return err
+		}
+	}
+
 	update := bson.M{"$addToSet": bson.M{"favouriteDailies": dailyId}}
-	_, err := r.users.UpdateOne(ctx, bson.M{"_id": userId}, update)
+	_, err = r.users.UpdateOne(ctx, bson.M{"_id": userId}, update)
 	return err
 }
 
@@ -34,8 +44,18 @@ func (r *UserRepository) AddToViewed(userId primitive.ObjectID, dailyId primitiv
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	var userRecord model.User
+	err := r.users.FindOne(ctx, bson.M{"_id": userId, "viewedDailies": bson.M{"$exists": false}}).Decode(&userRecord)
+	if err == mongo.ErrNoDocuments {
+		// If viewedDailies doesn't exist, initialize it
+		_, err = r.users.UpdateOne(ctx, bson.M{"_id": userId}, bson.M{"$set": bson.M{"viewedDailies": []primitive.ObjectID{}}})
+		if err != nil {
+			return err
+		}
+	}
+
 	update := bson.M{"$addToSet": bson.M{"viewedDailies": dailyId}}
-	_, err := r.users.UpdateOne(ctx, bson.M{"_id": userId}, update)
+	_, err = r.users.UpdateOne(ctx, bson.M{"_id": userId}, update)
 	return err
 }
 

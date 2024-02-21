@@ -7,6 +7,7 @@ import (
 	"github.com/Final-Projectors/daily-server/handler"
 	"github.com/Final-Projectors/daily-server/middleware"
 	"github.com/Final-Projectors/daily-server/repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -18,10 +19,12 @@ func Init() {
 }
 
 func New() *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 
 	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
 
+	// Cors middleware
+	router.Use(cors.Default())
 	//http://localhost:9090/docs/index.html
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
