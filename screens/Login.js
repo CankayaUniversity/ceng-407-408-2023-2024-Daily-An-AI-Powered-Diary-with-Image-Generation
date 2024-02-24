@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import Header from '../components/Header';
 import loginRequest from '../services/loginService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = React.useState('');
@@ -12,13 +13,17 @@ const Login = ({ navigation }) => {
   const handleLogin = async () => {
     // login logic here, now it just navigates to Home
     try {
-        const bearer = await handleLogin(email, password); // Call handleLogin function from the service
+        const bearerToken = await loginRequest(email, password); // Call loginRequest function from the service
+        console.log(bearerToken)
+
+        await AsyncStorage.setItem('bearerToken', bearerToken)
+
         navigation.navigate('Home');
     } catch (error) {
+      navigation.navigate('Login');
       setError(error.message);
-    }
-
-    navigation.navigate('Home');
+      console.log(error.message)
+    } 
   };
 
   return (
@@ -44,9 +49,9 @@ const Login = ({ navigation }) => {
           secureTextEntry={true}
         />
       </View>
-      <TouchableOpacity style={styles.loginBtn}>
+      <Pressable style={styles.loginBtn} onPress={handleLogin}>
         <Text style={styles.loginText}>LOGIN</Text>
-      </TouchableOpacity>
+      </Pressable>
       <StatusBar style="auto" />
     </View>
     </Header>
@@ -58,7 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   logo: {
     color: "white",
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor:'#0D1326',
     paddingHorizontal: 10,
     paddingVertical: 10,  
-    opacity: 0.3,
+    opacity: 0.8,
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',

@@ -8,7 +8,7 @@ import Statistics from './screens/Statistics';
 import WriteADaily from './screens/WriteADaily';
 import Login from './screens/Login';
 import React, { useState, useEffect, useRef } from 'react';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 
