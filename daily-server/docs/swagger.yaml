@@ -1,0 +1,469 @@
+basePath: /api
+definitions:
+  model.CreateDailyDTO:
+    properties:
+      image:
+        type: string
+      isShared:
+        type: boolean
+      text:
+        type: string
+    required:
+    - isShared
+    - text
+    type: object
+  model.Daily:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: integer
+      emotions:
+        $ref: '#/definitions/model.Emotion'
+      favourites:
+        type: integer
+      id:
+        type: string
+      image:
+        type: string
+      isShared:
+        type: boolean
+      keywords:
+        items:
+          type: string
+        type: array
+      text:
+        type: string
+      viewers:
+        items:
+          type: string
+        type: array
+    required:
+    - text
+    type: object
+  model.DailyRequestDTO:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  model.EditDailyImageDTO:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+    required:
+    - id
+    type: object
+  model.Emotion:
+    properties:
+      anger:
+        type: integer
+      happiness:
+        type: integer
+      sadness:
+        type: integer
+      shock:
+        type: integer
+    type: object
+  model.ReportedDaily:
+    properties:
+      content:
+        type: string
+      dailyId:
+        type: string
+      id:
+        type: string
+      reportedAt:
+        type: integer
+      reports:
+        type: integer
+      title:
+        type: string
+    required:
+    - dailyId
+    - title
+    type: object
+  model.User:
+    properties:
+      createdAt:
+        type: integer
+      email:
+        type: string
+      favouriteDailies:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      viewedDailies:
+        items:
+          type: string
+        type: array
+    required:
+    - email
+    - password
+    type: object
+  model.UserLoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.UserRegisterDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+host: localhost:9090
+info:
+  contact: {}
+  title: Daily API
+  version: "1.0"
+paths:
+  /api/daily:
+    post:
+      consumes:
+      - application/json
+      description: creates a new daily resource
+      parameters:
+      - description: CreateDailyDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateDailyDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "401":
+          description: 'Unauthorized {"message'': "Unauthorized"}'
+          schema:
+            type: object
+        "500":
+          description: 'Internal Server Error {"message'': "Couldn''t fetch the image"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "Couldn''t fetch the image / DB error"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns the created daily
+      tags:
+      - Daily
+  /api/daily/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: report a daily
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Unauthorized {"message'': "Unauthorized"}'
+          schema:
+            type: object
+        "502":
+          description: Internal Server Error
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: delete the given daily
+      tags:
+      - Daily
+    get:
+      consumes:
+      - application/json
+      description: returns a specific daily via daily.ID
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "500":
+          description: 'Internal Server Error {"message'': "mongo: no documents in
+            result"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns a daily
+      tags:
+      - Daily
+  /api/daily/fav:
+    put:
+      consumes:
+      - application/json
+      description: fav a daily
+      parameters:
+      - description: DailyRequestDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.DailyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "401":
+          description: 'Bad Gateway {"message'': "message": "Unauthorized"}'
+          schema:
+            type: object
+        "500":
+          description: 'Bad Gateway {"message'': "message": "Database error"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily & user to apply fav feature
+      tags:
+      - Daily
+  /api/daily/image:
+    put:
+      consumes:
+      - application/json
+      description: edit a daily's image
+      parameters:
+      - description: EditDailyImageDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.EditDailyImageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "500":
+          description: 'Bad Gateway {"message'': "message": "Database Error"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily image
+      tags:
+      - Daily
+  /api/daily/list:
+    get:
+      consumes:
+      - application/json
+      description: returns a list of dailies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Daily'
+            type: array
+        "500":
+          description: 'Bad Gateway {"message'': "Couldn''t fetch daily list"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "No user"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns a list of dailies
+      tags:
+      - Daily
+  /api/daily/report:
+    post:
+      consumes:
+      - application/json
+      description: report a daily
+      parameters:
+      - description: ReportedDaily
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.ReportedDaily'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "message": "Failed to update daily"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily to apply report feature
+      tags:
+      - Daily
+  /api/daily/view:
+    put:
+      consumes:
+      - application/json
+      description: view a daily
+      parameters:
+      - description: DailyRequestDTO
+        in: body
+        name: daily
+        required: true
+        schema:
+          $ref: '#/definitions/model.DailyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "401":
+          description: 'Bad Gateway {"message'': "message": "Wrong user id"}'
+          schema:
+            type: object
+        "500":
+          description: 'Bad Gateway {"message'': "message": "Database error"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: update daily & user to apply view feature
+      tags:
+      - Daily
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user using the provided email and password, and
+        return a token on successful authentication.
+      parameters:
+      - description: User login details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserLoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+      summary: User login
+      tags:
+      - Users
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the given email and password, if they don't
+        exist already.
+      parameters:
+      - description: User Registration
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: 'Bad Request {"message'': "Invalid JSON data"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "Couldn''t fetch the image"}'
+          schema:
+            type: object
+      summary: Register a new user
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
