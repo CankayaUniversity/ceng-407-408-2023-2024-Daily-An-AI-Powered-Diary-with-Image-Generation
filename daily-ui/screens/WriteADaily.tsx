@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {View, StyleSheet, Text, TextInput, Image, Pressable, Alert, Platform, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback} from 'react-native';
 import Header from '../components/Header';
 
-const WriteADaily = ({navigation}) => {
+const WriteADaily = ({navigation}:{navigation:any}) => {
    const [text, onChangeText] = useState('Useless Text');
    const [daily, setDaily] = useState('');
 
-   const handleDailyChange = (text) => {
+   const handleDailyChange = (text:string) => {
      setDaily(text);
    };
  
@@ -66,8 +66,6 @@ const styles = StyleSheet.create({
      height: "80%",
      width: "100%",
      borderRadius: 10,
-     borderWidth: 0.7,
-     borderColor:'white'
    },
 
    tickIcon: {

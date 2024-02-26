@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import loginRequest from '../services/loginService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation }:{navigation:any}) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
@@ -19,7 +19,7 @@ const Login = ({ navigation }) => {
         await AsyncStorage.setItem('bearerToken', bearerToken)
 
         navigation.navigate('Home');
-    } catch (error) {
+    } catch (error:any) {
       navigation.navigate('Login');
       setError(error.message);
       console.log(error.message)
