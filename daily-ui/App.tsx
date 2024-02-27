@@ -7,6 +7,7 @@ import Profile from './screens/Profile';
 import Statistics from './screens/Statistics';
 import WriteADaily from './screens/WriteADaily';
 import Login from './screens/Login';
+import Register from './screens/Register';
 import React, { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -30,7 +31,7 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Login' screenOptions={{headerShown:false}}>
+      <Stack.Navigator initialRouteName="Register" screenOptions={{headerShown:false}}>
         <Stack.Screen name="Home" component={Home}/>
         <Stack.Screen name="YourDaily" component={YourDaily}/>
         <Stack.Screen name="Explore" component={Explore}/>
@@ -38,6 +39,7 @@ const App = () => {
         <Stack.Screen name="Statistics" component={Statistics}/>
         <Stack.Screen name="WriteADaily" component={WriteADaily}/>
         <Stack.Screen name="Login" component={Login}/>
+        <Stack.Screen name="Register" component={Register}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

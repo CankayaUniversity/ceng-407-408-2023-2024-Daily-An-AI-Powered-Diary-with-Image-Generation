@@ -4,6 +4,7 @@ go 1.21.5
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/files v1.0.1
@@ -25,7 +26,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
-	github.com/gin-contrib/cors v1.5.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/analysis v0.22.2 // indirect
 	github.com/go-openapi/errors v0.21.0 // indirect
