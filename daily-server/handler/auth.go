@@ -57,7 +57,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
 
 // Login authenticates a user and provides a token.

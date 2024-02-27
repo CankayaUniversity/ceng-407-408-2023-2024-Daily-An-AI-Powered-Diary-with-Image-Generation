@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet,TouchableOpacity,Text,ImageBackground} from 'react-native';
 
-const Header = ({navigation, children, previous, homepage}) => {
+const Header = ({navigation, children, previous, homepage}: {navigation:any, children:any, previous:any, homepage:any}) => {
    return (
       <View style={styles.container}>
          <View style={styles.background}>
@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
      width: '100%',
      // Additional homepage styles...
    },
-   background: {
-     alignContent: 'center',
-     alignItems: 'center',
-     width: '100%',
-     position: 'fixed',
-     top: 0,
-     left: 0,
-     right: 0,
-     bottom: 0,
-     backgroundColor: 'black', // Example background color
-   },
+    background: {
+       alignContent: 'center',
+       alignItems: 'center',
+       width: '100%',
+       position: 'absolute',
+       top: 0,
+       left: 0,
+       right: 0,
+       bottom: 0,
+       backgroundColor: 'black', // Example background color
+    },
  });
 
 export default Header;
