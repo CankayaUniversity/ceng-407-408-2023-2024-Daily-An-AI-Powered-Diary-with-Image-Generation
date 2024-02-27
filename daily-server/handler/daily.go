@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -105,6 +106,14 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 // @Router /api/daily/{id} [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetDaily(c *gin.Context) {
+	//denemelik burada çağırıyorum abiler
+	flaskData, err := getDataFromFlask()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println(flaskData["emotions"])
+
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 	if err != nil {
@@ -334,4 +343,26 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+func getDataFromFlask() (map[string]interface{}, error) {
+	url := "http://localhost:5000"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal(body, &jsonData); err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }
