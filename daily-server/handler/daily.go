@@ -112,7 +112,7 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(flaskData["emotions"])
+	fmt.Println(flaskData["image"])
 
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
