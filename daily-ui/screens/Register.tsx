@@ -13,8 +13,6 @@ const Register = ({ navigation }:{navigation:any}) => {
   const handleRegister = async () => {
     try {
       const token = await registerRequest(email, password);
-      console.log(token)
-      await AsyncStorage.setItem('bearerToken', token);
 
       navigation.navigate('Login');
     } catch (error:any) {
