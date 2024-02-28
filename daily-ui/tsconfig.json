@@ -3,7 +3,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": [
-      "./types"
+      "./libs/types"
     ],
   },
   "extends": "expo/tsconfig.base"

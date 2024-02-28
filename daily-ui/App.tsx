@@ -8,30 +8,18 @@ import Statistics from './screens/Statistics';
 import WriteADaily from './screens/WriteADaily';
 import Login from './screens/Login';
 import Register from './screens/Register';
-import React, { useState, useEffect, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import AuthLoadingScreen from './screens/AuthLoadingScreen';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Check authentication status on app load
-  useEffect(() => {
-    // Here you can check if the user has a bearer key stored in AsyncStorage or any other storage mechanism
-    const checkAuthentication = async () => {
-      // Example: Check if the user has a bearer key stored
-      const bearerKey = await AsyncStorage.getItem('bearerKey');
-      setIsAuthenticated(!!bearerKey); // Update isAuthenticated based on the presence of bearer key
-    };
-
-    checkAuthentication();
-  }, []);
 
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Register" screenOptions={{headerShown:false}}>
+      <Stack.Navigator initialRouteName="AuthLoadingScreen" screenOptions={{headerShown:false}}>
+        <Stack.Screen name="AuthLoadingScreen" component={AuthLoadingScreen}/>
         <Stack.Screen name="Home" component={Home}/>
         <Stack.Screen name="YourDaily" component={YourDaily}/>
         <Stack.Screen name="Explore" component={Explore}/>
