@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,6 @@ import (
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
 	"github.com/Final-Projectors/daily-server/repository"
-	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -61,14 +61,33 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	if createDailyDTO.Image == "" {
-		response, err := http.Get("https://d2opxh93rbxzdn.cloudfront.net/original/2X/4/40cfa8ca1f24ac29cfebcb1460b5cafb213b6105.png")
+		flaskData, err := getDataFromFlask(daily.Text)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Couldn't fetch image"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		defer response.Body.Close()
-		image, _ := io.ReadAll(response.Body)
-		daily.Image = utils.ImageToBase64(image)
+		if emotionsMap, ok := flaskData["emotions"].(map[string]interface{}); ok {
+			intEmotions := make(map[string]int)
+			for key, value := range emotionsMap {
+				switch v := value.(type) {
+				case int:
+					intEmotions[key] = v
+				case float64: // Handle float64 as well
+					intEmotions[key] = int(v)
+				default:
+					fmt.Printf("Error: Value for key %s is not an integer: %v\n", key, value)
+				}
+			}
+			daily.Emotions.Sadness = intEmotions["Sadness"]
+			daily.Emotions.Joy = intEmotions["Joy"]
+			daily.Emotions.Love = intEmotions["Love"]
+			daily.Emotions.Anger = intEmotions["Anger"]
+			daily.Emotions.Fear = intEmotions["Fear"]
+			daily.Emotions.Surprise = intEmotions["Surprise"]
+		} else {
+			fmt.Println("Error: Value in flaskData['emotions'] is not a map[string]interface{}")
+		}
+		daily.Image = flaskData["image"].(string)
 	} else {
 		//assuming that createDailyDTO.Image is a propper base64 data
 		daily.Image = createDailyDTO.Image
@@ -106,14 +125,6 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 // @Router /api/daily/{id} [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetDaily(c *gin.Context) {
-	//denemelik burada çağırıyorum abiler
-	flaskData, err := getDataFromFlask()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	fmt.Println(flaskData["image"])
-
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 	if err != nil {
@@ -345,14 +356,28 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-func getDataFromFlask() (map[string]interface{}, error) {
+func getDataFromFlask(daily string) (map[string]interface{}, error) {
 	url := "http://localhost:5000"
 
-	resp, err := http.Get(url)
+	payload := map[string]string{
+		"daily": daily,
+	}
+	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
 
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

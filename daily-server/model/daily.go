@@ -16,10 +16,12 @@ type Daily struct {
 }
 
 type Emotion struct {
-	Anger     int `json:"anger" bson:"anger"`
-	Happiness int `json:"happiness" bson:"happiness"`
-	Sadness   int `json:"sadness" bson:"sadness"`
-	Shock     int `json:"shock" bson:"shock"`
+	Sadness  int `json:"sadness" bson:"sadness"`
+	Joy      int `json:"joy" bson:"joy"`
+	Love     int `json:"love" bson:"love"`
+	Anger    int `json:"anger" bson:"anger"`
+	Fear     int `json:"fear" bson:"fear"`
+	Surprise int `json:"surprise" bson:"surprise"`
 }
 
 type DailyRequestDTO struct {

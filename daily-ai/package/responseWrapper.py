@@ -2,7 +2,8 @@ from . import emotion
 from . import summary
 from . import image
 
-def wrap():
+def wrap(daily):
+    print("daily: ", daily)
     json = {
         "emotions": emotion.getEmotions(),
         "summary": summary.getSummary(),
