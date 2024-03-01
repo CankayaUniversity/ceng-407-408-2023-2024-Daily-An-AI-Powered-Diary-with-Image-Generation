@@ -1,16 +1,14 @@
 package handler
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
 	"github.com/Final-Projectors/daily-server/repository"
+	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -61,7 +59,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	if createDailyDTO.Image == "" {
-		flaskData, err := getDataFromFlask(daily.Text)
+		flaskData, err := utils.getDataFromFlask(daily.Text)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -354,40 +352,4 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
-}
-
-func getDataFromFlask(daily string) (map[string]interface{}, error) {
-	url := "http://localhost:5000"
-
-	payload := map[string]string{
-		"daily": daily,
-	}
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var jsonData map[string]interface{}
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		return nil, err
-	}
-
-	return jsonData, nil
 }
