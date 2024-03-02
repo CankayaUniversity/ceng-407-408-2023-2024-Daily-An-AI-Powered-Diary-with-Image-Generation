@@ -59,7 +59,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	if createDailyDTO.Image == "" {
-		flaskData, err := utils.getDataFromFlask(daily.Text)
+		flaskData, err := utils.GetDataFromFlask(daily.Text)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
