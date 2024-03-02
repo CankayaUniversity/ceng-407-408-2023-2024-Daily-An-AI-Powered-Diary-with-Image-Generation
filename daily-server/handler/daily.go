@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -43,6 +45,9 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 // @Router /api/daily [post]
 // @Security ApiKeyAuth
 func (d *DailyController) CreateDaily(c *gin.Context) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
 	err := c.ShouldBindJSON(&createDailyDTO)
@@ -50,20 +55,31 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
 	}
+
 	daily.Keywords = []string{} // assuming Keywords is a string slice.
 	daily.Emotions = model.Emotion{}
 	daily.Favourites = 0                   // assuming Favourites is an integer.
 	daily.Viewers = []primitive.ObjectID{} // assuming Viewers is an integer.
 
-	daily.ID = primitive.NewObjectID()
+	dailyID := primitive.NewObjectID()
+	daily.ID = dailyID
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	if createDailyDTO.Image == "" {
+	daily.IsShared = *createDailyDTO.IsShared
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		flaskData, err := utils.GetDataFromFlask(daily.Text)
 		if err != nil {
+			mu.Lock()
+			defer mu.Unlock()
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		mu.Lock()
+		defer mu.Unlock()
 		if emotionsMap, ok := flaskData["emotions"].(map[string]interface{}); ok {
 			intEmotions := make(map[string]int)
 			for key, value := range emotionsMap {
@@ -86,10 +102,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 			fmt.Println("Error: Value in flaskData['emotions'] is not a map[string]interface{}")
 		}
 		daily.Image = flaskData["image"].(string)
-	} else {
-		//assuming that createDailyDTO.Image is a propper base64 data
-		daily.Image = createDailyDTO.Image
-	}
+	}()
 
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
@@ -100,14 +113,46 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
-	daily.IsShared = *createDailyDTO.IsShared
-
 	err = d.DailyRepository.Create(&daily)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, daily)
+	c.JSON(http.StatusOK, gin.H{"message": "Daily created successfuly without Image and Emotions"})
+
+	//preparation to ai response
+	var fetchedDaily model.Daily
+	result := database.Dailies.FindOne(c, bson.M{"_id": dailyID})
+	if result.Err() != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Daily could not be fetched"})
+		return
+	}
+	if err := result.Decode(&fetchedDaily); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode fetched daily document"})
+		return
+	}
+
+	// Wait for the async operation to finish
+	wg.Wait()
+	fetchedDaily.Emotions = daily.Emotions
+	fetchedDaily.Image = daily.Image
+
+	updatedBSON, err := bson.Marshal(fetchedDaily)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal updated daily document"})
+		return
+	}
+	filter := bson.M{"_id": dailyID}
+	updateResult, err := database.Dailies.ReplaceOne(context.TODO(), filter, updatedBSON)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update daily document"})
+		return
+	}
+	if updateResult.ModifiedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Document not found or not updated"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Daily document updated with Image and Emotions successfully"})
 }
 
 // GetDaily returns a specific daily via daily.ID
