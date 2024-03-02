@@ -134,8 +134,14 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 
 	// Wait for the async operation to finish
 	wg.Wait()
+
 	fetchedDaily.Emotions = daily.Emotions
-	fetchedDaily.Image = daily.Image
+	if createDailyDTO.Image == "" {
+		fetchedDaily.Image = daily.Image
+	} else {
+		//assuming that createDailyDTO.Image is a propper base64 data
+		fetchedDaily.Image = createDailyDTO.Image
+	}
 
 	updatedBSON, err := bson.Marshal(fetchedDaily)
 	if err != nil {
