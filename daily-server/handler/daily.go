@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -45,8 +43,6 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 // @Router /api/daily [post]
 // @Security ApiKeyAuth
 func (d *DailyController) CreateDaily(c *gin.Context) {
-	var wg sync.WaitGroup
-	var mu sync.Mutex
 
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
@@ -67,43 +63,38 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	daily.IsShared = *createDailyDTO.IsShared
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		flaskData, err := utils.GetDataFromFlask(daily.Text)
-		if err != nil {
-			mu.Lock()
-			defer mu.Unlock()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		mu.Lock()
-		defer mu.Unlock()
-		if emotionsMap, ok := flaskData["emotions"].(map[string]interface{}); ok {
-			intEmotions := make(map[string]int)
-			for key, value := range emotionsMap {
-				switch v := value.(type) {
-				case int:
-					intEmotions[key] = v
-				case float64: // Handle float64 as well
-					intEmotions[key] = int(v)
-				default:
-					fmt.Printf("Error: Value for key %s is not an integer: %v\n", key, value)
-				}
+	flaskData, err := utils.GetDataFromFlask(daily.Text)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if emotionsMap, ok := flaskData["emotions"].(map[string]interface{}); ok {
+		intEmotions := make(map[string]int)
+		for key, value := range emotionsMap {
+			switch v := value.(type) {
+			case int:
+				intEmotions[key] = v
+			case float64: // Handle float64 as well
+				intEmotions[key] = int(v)
+			default:
+				fmt.Printf("Error: Value for key %s is not an integer: %v\n", key, value)
 			}
-			daily.Emotions.Sadness = intEmotions["Sadness"]
-			daily.Emotions.Joy = intEmotions["Joy"]
-			daily.Emotions.Love = intEmotions["Love"]
-			daily.Emotions.Anger = intEmotions["Anger"]
-			daily.Emotions.Fear = intEmotions["Fear"]
-			daily.Emotions.Surprise = intEmotions["Surprise"]
-		} else {
-			fmt.Println("Error: Value in flaskData['emotions'] is not a map[string]interface{}")
 		}
-		daily.Image = flaskData["image"].(string)
-	}()
+		daily.Emotions.Sadness = intEmotions["Sadness"]
+		daily.Emotions.Joy = intEmotions["Joy"]
+		daily.Emotions.Love = intEmotions["Love"]
+		daily.Emotions.Anger = intEmotions["Anger"]
+		daily.Emotions.Fear = intEmotions["Fear"]
+		daily.Emotions.Surprise = intEmotions["Surprise"]
+	} else {
+		fmt.Println("Error: Value in flaskData['emotions'] is not a map[string]interface{}")
+	}
 
+	if createDailyDTO.Image == "" {
+		daily.Image = flaskData["image"].(string)
+	} else {
+		daily.Image = createDailyDTO.Image
+	}
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
 	if auth, ok := author.(primitive.ObjectID); ok {
@@ -113,52 +104,13 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
+	daily.IsShared = *createDailyDTO.IsShared
 	err = d.DailyRepository.Create(&daily)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Daily created successfuly without Image and Emotions"})
-
-	//preparation to ai response
-	var fetchedDaily model.Daily
-	result := database.Dailies.FindOne(c, bson.M{"_id": dailyID})
-	if result.Err() != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Daily could not be fetched"})
-		return
-	}
-	if err := result.Decode(&fetchedDaily); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode fetched daily document"})
-		return
-	}
-
-	// Wait for the async operation to finish
-	wg.Wait()
-
-	fetchedDaily.Emotions = daily.Emotions
-	if createDailyDTO.Image == "" {
-		fetchedDaily.Image = daily.Image
-	} else {
-		//assuming that createDailyDTO.Image is a propper base64 data
-		fetchedDaily.Image = createDailyDTO.Image
-	}
-
-	updatedBSON, err := bson.Marshal(fetchedDaily)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal updated daily document"})
-		return
-	}
-	filter := bson.M{"_id": dailyID}
-	updateResult, err := database.Dailies.ReplaceOne(context.TODO(), filter, updatedBSON)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update daily document"})
-		return
-	}
-	if updateResult.ModifiedCount == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Document not found or not updated"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Daily document updated with Image and Emotions successfully"})
+	c.JSON(http.StatusOK, daily)
 }
 
 // GetDaily returns a specific daily via daily.ID
@@ -227,13 +179,13 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
-// @Success 200 {object} object
-// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 401 {object} object "Bad Gateway {"message': "message": "Unauthorized"}"
-// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
+// @Success 200 {object} object "Success {"message": "Favourite Success"}"
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 401 {object} object "Bad Gateway {"message": "Unauthorized"}"
+// @Failure 500 {object} object "Bad Gateway {"message": "Database error"}"
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
-func (d *DailyController) Favourite(c *gin.Context) {
+func (d *DailyController) FavDaily(c *gin.Context) {
 	user, _ := c.Get("user_id")
 	if _, ok := user.(primitive.ObjectID); !ok {
 		fmt.Println("author is not a primitive.ObjectID")
@@ -252,7 +204,6 @@ func (d *DailyController) Favourite(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "Favourite success"})
 }
 
@@ -263,10 +214,10 @@ func (d *DailyController) Favourite(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
-// @Success 200 {object} object
-// @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 401 {object} object "Bad Gateway {"message': "message": "Wrong user id"}"
-// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database error"}"
+// @Success 200 {object} object "Success {"message": "Viewed Successfully"}"
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 401 {object} object "Bad Gateway {"message": "Wrong user id"}"
+// @Failure 500 {object} object "Bad Gateway {"message": "Database error"}"
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
 func (d *DailyController) ViewDaily(c *gin.Context) {
@@ -288,8 +239,7 @@ func (d *DailyController) ViewDaily(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+	c.JSON(http.StatusOK, gin.H{"message": "Viewed Successfully"})
 }
 
 // ReportDaily accepts a body request to update a daily
@@ -299,9 +249,9 @@ func (d *DailyController) ViewDaily(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param daily body model.ReportedDaily true "ReportedDaily"
-// @Success 200 {object} object
+// @Success 200 {object} object "Success {"message": "Created Successfully"}"
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 502 {object} object "Bad Gateway {"message': "message": "Failed to update daily"}"
+// @Failure 502 {object} object "Bad Gateway {"message": "Failed to update daily"}"
 // @Router /api/daily/report [post]
 // @Security ApiKeyAuth
 func (d *DailyController) ReportDaily(c *gin.Context) {
@@ -323,7 +273,7 @@ func (d *DailyController) ReportDaily(c *gin.Context) {
 			c.JSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "create success"})
+		c.JSON(http.StatusOK, gin.H{"message": "Created Successfully"})
 		return
 	}
 	if err := result.Decode(&dbReportedDaily); err == nil {
@@ -332,7 +282,7 @@ func (d *DailyController) ReportDaily(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update reported daily", "error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "increment success"})
+		c.JSON(http.StatusOK, gin.H{"message": "Incremented Successfully"})
 		return
 	}
 }
@@ -344,7 +294,7 @@ func (d *DailyController) ReportDaily(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Daily ID"
-// @Success 200 {object} object
+// @Success 200 {object} object "Success {"message": "Deleted Successfully"}"
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data | user was not found"}"
 // @Failure 400 {object} object "Unauthorized {"message': "Unauthorized"}"
 // @Failure 502 {object} object "Internal Server Error"
@@ -376,7 +326,7 @@ func (d *DailyController) DeleteDaily(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+	c.JSON(http.StatusOK, gin.H{"message": "Deleted Successfully"})
 }
 
 // EditDailyImage accepts a body request to update a daily's image
@@ -386,9 +336,9 @@ func (d *DailyController) DeleteDaily(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param daily body model.EditDailyImageDTO true "EditDailyImageDTO"
-// @Success 200 {object} object
+// @Success 200 {object} object "Success {"message": "Image Edited Successfully"}"
 // @Failure 400 {object} object "Bad Request {"message': "Invalid JSON data"}"
-// @Failure 500 {object} object "Bad Gateway {"message': "message": "Database Error"}"
+// @Failure 500 {object} object "Bad Gateway {"message": "Database Error"}"
 // @Router /api/daily/image [put]
 // @Security ApiKeyAuth
 func (d *DailyController) EditDailyImage(c *gin.Context) {
@@ -402,5 +352,5 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database Error"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+	c.JSON(http.StatusOK, gin.H{"message": "Image Edited Successfully"})
 }
