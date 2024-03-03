@@ -109,25 +109,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success {\"message\": \"Favourite Success\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "400": {
-                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "401": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Unauthorized\"}",
+                        "description": "Bad Gateway {\"message\": \"Unauthorized\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Database error\"}",
+                        "description": "Bad Gateway {\"message\": \"Database error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -166,7 +166,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success {\"message\": \"Image Edited Successfully\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -178,7 +178,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Database Error\"}",
+                        "description": "Bad Gateway {\"message\": \"Database Error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -260,7 +260,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success {\"message\": \"Created Successfully\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -272,7 +272,7 @@ const docTemplate = `{
                         }
                     },
                     "502": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Failed to update daily\"}",
+                        "description": "Bad Gateway {\"message\": \"Failed to update daily\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -311,25 +311,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success {\"message\": \"Viewed Successfully\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "400": {
-                        "description": "Bad Request {\"message': \"Invalid JSON data\"}",
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "401": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Wrong user id\"}",
+                        "description": "Bad Gateway {\"message\": \"Wrong user id\"}",
                         "schema": {
                             "type": "object"
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message': \"message\": \"Database error\"}",
+                        "description": "Bad Gateway {\"message\": \"Database error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -413,7 +413,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success {\"message\": \"Deleted Successfully\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -617,13 +617,19 @@ const docTemplate = `{
                 "anger": {
                     "type": "integer"
                 },
-                "happiness": {
+                "fear": {
+                    "type": "integer"
+                },
+                "joy": {
+                    "type": "integer"
+                },
+                "love": {
                     "type": "integer"
                 },
                 "sadness": {
                     "type": "integer"
                 },
-                "shock": {
+                "surprise": {
                     "type": "integer"
                 }
             }
