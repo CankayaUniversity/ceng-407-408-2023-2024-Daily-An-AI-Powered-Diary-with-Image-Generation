@@ -186,20 +186,15 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Router /api/daily/fav [put]
 // @Security ApiKeyAuth
 func (d *DailyController) FavDaily(c *gin.Context) {
+	id := c.Param("id")                            // Extract the id from the URL.
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
+		return
+	}
+
 	user, _ := c.Get("user_id")
-	if _, ok := user.(primitive.ObjectID); !ok {
-		fmt.Println("author is not a primitive.ObjectID")
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
-	var daily model.DailyRequestDTO
-	if err := c.ShouldBindJSON(&daily); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
-		return
-	}
-
-	err := d.DailyRepository.FavouriteDaily(daily.ID, user.(primitive.ObjectID))
+	err = d.DailyRepository.FavouriteDaily(objectID, user.(primitive.ObjectID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -221,20 +216,15 @@ func (d *DailyController) FavDaily(c *gin.Context) {
 // @Router /api/daily/view [put]
 // @Security ApiKeyAuth
 func (d *DailyController) ViewDaily(c *gin.Context) {
+	id := c.Param("id")                            // Extract the id from the URL.
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
+		return
+	}
+
 	user, _ := c.Get("user_id")
-	if _, ok := user.(primitive.ObjectID); !ok {
-		fmt.Println("author is not a primitive.ObjectID")
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
-	var daily model.DailyRequestDTO
-	if err := c.ShouldBindJSON(&daily); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
-		return
-	}
-
-	err := d.DailyRepository.View(daily.ID, user.(primitive.ObjectID))
+	err = d.DailyRepository.View(objectID, user.(primitive.ObjectID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
