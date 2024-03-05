@@ -2,6 +2,7 @@ package router
 
 import (
 	"os"
+	"time"
 
 	docs "github.com/Final-Projectors/daily-server/docs"
 	"github.com/Final-Projectors/daily-server/handler"
@@ -24,7 +25,14 @@ func New() *gin.Engine {
 	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
 
 	// Cors middleware
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	//http://localhost:9090/docs/index.html
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -39,8 +47,8 @@ func New() *gin.Engine {
 	api.POST("/daily", dailyHandler.CreateDaily)
 	api.GET("/daily/:id", dailyHandler.GetDaily)
 	api.GET("/daily/list", dailyHandler.GetDailies)
-	api.PUT("/daily/fav", dailyHandler.FavDaily)
-	api.PUT("/daily/view", dailyHandler.ViewDaily)
+	api.POST("/daily/fav/:id", dailyHandler.FavDaily)
+	api.POST("/daily/view/:id", dailyHandler.ViewDaily)
 	api.POST("/daily/report", dailyHandler.ReportDaily)
 	api.PUT("/daily/image", dailyHandler.EditDailyImage)
 	api.DELETE("/daily/:id", dailyHandler.DeleteDaily)
