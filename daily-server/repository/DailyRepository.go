@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -137,6 +138,17 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 
 	getDaily := bson.M{"_id": dailyID}
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
-	_, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
-	return err
+	result, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
+
+	if err == mongo.ErrNoDocuments {
+		return mongo.ErrNoDocuments
+	}
+	if err != nil {
+		return err
+	}
+	if result.ModifiedCount == 0 {
+		fmt.Println("Image update is failed due to an error")
+		return err
+	}
+	return nil
 }
