@@ -339,7 +339,7 @@ func (d *DailyController) EditDailyImage(c *gin.Context) {
 	}
 	err := d.DailyRepository.EditDailyImage(daily.ID, daily.Image)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Image Edited Successfully"})

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -139,16 +140,12 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 	getDaily := bson.M{"_id": dailyID}
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
 	result, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
-
-	if err == mongo.ErrNoDocuments {
-		return mongo.ErrNoDocuments
+	fmt.Println("Matched: ", result.MatchedCount, " Modified: ", result.ModifiedCount)
+	if result.MatchedCount == 0 || err != nil {
+		return errors.New("There is no file matched with this id.")
 	}
-	if err != nil {
-		return err
-	}
-	if result.ModifiedCount == 0 {
-		fmt.Println("Image update is failed due to an error")
-		return err
+	if result.ModifiedCount == 0 || err != nil {
+		return errors.New("Same image with the old one, couldn't update succesfully.")
 	}
 	return nil
 }
