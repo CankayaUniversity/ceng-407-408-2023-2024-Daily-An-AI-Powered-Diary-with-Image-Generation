@@ -1,27 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import Header from '../components/Header';
-import loginRequest from '../services/loginService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserInfo, login } from '../libs';
 
 const Login = ({ navigation }:{navigation:any}) => {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    // login logic here, now it just navigates to Home
     try {
-        const bearerToken = await loginRequest(email, password); // Call loginRequest function from the service
-        console.log(bearerToken)
-
-        await AsyncStorage.setItem('bearerToken', bearerToken)
-
-        navigation.navigate('Home');
+      const userInfo:UserInfo = {
+        email: email,
+        password: password
+      }
+      await login(userInfo);
+      navigation.navigate('Home');
     } catch (error:any) {
-      navigation.navigate('Login');
-      setError(error.message);
       console.log(error.message)
     } 
   };

@@ -2,22 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import Header from '../components/Header';
-import registerRequest from '../services/registerService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserInfo, register } from '../libs';
 
 const Register = ({ navigation }:{navigation:any}) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState('');
 
   const handleRegister = async () => {
     try {
-      const token = await registerRequest(email, password);
-
+      const userInfo:UserInfo = {
+        email: email,
+        password: password
+      }
+      const response = await register(userInfo);
       navigation.navigate('Login');
     } catch (error:any) {
       navigation.navigate('Register');
-      setError(error.message);
       console.log(error.message)
     } 
   };
