@@ -11,10 +11,10 @@ export const createDaily = async (daily: CreateDailyRequest) => {
 }
 
 export const getDailies = async () => {
-   const url = "/daily";
+   const url = "/daily/list";
    const response = await serviceConsumer.get<
-   DailyResponse,
-   AxiosResponse<DailyResponse>>(url);
+   DailyResponse[],
+   AxiosResponse<DailyResponse[]>>(url);
    return response;
 }
 
@@ -35,7 +35,7 @@ export const viewDaily = async (id: string) => {
 }
 
 export const editDailyImage = async (daily: EditDailyImageRequest) => {
-   const url = "/daily/image/";
+   const url = "/daily/image";
    const response = await serviceConsumer.put<
    CommonResponse,
    AxiosResponse<CommonResponse>,
@@ -44,7 +44,7 @@ export const editDailyImage = async (daily: EditDailyImageRequest) => {
 }
 
 export const reportDaily = async (dailyReport: ReportDailyRequest) => {
-      const url = "/daily/report/";
+      const url = "/daily/report";
       const response = await serviceConsumer.post<
       CommonResponse,
       AxiosResponse<CommonResponse>,
