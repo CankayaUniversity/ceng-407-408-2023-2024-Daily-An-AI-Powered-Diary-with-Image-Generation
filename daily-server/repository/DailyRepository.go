@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -140,7 +139,6 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 	getDaily := bson.M{"_id": dailyID}
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
 	result, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
-	fmt.Println("Matched: ", result.MatchedCount, " Modified: ", result.ModifiedCount)
 	if result.MatchedCount == 0 || err != nil {
 		return errors.New("There is no file matched with this id.")
 	}
