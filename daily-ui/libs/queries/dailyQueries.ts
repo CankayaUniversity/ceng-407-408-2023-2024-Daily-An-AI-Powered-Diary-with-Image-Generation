@@ -33,7 +33,7 @@ export const useCreateDaily = () =>{
    return useMutation({
       mutationFn:(daily:CreateDailyRequest)=>createDaily(daily),
       onSuccess: () => {
-        queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies,dailyQueryKeys.getDaily]});
+        queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies]});
       },
     })
 }

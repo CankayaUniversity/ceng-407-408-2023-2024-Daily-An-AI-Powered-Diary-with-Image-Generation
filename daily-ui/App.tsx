@@ -12,6 +12,7 @@ import React from 'react';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './libs';
+import ReadDaily from './screens/ReadDaily';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ const App = () => {
           <Stack.Screen name="AuthLoadingScreen" component={AuthLoadingScreen}/>
           <Stack.Screen name="Home" component={Home}/>
           <Stack.Screen name="YourDaily" component={YourDaily}/>
+          <Stack.Screen name="ReadDaily" component={ReadDaily}/>
           <Stack.Screen name="Explore" component={Explore}/>
           <Stack.Screen name="Profile" component={Profile}/>
           <Stack.Screen name="Statistics" component={Statistics}/>
