@@ -3,12 +3,15 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 func GetDataFromFlask(daily string) (map[string]interface{}, error) {
-	url := "http://localhost:5000"
+	host := os.Getenv("HOST")
+	url := fmt.Sprintf("http://%s:5000", host)
 
 	payload := map[string]string{
 		"daily": daily,
