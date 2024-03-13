@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -16,7 +17,8 @@ import (
 
 func Init() {
 	router := New()
-	router.Run(os.Getenv("PORT"))
+	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	router.Run(url)
 }
 
 func New() *gin.Engine {
