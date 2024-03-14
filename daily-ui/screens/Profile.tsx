@@ -8,7 +8,7 @@ const Profile = ({navigation}:{navigation:any}) => {
             <View style={styles.container}>
                <View style={styles.columns}>
                   <View style={styles.rows}>
-                     <View style={{width:'40%', height:'40%', paddingTop:12,borderRadius:12, alignItems: 'center',backgroundColor:'rgba(0,0,0,0.4)'}}>
+                     <View style={{width:'40%', height:'40%', paddingTop:12,borderRadius:12, alignItems: 'center',backgroundColor:'rgba(0,0,0,0.4)',aspectRatio: 1/1}}>
                         <View style={styles.avatarPlaceholder}/>
                      </View>
                      <View style={{width:'60%',height:'40%', paddingTop:12,borderRadius:12,backgroundColor:'rgba(0,0,0,0.4)'}}>
