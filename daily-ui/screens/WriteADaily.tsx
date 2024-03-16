@@ -45,6 +45,11 @@ const WriteADaily = ({navigation}:{navigation:any}) => {
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
          <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={80}>
+            {
+               mutation.isPending &&
+               <Text style={{ alignItems: 'center', justifyContent: 'center', fontSize: 40, color: 'white' }}>Loading</Text>
+            }
+
             <Pressable onPress={Keyboard.dismiss} style={{flex: 1, alignItems: "center", height:"100%", width:"100%"}}>
                <Text style={{fontSize:40,fontWeight:'200',color:'white',paddingBottom: 12}}>Write a Daily</Text>
                <TextInput
