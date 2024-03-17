@@ -1,6 +1,6 @@
 import React, { useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable, Alert } from 'react-native';
 import Header from '../components/Header';
 import { UserInfo, login } from '../libs';
 
@@ -8,8 +8,18 @@ const Login = ({ navigation }:{navigation:any}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const validateEmail = (email: string) => {
+    // Regular expression for email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
   const handleLogin = async () => {
     try {
+      if (!validateEmail(email)) {
+        Alert.alert("Invalid email pattern");
+        return
+      }
       const userInfo:UserInfo = {
         email: email,
         password: password
@@ -17,7 +27,8 @@ const Login = ({ navigation }:{navigation:any}) => {
       await login(userInfo);
       navigation.navigate('Home');
     } catch (error:any) {
-      console.log(error.message)
+      navigation.navigate('Login');
+      console.log(error.message);
     } 
   };
 
