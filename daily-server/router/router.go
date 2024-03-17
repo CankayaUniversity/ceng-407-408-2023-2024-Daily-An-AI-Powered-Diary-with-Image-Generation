@@ -7,6 +7,7 @@ import (
 
 	docs "github.com/Final-Projectors/daily-server/docs"
 	"github.com/Final-Projectors/daily-server/handler"
+	"github.com/Final-Projectors/daily-server/health"
 	"github.com/Final-Projectors/daily-server/middleware"
 	"github.com/Final-Projectors/daily-server/repository"
 	"github.com/gin-contrib/cors"
@@ -18,6 +19,7 @@ import (
 func Init() {
 	router := New()
 	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	fmt.Printf("%s", url)
 	router.Run(url)
 }
 
@@ -38,6 +40,8 @@ func New() *gin.Engine {
 	//http://localhost:9090/docs/index.html
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.GET("/health", health.Check)
 
 	api := router.Group("/api")
 	admin := router.Group("/admin")

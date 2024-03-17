@@ -15,6 +15,10 @@ var (
 	Users, Dailies, ReportedDailies *mongo.Collection
 )
 
+func GetClient() *mongo.Client {
+	return client
+}
+
 func Init() {
 	opts := options.Client().ApplyURI(os.Getenv("DB_CONNECTION"))
 	localClient, err := mongo.Connect(context.Background(), opts)

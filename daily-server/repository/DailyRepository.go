@@ -140,10 +140,10 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
 	result, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
 	if result.MatchedCount == 0 || err != nil {
-		return errors.New("There is no file matched with this id.")
+		return errors.New("there is no file matched with this id")
 	}
 	if result.ModifiedCount == 0 || err != nil {
-		return errors.New("Same image with the old one, couldn't update succesfully.")
+		return errors.New("same image with the old one, couldn't update succesfully")
 	}
 	return nil
 }
