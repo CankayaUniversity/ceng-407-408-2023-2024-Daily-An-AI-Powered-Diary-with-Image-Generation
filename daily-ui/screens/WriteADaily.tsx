@@ -7,8 +7,8 @@ import { CreateDailyRequest } from "../libs"
 const WriteADaily = ({navigation}:{navigation:any}) => {
    const [daily, setDaily] = useState('');
    const [shared, setShared] = useState(false);
-   const mutation = useCreateDaily()
-   
+   const mutation = useCreateDaily();
+
    useEffect(() => {
       if (mutation.isError) {
          const errorMessage = mutation.error instanceof Error ? mutation.error.toString() : String(mutation.error);
@@ -25,21 +25,22 @@ const WriteADaily = ({navigation}:{navigation:any}) => {
    const handleDailyChange = (text:string) => {
       setDaily(text);
    }
-   
+
    const handleShared = () => {
       console.log(!shared);
       setShared(!shared);
    }
- 
+
    const handleDailySubmit = () => {
      if (daily.trim() === '') {
        Alert.alert('Error', 'Please enter some text before submitting.');
        return;
      }
- 
+
      // Here you can perform any action with the tweet, such as sending it to a server or saving it locally.
      // For demonstration, we'll just log the tweet to the console.
      mutation.mutate({text:daily, isShared:shared})
+     console.log("Daily: " + daily + " Shared: " + shared);
     };
 
    return (
@@ -61,15 +62,17 @@ const WriteADaily = ({navigation}:{navigation:any}) => {
                   inputMode="text"
                />
                <View style={styles.save}>
-                  <Switch 
+                  <Switch
                      onValueChange={handleShared}
                      trackColor={{ false: "#767577", true: "#81b0ff" }}
                      thumbColor={shared ? "#f5dd4b" : "#f4f3f4"}
                      value={shared}
                   />
-                  <Pressable onPress={handleDailySubmit}>
-                     <Image source={require("../assets/tickIcon.png")} style={styles.tickIcon}></Image>
-                  </Pressable>
+                  { mutation.isPending == false &&
+                      <Pressable onPress={() => {handleDailySubmit(); console.log("is loading: " + mutation.isPending);}}>
+                          <Image source={require("../assets/tickIcon.png")} style={styles.tickIcon}></Image>
+                      </Pressable>
+                  }
                </View>
             </Pressable>
          </KeyboardAvoidingView>
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
       marginHorizontal: 20,
       justifyContent: "flex-start",
       alignItems: 'center',
-      color: "white" 
+      color: "white"
    },
 
    input: {

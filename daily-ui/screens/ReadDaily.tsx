@@ -9,7 +9,7 @@ export default function ReadDaily({route,navigation}:{route:any,navigation:any})
   return (
    <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-         <TouchableOpacity onPress={()=>{setVisible(!isVisible);console.log(isVisible + " " + data.image)}} style={{ height: '100%', width: '100%', opacity: 1.0, backgroundColor: '#0D1326' }}>
+         <TouchableOpacity onPress={ ()=>setVisible(!isVisible) } style={{ height: '100%', width: '100%', opacity: 1.0, backgroundColor: '#0D1326' }}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                {
                   isVisible &&
