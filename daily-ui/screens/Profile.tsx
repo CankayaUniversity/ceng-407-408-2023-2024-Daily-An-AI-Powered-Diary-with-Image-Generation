@@ -8,16 +8,14 @@ const Profile = ({navigation}:{navigation:any}) => {
             <View style={styles.container}>
                <View style={styles.container2}>
                   <View style={styles.rows}>
-                     <View style={{width:'40%', paddingTop:12,borderRadius:12, alignItems: 'center',backgroundColor:'rgba(0,0,0,0.4)',aspectRatio: 1/1}}>
+                     <View style={styles.box1}>
                         <View style={styles.avatarPlaceholder}/>
-                     </View>
-                     <View style={{width:'60%', paddingTop:12,borderRadius:12,backgroundColor:'rgba(0,0,0,0.4)'}}>
-                        <Text style={styles.name}>daily dev</Text>
-                        <Text style={styles.username}>@daily_dev</Text>
+                           <Text style={styles.name}>daily dev</Text>
+                           <Text style={styles.username}>@daily_dev</Text>
                      </View>
                   </View>
                   <View style={styles.rows}>
-                     <View style={styles.box2}>
+                     <View style={styles.box1}>
                         <Text style={styles.username}>test</Text>
                      </View>  
                   </View>
@@ -50,38 +48,35 @@ const styles = StyleSheet.create({
       padding:12
    },
    container2: {
+      paddingTop: 12,
       height: '100%',
       borderRadius:12,
-      padding:12,
       backgroundColor:'rgba(0,0,0,0.4)'
    },
    rows: {
       justifyContent: 'space-around',
       height: '25%',
+      width : '100%',
       marginBottom: 12,
+      paddingStart: 12,
+      paddingEnd: 12,
+      gap: 12,
       flex: 1,
       flexDirection: 'row',
-      borderRadius:12,
+      borderRadius: 12,
+      alignItems: 'stretch',
    },
    box1: {
+      flex: 3,
+      height: '100%',
       paddingStart:12,
       paddingEnd:12,
-      paddingTop:12, 
+      paddingTop:12,
       borderTopStartRadius:12,
       borderTopEndRadius:12,
-      width:'50%', 
       borderRadius:12,
+      alignSelf: 'flex-start',
       backgroundColor:'rgba(0,0,0,0.4)' 
-   },
-   box2: {
-      paddingStart:12,
-      paddingEnd:12,
-      paddingTop:12, 
-      borderTopStartRadius:12,
-      borderTopEndRadius:12,
-      width:'100%', 
-      borderRadius:12,
-      backgroundColor:'rgba(0,0,0,0.4)'
    },
    name: {
       textAlign:'right',
@@ -110,8 +105,7 @@ const styles = StyleSheet.create({
       borderRadius: 100,
       backgroundColor: '#FFFFFF',
       opacity: 0.5,
-      alignSelf: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
    }
    
 });
