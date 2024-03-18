@@ -17,7 +17,6 @@ export const serviceConsumer = axios.create({
 serviceConsumer.interceptors.request.use(
    async (config) => {
       if(!config.url?.includes("login") && !config.url?.includes("register")){
-         console.log("hello");
          const userToken = await storageUtils.getItem<UserToken>(storageKeys.bearerToken);
          if (userToken){
             config.headers.Authorization = "Bearer " + userToken.token;

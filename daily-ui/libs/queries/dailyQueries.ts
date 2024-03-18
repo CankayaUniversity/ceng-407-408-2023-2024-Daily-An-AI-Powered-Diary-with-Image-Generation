@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {queryClient} from "."
 import {CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, viewDaily} from ".."
+import { Alert } from "react-native"
 
 export const dailyQueryKeys = {
    createDaily:'#daily/createDaily',
@@ -29,11 +30,15 @@ export const useGetDaily = (
    })
 }
 
-export const useCreateDaily = () =>{
+export const useCreateDaily = (navigation: any) =>{
    return useMutation({
       mutationFn:(daily:CreateDailyRequest)=>createDaily(daily),
+      onError: (error) => {
+          Alert.alert('Error', error.message);
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies]});
+        navigation.navigate("YourDaily");
       },
     })
 }

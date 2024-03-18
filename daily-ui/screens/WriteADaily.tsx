@@ -2,25 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {Switch, View, StyleSheet, Text, TextInput, Image, Pressable, Alert, Platform, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback} from 'react-native';
 import Header from '../components/Header';
 import { useCreateDaily } from '../libs';
-import { CreateDailyRequest } from "../libs"
 
 const WriteADaily = ({navigation}:{navigation:any}) => {
    const [daily, setDaily] = useState('');
    const [shared, setShared] = useState(false);
-   const mutation = useCreateDaily();
-
-   useEffect(() => {
-      if (mutation.isError) {
-         const errorMessage = mutation.error instanceof Error ? mutation.error.toString() : String(mutation.error);
-         Alert.alert("Please try again. Error: ", errorMessage);
-         console.log(errorMessage);
-      }
-      if (mutation.isSuccess) {
-         navigation.navigate("YourDaily");
-         console.log(mutation.isSuccess);
-         setDaily('');
-      }
-   }, [mutation])
+   const { mutate, isPending } = useCreateDaily(navigation);
 
    const handleDailyChange = (text:string) => {
       setDaily(text);
@@ -39,17 +25,17 @@ const WriteADaily = ({navigation}:{navigation:any}) => {
 
      // Here you can perform any action with the tweet, such as sending it to a server or saving it locally.
      // For demonstration, we'll just log the tweet to the console.
-     mutation.mutate({text:daily, isShared:shared})
+     mutate({text:daily, isShared:shared})
      console.log("Daily: " + daily + " Shared: " + shared);
     };
 
    return (
-      <Header navigation={navigation} previous="Home" homepage={false}>
-         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={80}>
-            {
-               mutation.isPending &&
-               <Text style={{ alignItems: 'center', justifyContent: 'center', fontSize: 40, color: 'white' }}>Loading</Text>
-            }
+           <Header navigation={navigation} previous="Home" homepage={false}>
+           <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={80}>
+           {
+           isPending == true &&
+           <Text style={{ alignItems: 'center', justifyContent: 'center', fontSize: 40, color: 'white' }}>Loading</Text>
+           }
 
             <Pressable onPress={Keyboard.dismiss} style={{flex: 1, alignItems: "center", height:"100%", width:"100%"}}>
                <Text style={{fontSize:40,fontWeight:'200',color:'white',paddingBottom: 12}}>Write a Daily</Text>
@@ -68,8 +54,8 @@ const WriteADaily = ({navigation}:{navigation:any}) => {
                      thumbColor={shared ? "#f5dd4b" : "#f4f3f4"}
                      value={shared}
                   />
-                  { mutation.isPending == false &&
-                      <Pressable onPress={() => {handleDailySubmit(); console.log("is loading: " + mutation.isPending);}}>
+                  { isPending == false &&
+                      <Pressable onPress={() => {handleDailySubmit(); console.log(isPending);}}>
                           <Image source={require("../assets/tickIcon.png")} style={styles.tickIcon}></Image>
                       </Pressable>
                   }
