@@ -3,7 +3,7 @@ import base64
 def getImage():
     base64Image = None
     try:
-        imagePath = "./venv/Image/sampleImage.jpg"
+        imagePath = "./image/sampleImage.jpg"
         with open(imagePath, "rb") as imgFile:
             img = imgFile.read()
             base64Image = "data:image/png;base64, " + base64.b64encode(img).decode('utf-8')
