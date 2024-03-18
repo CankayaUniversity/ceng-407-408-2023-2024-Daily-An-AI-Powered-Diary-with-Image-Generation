@@ -1,9 +1,31 @@
-To run this app
+## To run the app
 
-1) python -m venv venv
-2) Activate the virtual environment
-3)
-```python
+- Create a virtual environment using the following command
+
+```bash
+python -m venv venv
+```
+
+- Activate the virtual environment
+
+For Linux and MacOS:
+```bash
+source venv/bin/activate
+```
+
+For Windows:
+```bash
+.\venv\Scripts\activate
+```
+
+- Install the required packages using the following command
+
+```bash
 pip install requirements.txt
 ```
-4) python -m flask --app .\app.py run
+
+- Now you can run the app using the following command
+
+```bash
+python -m flask --app .\app.py run
+```
