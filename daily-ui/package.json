@@ -19,6 +19,7 @@
     "@types/react": "~18.2.14",
     "axios": "^1.6.7",
     "expo": "~49.0.15",
+    "expo-blur": "~12.4.1",
     "expo-status-bar": "~1.6.0",
     "npm": "^10.4.0",
     "react": "18.2.0",
