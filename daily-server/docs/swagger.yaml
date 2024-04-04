@@ -315,6 +315,11 @@ paths:
       consumes:
       - application/json
       description: returns a list of dailies
+      parameters:
+      - description: limit by q
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:

@@ -204,6 +204,14 @@ const docTemplate = `{
                     "Daily"
                 ],
                 "summary": "returns a list of dailies",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "limit by q",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

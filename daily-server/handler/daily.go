@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -146,6 +147,7 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 // @Tags Daily
 // @Accept json
 // @Produce json
+// @Param        limit    query     int  false  "limit by q"  default(all)
 // @Success 200 {array} model.Daily
 // @Failure 500 {object} object "Bad Gateway {"message': "Couldn't fetch daily list"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "No user"}"
@@ -153,13 +155,26 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 // @Security ApiKeyAuth
 func (d *DailyController) GetDailies(c *gin.Context) {
 	author, _ := c.Get("user_id")
+	limitStr := c.Query("limit") // Returns "" if "limit" is not provided
+	var limit int
+
+	if limitStr != "" {
+		var err error
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			limit = 0
+		}
+	} else {
+		limit = 0
+	}
+
 	if _, ok := author.(primitive.ObjectID); !ok {
 		fmt.Println("author is not a primitive.ObjectID")
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 
-	dailies, err := d.DailyRepository.List(author.(primitive.ObjectID))
+	dailies, err := d.DailyRepository.List(author.(primitive.ObjectID), limit)
 	if err != nil {
 		// Assuming err would not be nil if there's an error, you can expose the error message.
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to fetch Dailies: %s", err.Error())})

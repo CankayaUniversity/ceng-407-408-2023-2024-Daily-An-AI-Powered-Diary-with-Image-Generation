@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 /*
@@ -57,12 +58,14 @@ func (r *DailyRepository) FindById(id primitive.ObjectID) (model.Daily, error) {
 	return daily, err
 }
 
-func (r *DailyRepository) List(author_id primitive.ObjectID) ([]model.Daily, error) {
+func (r *DailyRepository) List(author_id primitive.ObjectID, limit int) ([]model.Daily, error) {
 	var dailies []model.Daily
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := r.dailies.Find(ctx, bson.M{"author": author_id})
+	opts := options.Find().SetLimit(int64(limit))
+
+	cursor, err := r.dailies.Find(ctx, bson.M{"author": author_id}, opts)
 	if err != nil {
 		return dailies, err
 	}
@@ -139,11 +142,11 @@ func (r *DailyRepository) EditDailyImage(dailyID primitive.ObjectID, image strin
 	getDaily := bson.M{"_id": dailyID}
 	dailyOperation := bson.M{"$set": bson.M{"image": image}}
 	result, err := r.dailies.UpdateOne(ctx, getDaily, dailyOperation)
-	if result.MatchedCount == 0 || err != nil {
-		return errors.New("There is no file matched with this id.")
+	if result.MatchedCount == 0 && err != nil {
+		return errors.New("not found")
 	}
-	if result.ModifiedCount == 0 || err != nil {
-		return errors.New("Same image with the old one, couldn't update succesfully.")
+	if result.ModifiedCount == 0 && err != nil {
+		return errors.New("same image")
 	}
 	return nil
 }
