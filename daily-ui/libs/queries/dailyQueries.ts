@@ -14,10 +14,10 @@ export const dailyQueryKeys = {
    deleteDaily:'#daily/deleteDaily'
 }
 
-export const useGetDailies = () =>{
+export const useGetDailies = (limit?: number) => {
    return useQuery({
       queryKey:[dailyQueryKeys.getDailies],
-      queryFn: ({signal}) => getDailies(signal),
+      queryFn: ({signal}) => getDailies(signal, limit),
    })
 }
 

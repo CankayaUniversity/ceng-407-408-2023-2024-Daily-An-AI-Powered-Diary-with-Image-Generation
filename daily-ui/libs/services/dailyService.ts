@@ -13,9 +13,15 @@ export const createDaily = async (
 }
 
 export const getDailies = async (
-   signal?:AbortSignal
+   signal?:AbortSignal,
+   limit?: number
 ) => {
-   const url = "/daily/list";
+   const params = new URLSearchParams();
+   let url = `/daily/list`;
+   if (limit !== undefined && limit > -1) {
+      params.append('limit', limit.toString());
+      url += `?${params.toString()}`; // Append query params to the existing URL
+   }
    const response = await serviceConsumer.get<
    DailyResponse[],
    AxiosResponse<DailyResponse[]>>(url,{signal});
