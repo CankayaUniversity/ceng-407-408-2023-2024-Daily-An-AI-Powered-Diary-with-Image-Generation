@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-import { BlurView, VibrancyView } from '@react-native-community/blur';
 import { StyleSheet, Text, View,Alert,TouchableOpacity, ImageBackground } from 'react-native';
 import Header from '../components/Header';
 
