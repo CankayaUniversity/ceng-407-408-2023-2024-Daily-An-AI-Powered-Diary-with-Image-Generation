@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { useGetDailies } from '../libs';
 
 const YourDaily = ({navigation}:{navigation:any}) => {
-  const { isError, isLoading, data }= useGetDailies(10);
+  const { isError, isLoading, data } = useGetDailies(10);
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", flexWrap: 'wrap', justifyContent:'flex-start',gap:10, alignItems: 'center',marginTop:10,paddingStart:15,paddingBottom:90}}>
