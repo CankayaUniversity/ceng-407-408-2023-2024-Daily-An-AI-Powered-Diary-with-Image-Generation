@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { BlurView } from "expo-blur";
+import { BlurView, VibrancyView } from '@react-native-community/blur';
 import { StyleSheet, Text, View,Alert,TouchableOpacity, ImageBackground } from 'react-native';
 import Header from '../components/Header';
 
@@ -7,13 +7,13 @@ const Profile = ({navigation}:{navigation:any}) => {
    return (
       <Header navigation={navigation} previous="Home" homepage={true}>
          <View style={styles.container}>
-            <BlurView style={styles.container2} tint="dark" intensity={70}>
+            <View style={styles.container2}>
                <View style={styles.rows}>
                   <View style={styles.avatarbox}>
                      <View style={styles.avatarPlaceholder} />
                   </View>
                   <View>
-                     <Text style={styles.name}>umit mete sahin</Text>
+                     <Text style={styles.name}>daily dev</Text>
                      <Text style={styles.username}>@daily_dev</Text>
                   </View>
                </View>
@@ -38,6 +38,7 @@ const Profile = ({navigation}:{navigation:any}) => {
                   </View>
                   <View style={styles.box1}>
                      <Text style={[styles.title, {textAlign: 'left'}]}>This week, you are feeling...</Text>
+                     <Text style={[styles.subtitle, {textAlign: 'left'}]}>insert mood here</Text>
                   </View>
                </View>
                <View style={styles.rows}>
@@ -49,7 +50,7 @@ const Profile = ({navigation}:{navigation:any}) => {
                   </View>
                </View>
 
-            </BlurView>
+            </View>
          </View>
       </Header>
    );
@@ -64,7 +65,14 @@ const styles = StyleSheet.create({
       paddingTop: 12,
       height: '100%',
       borderRadius:12,
-      backgroundColor:'rgba(0,0,0,0.4)'
+      backgroundColor:'rgba(0,0,0,0.4)',
+      elevation: 2,
+      shadowOffset: {
+         width: 0,
+         height: 4
+      },
+      shadowRadius: 6,
+      shadowOpacity: 0.5
    },
    rows: {
       justifyContent: 'space-around',
@@ -78,6 +86,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       borderRadius: 12,
       alignItems: 'stretch',
+      shadowColor: '#000000',
    },
    title: {
       textAlign:'right',
@@ -85,7 +94,13 @@ const styles = StyleSheet.create({
       fontSize:18,
       fontWeight:'600',
       color:'white',
-      opacity: 1.0
+      opacity: 1.0,
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
+      textShadowOffset: {
+         width: 0,
+         height: 2
+      },
+      textShadowRadius: 3
    },
    subtitle: {
       textAlign:'right',
@@ -105,13 +120,20 @@ const styles = StyleSheet.create({
       borderTopEndRadius:12,
       borderRadius:12,
       alignSelf: 'flex-start',
-      backgroundColor:'rgba(0,0,0,0.4)' 
+      backgroundColor:'rgba(0,0,0,0.4)',
+      elevation: 2,
+      shadowOffset: {
+         width: 0,
+         height: 4
+      },
+      shadowRadius: 6,
+      shadowOpacity: 0.4
    },
    subbox: {
       flex: 3,
       height: '100%',
       alignSelf: 'flex-start',
-      backgroundColor:'rgba(0,0,0,0)' 
+      backgroundColor:'rgba(0,0,0,0)',
    },
    avatarbox: {
       flex: 1,
@@ -131,7 +153,13 @@ const styles = StyleSheet.create({
       fontSize:36,
       fontWeight:'500',
       color:'white',
-      opacity: 1.0
+      opacity: 1.0,
+      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      textShadowOffset: {
+         width: 0,
+         height: 2
+      },
+      textShadowRadius: 3
    },
    username: {
       textAlign:'right',
@@ -153,6 +181,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#FFFFFF',
       opacity: 0.5,
       justifyContent: 'flex-start',
+      
    }
    
 });
