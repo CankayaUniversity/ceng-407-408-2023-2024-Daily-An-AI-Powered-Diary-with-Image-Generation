@@ -4,14 +4,23 @@ import Header from '../components/Header';
 import { useGetExplore } from '../libs';
 import Swiper from 'react-native-swiper';
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 
 const Explore = ({ navigation }: { navigation: any }) => {
-  const { isError, isLoading, data, refetch, isRefetching } = useGetExplore();
+  const { error, isError, isLoading, data, refetch, isRefetching } = useGetExplore();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (error) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.status === 401) {
+      navigation.navigate('Login');
+      console.log("Unauthorized, redirecting to login");
+    }
+  }
 
   const handleSwipe = (index: number) => {
     setCurrentIndex(index);
-    if (index > 4) {
+    if (index > 3) {
       refetch();
     }
   };
@@ -19,14 +28,15 @@ const Explore = ({ navigation }: { navigation: any }) => {
   return (
     <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        {isLoading && <Text>Loading...</Text>}
-        {isError && <Text>Error fetching data</Text>}
-        {isRefetching && <Text>Loading more...</Text>}
+        {isLoading && <Text style={{ color: "white", fontSize: 16 }}>Loading...</Text>}
+        {isError && <Text style={{ color: "white", fontSize: 16 }}>Error fetching data</Text>}
+        {isRefetching && <Text style={{ color: "white", fontSize: 16 }}>Loading more...</Text>}
 
         <Swiper
           onIndexChanged={handleSwipe}
           loop={false}
           index={currentIndex}
+          horizontal={false}
         >
           {data != undefined &&
             data.map((daily: any, index: number) => (

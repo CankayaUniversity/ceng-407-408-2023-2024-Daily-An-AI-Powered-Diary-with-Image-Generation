@@ -21,17 +21,17 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="AuthLoadingScreen" screenOptions={{headerShown:false}}>
-          <Stack.Screen name="AuthLoadingScreen" component={AuthLoadingScreen}/>
-          <Stack.Screen name="Home" component={Home}/>
-          <Stack.Screen name="YourDaily" component={YourDaily}/>
-          <Stack.Screen name="ReadDaily" component={ReadDaily}/>
-          <Stack.Screen name="Explore" component={Explore}/>
-          <Stack.Screen name="Profile" component={Profile}/>
-          <Stack.Screen name="Statistics" component={Statistics}/>
-          <Stack.Screen name="WriteADaily" component={WriteADaily}/>
-          <Stack.Screen name="Login" component={Login}/>
-          <Stack.Screen name="Register" component={Register}/>
+        <Stack.Navigator initialRouteName="AuthLoadingScreen" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="AuthLoadingScreen" component={AuthLoadingScreen} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="YourDaily" component={YourDaily} />
+          <Stack.Screen name="ReadDaily" component={ReadDaily} />
+          <Stack.Screen name="Explore" component={Explore} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Statistics" component={Statistics} />
+          <Stack.Screen name="WriteADaily" component={WriteADaily} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Register" component={Register} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>

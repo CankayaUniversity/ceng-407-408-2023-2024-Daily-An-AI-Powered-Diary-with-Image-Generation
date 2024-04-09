@@ -68,7 +68,7 @@ func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
 		"image":    bson.M{"$exists": true},
 	}
 
-	opts := options.Find().SetSort(bson.M{"favourites": -1}).SetLimit(10)
+	opts := options.Find().SetSort(bson.M{"favourites": -1}).SetLimit(5)
 
 	cursor, err := r.dailies.Find(ctx, filter, opts)
 	if err != nil {

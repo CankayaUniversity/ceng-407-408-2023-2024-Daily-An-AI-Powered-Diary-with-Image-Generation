@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity,Image, ScrollView } from 'react-native'
+import { StyleSheet, View, Text, Pressable, Image, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import { DailyResponse } from '../libs'
@@ -9,7 +9,7 @@ export default function ReadDaily({route,navigation}:{route:any,navigation:any})
   return (
    <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-         <TouchableOpacity onPress={ ()=>setVisible(!isVisible) } style={{ height: '100%', width: '100%', opacity: 1.0, backgroundColor: '#0D1326' }}>
+         <Pressable onPress={ ()=>setVisible(!isVisible) } style={{ height: '100%', width: '100%', opacity: 1.0, backgroundColor: '#0D1326' }}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                {
                   isVisible &&
@@ -20,7 +20,7 @@ export default function ReadDaily({route,navigation}:{route:any,navigation:any})
                   <Text style={styles.text}>{data.text}</Text>
                }
             </ScrollView>
-         </TouchableOpacity>
+         </Pressable>
       </View>
    </Header>
   )

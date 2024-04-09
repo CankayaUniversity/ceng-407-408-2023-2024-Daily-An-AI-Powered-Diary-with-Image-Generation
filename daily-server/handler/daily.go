@@ -196,7 +196,7 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 // @Success 200 {array} model.Daily
 // @Failure 500 {object} object "Bad Gateway {"message': "Failed to fetch Dailies"}"
 // @Failure 502 {object} object "Bad Gateway {"message': "No user"}"
-// @Router /api/daily/getExplore [get]
+// @Router /api/daily/explore [get]
 // @Security ApiKeyAuth
 func (d *DailyController) GetExplore(c *gin.Context) {
 	dailies, err := d.DailyRepository.GetExplore()
