@@ -12,7 +12,17 @@ export const dailyQueryKeys = {
    editDailyImage: '#daily/editDailyImage',
    reportDaily: '#daily/reportDaily',
    deleteDaily: '#daily/deleteDaily',
-   getExplore: '#daily/getExplore'
+   getExplore: '#daily/getExplore',
+   getExploreInfinite: '#daily/getExploreInfinite'
+}
+
+export const useGetExploreInfinite = () => {
+   return useInfiniteQuery({
+      queryKey: [dailyQueryKeys.getExploreInfinite],
+      queryFn: ({ signal }) => getExplore(signal),
+      initialPageParam: 1,
+      getNextPageParam: () => null,
+   })
 }
 
 export const useGetExplore = () => {

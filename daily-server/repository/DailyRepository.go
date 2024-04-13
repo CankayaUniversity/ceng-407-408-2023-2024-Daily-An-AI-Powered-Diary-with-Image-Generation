@@ -63,14 +63,20 @@ func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	filter := bson.M{
-		"isShared": true,
-		"image":    bson.M{"$exists": true},
+	pipeline := mongo.Pipeline{
+		{{"$sample", bson.D{{"size", 5}}}},
 	}
 
-	opts := options.Find().SetSort(bson.M{"favourites": -1}).SetLimit(5)
+	cursor, err := r.dailies.Aggregate(ctx, pipeline)
 
-	cursor, err := r.dailies.Find(ctx, filter, opts)
+	/*	filter := bson.M{
+			"isShared": true,
+			"image":    bson.M{"$exists": true},
+		}
+	*/
+	// opts := options.Find().SetSort(bson.M{"favourites": -1}).SetLimit(5)
+
+	// cursor, err := r.dailies.Find(ctx, filter, opts)
 	if err != nil {
 		return dailies, err
 	}

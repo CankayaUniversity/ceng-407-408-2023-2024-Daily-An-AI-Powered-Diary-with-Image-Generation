@@ -1,46 +1,61 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import Header from '../components/Header';
-import { useGetExplore } from '../libs';
+import { useGetExplore, useGetExploreInfinite } from '../libs';
 import Swiper from 'react-native-swiper';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AxiosError } from 'axios';
 
 const Explore = ({ navigation }: { navigation: any }) => {
-  const { error, isError, isLoading, data, refetch, isRefetching } = useGetExplore();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // const { error, isError, isLoading, data, refetch, isRefetching } = useGetExplore();
+  const { error, isError, isLoading, data, fetchNextPage, isFetchingNextPage } =
+    useGetExploreInfinite();
+  const currentIndex = useRef(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
-  if (error) {
-    const axiosError = error as AxiosError;
-    if (axiosError.response?.status === 401) {
-      navigation.navigate('Login');
-      console.log("Unauthorized, redirecting to login");
+  useEffect(() => {
+    if (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 401) {
+        console.log("Unauthorized, redirecting to login");
+        navigation.navigate('Login');
+      }
     }
-  }
+  }, [error, navigation]);
 
+
+  const pages = data?.pages.flat() ?? [];
   const handleSwipe = (index: number) => {
-    setCurrentIndex(index);
-    if (index > 3) {
-      refetch();
+    currentIndex.current += 1;
+    console.log(currentIndex.current + " " + currentPage);
+    console.log(pages.length);
+    if (index > 1) {
+      if (data && index >= pages.length - 1) {
+        console.log("fetching next page");
+        setCurrentPage(data?.pages.length + 1);
+        fetchNextPage();
+      }
     }
   };
 
+
+  // {isRefetching && <Text style={{ color: "white", fontSize: 16 }}>Loading more...</Text>}
   return (
     <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         {isLoading && <Text style={{ color: "white", fontSize: 16 }}>Loading...</Text>}
         {isError && <Text style={{ color: "white", fontSize: 16 }}>Error fetching data</Text>}
-        {isRefetching && <Text style={{ color: "white", fontSize: 16 }}>Loading more...</Text>}
+        {isFetchingNextPage && <Text style={{ color: "white", fontSize: 16 }}>Loading more...</Text>}
 
         <Swiper
           onIndexChanged={handleSwipe}
           loop={false}
-          index={currentIndex}
+          index={currentIndex.current}
           horizontal={false}
         >
-          {data != undefined &&
-            data.map((daily: any, index: number) => (
-              <View key={index} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          {pages !== undefined &&
+            pages.map((daily: any) => (
+              <View key={daily.id} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Image source={{ uri: daily.image }} style={{ width: '100%', height: '80%' }} />
               </View>
             ))
