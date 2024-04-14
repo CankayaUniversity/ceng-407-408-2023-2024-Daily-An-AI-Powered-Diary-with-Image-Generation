@@ -31,6 +31,7 @@ export const getDailies = async (
 export const getExplore = async (
    signal?: AbortSignal,
 ) => {
+   const params = new URLSearchParams();
    let url = `/daily/explore`;
 
    const response = await serviceConsumer.get<

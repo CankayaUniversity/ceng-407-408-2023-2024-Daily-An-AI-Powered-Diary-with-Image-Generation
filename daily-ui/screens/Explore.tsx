@@ -26,6 +26,7 @@ const Explore = ({ navigation }: { navigation: any }) => {
 
   const pages = data?.pages.flat() ?? [];
   const handleSwipe = (index: number) => {
+    console.log(index);
     currentIndex.current += 1;
     console.log(currentIndex.current + " " + currentPage);
     console.log(pages.length);
