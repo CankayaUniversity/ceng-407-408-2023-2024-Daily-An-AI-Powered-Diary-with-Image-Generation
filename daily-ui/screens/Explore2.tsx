@@ -5,11 +5,12 @@ import { getExplore } from '../libs';
 import Swiper from 'react-native-swiper';
 import { useState, useEffect, useRef } from 'react';
 import { AxiosError } from 'axios';
+import uuidv4 from 'uuid/v4';
 
 const Explore2 = ({ navigation }: { navigation: any }) => {
   const [error, setError] = useState<AxiosError | null>(null);
   const [data, setData] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const currentIndex = useRef(0);
 
   const handleSwipe = (index: number) => {
@@ -17,7 +18,7 @@ const Explore2 = ({ navigation }: { navigation: any }) => {
     currentIndex.current = index;
 
     console.log(index);
-    if (index >= (currentPage + 1) * 5 - 1) {
+    if (index >= (currentPage) * 5 - 1) {
       setCurrentPage((currentPage) => currentPage + 1);
     }
   };
@@ -54,14 +55,15 @@ const Explore2 = ({ navigation }: { navigation: any }) => {
     <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Swiper
-          onIndexChanged={handleSwipe}
+          key={uuidv4()}
           loop={false}
+          onIndexChanged={handleSwipe}
           horizontal={false}
           index={currentIndex.current}
         >
           {
-            data.map((daily: any, index: number) => (
-              <View key={`${daily.id}-${index}`} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            (data.length > currentPage * 5 - 1) && data.map((daily: any, index: number) => (
+              <View key={uuidv4()} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Image source={{ uri: daily.image }} style={{ width: '100%', height: '80%' }} />
               </View>
             ))
