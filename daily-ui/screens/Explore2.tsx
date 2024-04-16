@@ -6,6 +6,7 @@ import Swiper from 'react-native-swiper';
 import { useState, useEffect, useRef } from 'react';
 import { AxiosError } from 'axios';
 import uuidv4 from 'uuid/v4';
+import FlipCard from './FlipCard';
 
 const Explore2 = ({ navigation }: { navigation: any }) => {
   const [error, setError] = useState<AxiosError | null>(null);
@@ -63,16 +64,23 @@ const Explore2 = ({ navigation }: { navigation: any }) => {
         >
           {
             (data.length > currentPage * 5 - 1) && data.map((daily: any, index: number) => (
-              <View key={uuidv4()} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <Image source={{ uri: daily.image }} style={{ width: '100%', height: '80%' }} />
-              </View>
+              <FlipCard key={uuidv4()} dailyUrl={daily.image} dailyContent={daily.text} />
             ))
           }
+
         </Swiper>
       </View>
     </Header>
   );
 
+  /*          {
+              (data.length > currentPage * 5 - 1) && data.map((daily: any, index: number) => (
+                <View key={uuidv4()} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                  <Image source={{ uri: daily.image }} style={{ width: '100%', height: '80%' }} />
+                </View>
+              ))
+            }
+            */
 
 }
 const styles = StyleSheet.create({})
