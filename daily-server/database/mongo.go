@@ -26,9 +26,9 @@ func Init() {
 		log.Fatal("error while trying to ping mongo", err)
 	}
 	client = localClient
-	Users = client.Database("daily-ai").Collection("users")
-	Dailies = client.Database("daily-ai").Collection("dailies")
-	ReportedDailies = client.Database("daily-ai").Collection("reportedDailies")
+	Users = client.Database("daily").Collection("users")
+	Dailies = client.Database("daily").Collection("dailies")
+	ReportedDailies = client.Database("daily").Collection("reportedDailies")
 }
 
 func Close() error {
