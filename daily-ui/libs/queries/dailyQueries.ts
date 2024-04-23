@@ -1,74 +1,92 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
-import {queryClient} from "."
-import {CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, viewDaily} from ".."
+import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query"
+import { queryClient } from "."
+import { CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, viewDaily } from ".."
 import { Alert } from "react-native"
 
 export const dailyQueryKeys = {
-   createDaily:'#daily/createDaily',
-   getDaily:'#daily/getDaily',
+   createDaily: '#daily/createDaily',
+   getDaily: '#daily/getDaily',
    getDailies: '#daily/getDailies',
-   favDaily:'#daily/favDaily',
-   viewDaily:'#daily/viewDaily',
-   editDailyImage:'#daily/editDailyImage',
-   reportDaily:'#daily/reportDaily',
-   deleteDaily:'#daily/deleteDaily'
+   favDaily: '#daily/favDaily',
+   viewDaily: '#daily/viewDaily',
+   editDailyImage: '#daily/editDailyImage',
+   reportDaily: '#daily/reportDaily',
+   deleteDaily: '#daily/deleteDaily',
+   getExplore: '#daily/getExplore',
+   getExploreInfinite: '#daily/getExploreInfinite'
+}
+
+export const useGetExploreInfinite = () => {
+   return useInfiniteQuery({
+      queryKey: [dailyQueryKeys.getExploreInfinite],
+      queryFn: ({ signal }) => getExplore(signal),
+      initialPageParam: 1,
+      getNextPageParam: () => null,
+   })
+}
+
+export const useGetExplore = () => {
+   return useQuery({
+      queryKey: [dailyQueryKeys.getExplore],
+      queryFn: ({ signal }) => getExplore(signal),
+   })
 }
 
 export const useGetDailies = (limit?: number) => {
    return useQuery({
-      queryKey:[dailyQueryKeys.getDailies],
-      queryFn: ({signal}) => getDailies(signal, limit),
+      queryKey: [dailyQueryKeys.getDailies],
+      queryFn: ({ signal }) => getDailies(signal, limit),
    })
 }
 
 export const useGetDaily = (
-   id:string
-) =>{
+   id: string
+) => {
    return useQuery({
-      queryKey:[dailyQueryKeys.getDaily],
-      queryFn: ({signal}) => getDaily(id,signal),
+      queryKey: [dailyQueryKeys.getDaily],
+      queryFn: ({ signal }) => getDaily(id, signal),
    })
 }
 
-export const useCreateDaily = (navigation: any) =>{
+export const useCreateDaily = (navigation: any) => {
    return useMutation({
-      mutationFn:(daily:CreateDailyRequest)=>createDaily(daily),
+      mutationFn: (daily: CreateDailyRequest) => createDaily(daily),
       onError: (error) => {
-          Alert.alert('Error', error.message);
+         Alert.alert('Error', error.message);
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies]});
-        navigation.navigate("YourDaily");
+         queryClient.invalidateQueries({ queryKey: [dailyQueryKeys.getDailies] });
+         navigation.navigate("YourDaily");
       },
-    })
+   })
 }
 
-export const useFavDaily = () =>{
+export const useFavDaily = () => {
    return useMutation({
-      mutationFn:(id:string)=>favDaily(id)
-    })
+      mutationFn: (id: string) => favDaily(id)
+   })
 }
 
-export const useViewDaily = () =>{
+export const useViewDaily = () => {
    return useMutation({
-      mutationFn:(id:string)=>viewDaily(id)
-    })
+      mutationFn: (id: string) => viewDaily(id)
+   })
 }
 
-export const useDeleteDaily = () =>{
+export const useDeleteDaily = () => {
    return useMutation({
-      mutationFn:(id:string)=>deleteDaily(id),
+      mutationFn: (id: string) => deleteDaily(id),
       onSuccess: () => {
-        queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies,dailyQueryKeys.getDaily]});
+         queryClient.invalidateQueries({ queryKey: [dailyQueryKeys.getDailies, dailyQueryKeys.getDaily] });
       },
-    })
+   })
 }
 
-export const useEditDailyImage = () =>{
+export const useEditDailyImage = () => {
    return useMutation({
-      mutationFn:(editDaily:EditDailyImageRequest)=>editDailyImage(editDaily),
+      mutationFn: (editDaily: EditDailyImageRequest) => editDailyImage(editDaily),
       onSuccess: () => {
-        queryClient.invalidateQueries({queryKey:[dailyQueryKeys.getDailies,dailyQueryKeys.getDaily]});
+         queryClient.invalidateQueries({ queryKey: [dailyQueryKeys.getDailies, dailyQueryKeys.getDaily] });
       },
-    })
+   })
 }

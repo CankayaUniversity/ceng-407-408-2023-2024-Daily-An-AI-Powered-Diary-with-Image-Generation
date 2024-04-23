@@ -58,6 +58,33 @@ func (r *DailyRepository) FindById(id primitive.ObjectID) (model.Daily, error) {
 	return daily, err
 }
 
+func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
+	var dailies []model.Daily
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pipeline := mongo.Pipeline{
+		{{"$sample", bson.D{{"size", 5}}}},
+	}
+
+	cursor, err := r.dailies.Aggregate(ctx, pipeline)
+
+	/*	filter := bson.M{
+			"isShared": true,
+			"image":    bson.M{"$exists": true},
+		}
+	*/
+	// opts := options.Find().SetSort(bson.M{"favourites": -1}).SetLimit(5)
+
+	// cursor, err := r.dailies.Find(ctx, filter, opts)
+	if err != nil {
+		return dailies, err
+	}
+
+	err = cursor.All(ctx, &dailies)
+	return dailies, err
+}
+
 func (r *DailyRepository) List(author_id primitive.ObjectID, limit int) ([]model.Daily, error) {
 	var dailies []model.Daily
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

@@ -187,6 +187,31 @@ func (d *DailyController) GetDailies(c *gin.Context) {
 	c.JSON(http.StatusOK, dailies)
 }
 
+// GetExplore returns a list of shared dailies
+// @Summary returns a list of shared dailies
+// @Description returns a list of shared dailies
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Daily
+// @Failure 500 {object} object "Bad Gateway {"message': "Failed to fetch Dailies"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "No user"}"
+// @Router /api/daily/explore [get]
+// @Security ApiKeyAuth
+func (d *DailyController) GetExplore(c *gin.Context) {
+	dailies, err := d.DailyRepository.GetExplore()
+	if err != nil {
+		// Assuming err would not be nil if there's an error, you can expose the error message.
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to fetch Dailies: %s", err.Error())})
+		return
+	}
+	if len(dailies) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No Dailies found"})
+		return
+	}
+	c.JSON(http.StatusOK, dailies)
+}
+
 // FavDaily accepts a body request to update a daily & user
 // @Summary update daily & user to apply fav feature
 // @Description fav a daily
