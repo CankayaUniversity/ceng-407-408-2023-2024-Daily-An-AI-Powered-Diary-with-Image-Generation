@@ -305,33 +305,6 @@ paths:
       summary: update daily & user to apply fav feature
       tags:
       - Daily
-  /api/daily/getExplore:
-    get:
-      consumes:
-      - application/json
-      description: returns a list of shared dailies
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.Daily'
-            type: array
-        "500":
-          description: 'Bad Gateway {"message'': "Failed to fetch Dailies"}'
-          schema:
-            type: object
-        "502":
-          description: 'Bad Gateway {"message'': "No user"}'
-          schema:
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: returns a list of shared dailies
-      tags:
-      - Daily
   /api/daily/image:
     put:
       consumes:

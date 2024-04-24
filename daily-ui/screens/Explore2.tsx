@@ -30,7 +30,6 @@ const Explore2 = ({ navigation }: { navigation: any }) => {
       try {
         const newData = await getExplore();
         setData(data => [...data, ...newData]);
-        console.log(data);
         setError(null);
       } catch (error: any) {
         setError(error);

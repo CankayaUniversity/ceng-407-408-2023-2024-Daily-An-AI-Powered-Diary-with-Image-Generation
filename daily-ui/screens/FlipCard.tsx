@@ -60,17 +60,17 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   flipCard: {
-    alignItems: 'center',
+    backgroundColor: 'black',
     justifyContent: 'center',
     backfaceVisibility: 'hidden',
     // Add perspective for Android support:
-    transform: [{ perspective: 1000 }]
+    transform: [{ perspective: 1000 }],
+    paddingBottom: 100,
   },
   flipCardBack: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    top: 0,
   },
   flipCardBackInside: {
     borderRadius: 16,
@@ -79,17 +79,17 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     borderWidth: 0.5,
     opacity: 0.85,
-    borderColor: 'gray',
+    borderColor: 'purple',
     backgroundColor: '#0D1326',
     height: '75%',
-    width: '90%',
+    width: '100%',
     marginTop: 40,
     marginBottom: 40,
   },
   image: {
+    resizeMode: 'contain',
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
 });
 

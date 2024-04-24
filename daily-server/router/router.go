@@ -24,6 +24,10 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.Default()
 
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.Use(middleware.ErrorLogger())
+
 	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
 
 	// Cors middleware
@@ -55,7 +59,6 @@ func New() *gin.Engine {
 	api.PUT("/daily/image", dailyHandler.EditDailyImage)
 	api.DELETE("/daily/:id", dailyHandler.DeleteDaily)
 	api.GET("/daily/explore", dailyHandler.GetExplore)
-
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
 	admin.DELETE("/deleteUser", handler.DeleteUserAdmin)

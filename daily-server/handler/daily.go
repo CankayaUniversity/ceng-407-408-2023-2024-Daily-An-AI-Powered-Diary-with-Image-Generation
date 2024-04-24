@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
 	"github.com/Final-Projectors/daily-server/repository"
-	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -64,35 +64,8 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	daily.IsShared = *createDailyDTO.IsShared
 
-	flaskData, err := utils.GetDataFromFlask(daily.Text)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	if emotionsMap, ok := flaskData["emotions"].(map[string]interface{}); ok {
-		intEmotions := make(map[string]int)
-		for key, value := range emotionsMap {
-			switch v := value.(type) {
-			case int:
-				intEmotions[key] = v
-			case float64: // Handle float64 as well
-				intEmotions[key] = int(v)
-			default:
-				fmt.Printf("Error: Value for key %s is not an integer: %v\n", key, value)
-			}
-		}
-		daily.Emotions.Sadness = intEmotions["Sadness"]
-		daily.Emotions.Joy = intEmotions["Joy"]
-		daily.Emotions.Love = intEmotions["Love"]
-		daily.Emotions.Anger = intEmotions["Anger"]
-		daily.Emotions.Fear = intEmotions["Fear"]
-		daily.Emotions.Surprise = intEmotions["Surprise"]
-	} else {
-		fmt.Println("Error: Value in flaskData['emotions'] is not a map[string]interface{}")
-	}
-
 	if createDailyDTO.Image == "" {
-		daily.Image = flaskData["image"].(string)
+		daily.Image = "https://free-images.com/md/7687/blue_jay_bird_nature.jpg"
 	} else {
 		daily.Image = createDailyDTO.Image
 	}
@@ -135,7 +108,8 @@ func (d *DailyController) GetDaily(c *gin.Context) {
 	}
 	daily, err := d.DailyRepository.FindById(objectID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error() + objectID.String()})
+		c.AbortWithError(http.StatusBadRequest, errors.New("invalid id"))
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error() + ": " + objectID.String()})
 		return
 	}
 	c.JSON(http.StatusOK, daily)

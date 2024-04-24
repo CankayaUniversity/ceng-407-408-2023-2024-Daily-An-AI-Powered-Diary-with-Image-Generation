@@ -171,49 +171,6 @@
                 }
             }
         },
-        "/api/daily/getExplore": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "returns a list of shared dailies",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Daily"
-                ],
-                "summary": "returns a list of shared dailies",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Daily"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Bad Gateway {\"message': \"Failed to fetch Dailies\"}",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway {\"message': \"No user\"}",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/api/daily/image": {
             "put": {
                 "security": [

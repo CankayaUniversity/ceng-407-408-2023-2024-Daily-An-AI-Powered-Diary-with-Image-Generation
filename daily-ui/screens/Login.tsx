@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import Header from '../components/Header';
 import { UserInfo, login } from '../libs';
 
@@ -13,6 +13,7 @@ const Login = ({ navigation }: { navigation: any }) => {
         email: email,
         password: password
       }
+      console.log(password);
       await login(userInfo);
       navigation.navigate('Home');
     } catch (error: any) {
@@ -23,7 +24,8 @@ const Login = ({ navigation }: { navigation: any }) => {
   return (
     <Header navigation={navigation} previous="Home" homepage={false}>
       <View style={styles.container}>
-        <Text style={styles.logo}>daily</Text>
+        <Image style={styles.logo} source={require("../assets/main-logo-big.png")}>
+        </Image>
         <View style={styles.inputView}>
           <TextInput
             style={styles.inputText}
@@ -43,12 +45,17 @@ const Login = ({ navigation }: { navigation: any }) => {
             secureTextEntry={true}
           />
         </View>
-        <Pressable style={styles.loginBtn} onPress={handleLogin}>
-          <Text style={styles.loginText}>LOGIN</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.loginBtn,
+            { opacity: pressed ? 0.5 : 1 }
+          ]}
+          onPress={handleLogin}>
+          <Text style={styles.loginText}>Log in</Text>
         </Pressable>
         <StatusBar style="auto" />
       </View>
-    </Header>
+    </Header >
 
   );
 };
@@ -59,17 +66,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    color: "white",
-    fontWeight: 'bold',
+    marginTop: 160,
     fontSize: 50,
     marginBottom: 40,
   },
   inputView: {
     width: '80%',
     backgroundColor: '#ffffff',
-    borderRadius: 25,
+    borderRadius: 15,
     height: 50,
-    marginBottom: 20,
+    marginBottom: 15,
     justifyContent: 'center',
     padding: 20,
   },
@@ -79,19 +85,21 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     borderWidth: 1,
-    backgroundColor: '#0D1326',
+    backgroundColor: '#6A51BE',
     paddingHorizontal: 10,
     paddingVertical: 10,
+    width: '80%',
     opacity: 0.8,
-    borderRadius: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
-    borderColor: "white",
+    borderColor: '#6A51BE',
     border: 10
   },
   loginText: {
     color: 'white',
+    fontWeight: 'bold',
     fontSize: 20,
   },
 });
