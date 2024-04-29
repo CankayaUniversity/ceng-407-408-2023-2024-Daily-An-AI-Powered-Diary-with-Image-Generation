@@ -24,10 +24,6 @@ func Init() {
 func New() *gin.Engine {
 	router := gin.Default()
 
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	router.Use(middleware.ErrorLogger())
-
 	dailyHandler := handler.NewDailyController(repository.NewUserRepository(), repository.NewDailyRepository(repository.NewUserRepository()), repository.NewReportedDailyRepository())
 
 	// Cors middleware
