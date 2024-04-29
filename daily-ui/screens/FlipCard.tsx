@@ -57,6 +57,7 @@ const FlipCard = ({ dailyUrl, dailyContent }: FlipCardProps) => {
 
 const styles = StyleSheet.create({
   textStyle: {
+    fontSize: 20,
     color: 'white',
   },
   flipCard: {
@@ -73,15 +74,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   flipCardBackInside: {
-    borderRadius: 16,
+    fontSize: 15,
     paddingStart: 10,
     paddingEnd: 10,
     paddingTop: 10,
     borderWidth: 0.5,
     opacity: 0.85,
-    borderColor: 'purple',
     backgroundColor: '#0D1326',
-    height: '75%',
+    height: '100%',
     width: '100%',
     marginTop: 40,
     marginBottom: 40,
