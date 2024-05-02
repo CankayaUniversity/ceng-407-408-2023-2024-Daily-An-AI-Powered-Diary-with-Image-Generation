@@ -137,6 +137,12 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 	return err
 }
 
+func (r *DailyRepository) GetDailyFavourites(dailyID primitive.ObjectID) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	query := bson.M{"$"}
+}
+
 func (r *DailyRepository) View(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
