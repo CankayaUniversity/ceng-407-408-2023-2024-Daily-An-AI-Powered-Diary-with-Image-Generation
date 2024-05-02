@@ -121,13 +121,13 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                <View style={styles.innerItem}>
                   <View>
                      <Text style={styles.innerText}>
-                        Dailies written
+                        Views
                      </Text>
                      <View style={{ width: "100%", height: 34 }}></View>
                      <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                         <Text style={styles.innerNumber}>
-                           {statistics.dailyWritten}
+                           {statistics.views}
                         </Text>
                      </View>
                   </View>
@@ -169,7 +169,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      </Text>
                      <View style={{ width: "100%", height: 20 }}></View>
                      <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                        <Text style={[styles.innerNumber, { fontSize: 24, fontWeight: "bold" }]}>
+                        <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
                            {statistics.topic}
                         </Text>
                      </View>

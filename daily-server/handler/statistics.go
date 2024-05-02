@@ -1,4 +1,4 @@
-;package handler
+package handler
 
 import (
 	"errors"
@@ -23,8 +23,8 @@ type StatisticsController struct {
 
 func NewStatisticsController(_userRepository *repository.UserRepository, _repository *repository.DailyRepository, _reports *repository.ReportedDailyRepository) *DailyController {
 	return &DailyController{
-		UserRepository:   _userRepository,
-		DailyRepository:  _repository, ReportRepository: _reports,
+		UserRepository:  _userRepository,
+		DailyRepository: _repository, ReportRepository: _reports,
 	}
 }
 
