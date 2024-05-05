@@ -331,6 +331,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/daily/statistics": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "provides statistical data about a user's activity including likes, views, number of dailies written, current mood, streak, and a predefined topic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "Get user statistics",
+                "responses": {
+                    "200": {
+                        "description": "An object of statistics including likes, views, dailies written, mood, streak, and topic",
+                        "schema": {
+                            "$ref": "#/definitions/model.StatisticsDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/daily/view": {
             "put": {
                 "security": [
@@ -709,6 +749,35 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "model.StatisticsDTO": {
+            "type": "object",
+            "properties": {
+                "dailiesWritten": {
+                    "description": "Number of dailies written",
+                    "type": "integer"
+                },
+                "likes": {
+                    "description": "Number of likes received",
+                    "type": "integer"
+                },
+                "mood": {
+                    "description": "Current mood based on user's entries",
+                    "type": "string"
+                },
+                "streak": {
+                    "description": "Current streak of daily entries",
+                    "type": "integer"
+                },
+                "topic": {
+                    "description": "Currently focused topic",
+                    "type": "string"
+                },
+                "views": {
+                    "description": "Number of views",
+                    "type": "integer"
                 }
             }
         },
