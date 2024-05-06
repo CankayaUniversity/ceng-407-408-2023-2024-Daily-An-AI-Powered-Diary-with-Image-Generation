@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"reflect"
+	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
@@ -64,7 +65,7 @@ func (controller *StatisticsController) Statistics(c *gin.Context) {
 	}
 	statistics.Streak = controller.Streak(dailies)
 	statistics.Topic = controller.Topics(dailies)
-	statistics.Dates = controller.GetDates(author, c)
+
 	c.JSON(http.StatusOK, statistics)
 }
 
@@ -87,18 +88,16 @@ func (controller *StatisticsController) GetDates(userId primitive.ObjectID, c *g
 		if err != nil {
 			// Handle cursor decoding error
 			fmt.Println("Error decoding cursor:", err)
+			return "", err
 		}
 
 		// Extract and format the createdAt field
 		if createdAt, ok := result["createdAt"].(primitive.DateTime); ok {
-			goTime := createdAt.Time() // Convert MongoDB Datetime to Go's time.Time
-			controller.logger.Infof("Date: %v", goTime)
+			goTime := createdAt.Time()                   // Convert MongoDB Datetime to Go's time.Time
 			formattedDate := goTime.Format("2006-01-02") // Format the time to "YYYY-MM-DD"
-			controller.logger.Infof("Date: %v", formattedDate)
 			formattedDates = append(formattedDates, formattedDate)
 		}
 	}
-	return formattedDates
 }
 
 func (controller *StatisticsController) Views(dailies []model.Daily) int {

@@ -759,6 +759,12 @@ const docTemplate = `{
                     "description": "Number of dailies written",
                     "type": "integer"
                 },
+                "date": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "likes": {
                     "description": "Number of likes received",
                     "type": "integer"

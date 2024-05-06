@@ -5,20 +5,45 @@ import Header from '../components/Header';
 import { Calendar } from 'react-native-calendars';
 import { Colors } from '../libs/colors.tsx';
 import uuidv4 from 'uuid/v4';
+import { getStatistics } from '../libs/services/dailyService';
+import { StatisticsResponse } from '../libs/types';
 
 const calendarSelectedColor = '#AF5C5C66';
 
-
 const Statistics = ({ navigation }: { navigation: any }) => {
    const [timeframe, setTimeframe] = useState("month");
-   const [statistics, setStatistics] = useState({
-      likes: 1,
-      dailyWritten: 1,
-      views: 1,
-      streak: 1,
-      mood: "Happy",
-      topic: "Friends"
-   });
+   const [statistics, setStatistics] = useState<StatisticsResponse | null>(null);
+   const [isLoading, setIsLoading] = useState<boolean>(true);
+   const [error, setError] = useState<string | null>(null);
+   const [markedDatesState, setMarkedDatesState] = useState<any>(null);
+
+   useEffect(() => {
+      const fetchData = async () => {
+         try {
+            const data = await getStatistics();
+            setStatistics(data);
+         } catch (err) {
+            setError("Failed to fetch statistics");
+            console.error(err);
+         } finally {
+            setIsLoading(false);
+         }
+      };
+
+      fetchData();
+   }, []);
+
+
+   const markedDatesFunc = statistics?.date.reduce((acc: any, date) => {
+      acc[date] = { selected: true };
+      return acc;
+   }, {});
+
+   useEffect(() => {
+      console.log(markedDatesFunc);
+      setMarkedDatesState(markedDatesFunc);
+   }, [statistics]);
+
 
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
@@ -26,9 +51,9 @@ const Statistics = ({ navigation }: { navigation: any }) => {
             <Calendar
                key={uuidv4()}
 
-               markedDates={{
-                  '2024-05-22': { selected: true }
-               }}
+               markedDates={
+                  markedDatesState
+               }
 
                style={{
                   backgroundColor: Colors.main_container,
@@ -45,14 +70,12 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                   monthTextColor: Colors.background,
                   dayTextColor: 'white',
                   'stylesheet.calendar.header': {
-                     week: {
-                        fontSize: 20,
-                        width: '100%',
-                        alignItems: 'center',
-                        marginTop: 5,
-                        flexDirection: 'row',
-                        justifyContent: 'center'
-                     },
+                     fontSize: 20,
+                     width: '100%',
+                     alignItems: 'center',
+                     marginTop: 5,
+                     flexDirection: 'row',
+                     justifyContent: 'center',
                      dayHeader: {
                         marginBottom: 7,
                         width: 36,
@@ -97,7 +120,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <Image source={require('../assets/Heart.png')} style={{ marginRight: 10 }} />
                         <Text style={styles.innerNumber}>
-                           {statistics.likes}
+                           {statistics?.likes || "0"}
                         </Text>
                      </View>
                   </View>
@@ -111,7 +134,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                         <Text style={styles.innerNumber}>
-                           {statistics.dailyWritten}
+                           {statistics?.dailiesWritten || 0}
                         </Text>
                      </View>
                   </View>
@@ -127,7 +150,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                         <Text style={styles.innerNumber}>
-                           {statistics.views}
+                           {statistics?.views || 0}
                         </Text>
                      </View>
                   </View>
@@ -141,7 +164,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <Image source={require('../assets/streak.png')} style={{ marginRight: 10, marginTop: 5 }} />
                         <Text style={styles.innerNumber}>
-                           {statistics.streak}
+                           {statistics?.streak || 0}
                         </Text>
                      </View>
                   </View>
@@ -157,7 +180,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
                         <Image source={require('../assets/happy.png')} style={{ marginRight: 10, }} />
                         <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                           {statistics.mood}
+                           {statistics?.mood || "Uncalculated"}
                         </Text>
                      </View>
                   </View>
@@ -170,7 +193,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={{ width: "100%", height: 20 }}></View>
                      <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
                         <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                           {statistics.topic}
+                           {statistics?.topic || "Uncalculated"}
                         </Text>
                      </View>
                   </View>

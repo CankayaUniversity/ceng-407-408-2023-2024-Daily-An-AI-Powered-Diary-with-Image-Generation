@@ -95,6 +95,10 @@ definitions:
       dailiesWritten:
         description: Number of dailies written
         type: integer
+      date:
+        items:
+          type: string
+        type: array
       likes:
         description: Number of likes received
         type: integer
