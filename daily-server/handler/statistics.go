@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"reflect"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
@@ -58,6 +59,7 @@ func (controller *StatisticsController) Statistics(c *gin.Context) {
 	statistics.DailiesWritten = controller.DailiesWritten(dailies)
 	statistics.Mood, err = controller.UserMood(author, c)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		statistics.Mood = "None"
 	}
 	statistics.Streak = controller.Streak(dailies)
@@ -125,12 +127,18 @@ func (controller *StatisticsController) UserMood(userId primitive.ObjectID, c *g
 	if len(results) > 0 {
 		summary := results[0]
 		for emotion, total := range summary {
+			controller.logger.Infof("Emotion: %v, total: %v,  typeof total: %v", emotion, total, reflect.TypeOf(total))
 			if emotion != "_id" { // Ignoring the _id field
+				switch v := total.(type) {
+				case int32:
+					total = float64(v)
+				}
 				totalConverted, ok := total.(float64)
+
 				if !ok {
 					continue
 				}
-
+				controller.logger.Infof("Highest: %v, cur: %v, emotion: %v", highestTotal, totalConverted, emotion)
 				if totalConverted > highestTotal {
 					highestTotal = totalConverted
 					mostProminentEmotion = emotion
