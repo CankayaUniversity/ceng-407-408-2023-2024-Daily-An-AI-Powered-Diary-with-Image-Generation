@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { CommonResponse, CreateDailyRequest, DailyResponse, EditDailyImageRequest, ReportDailyRequest, serviceConsumer } from '..';
+import { CommonResponse, CreateDailyRequest, DailyResponse, EditDailyImageRequest, ReportDailyRequest, StatisticsResponse, serviceConsumer } from '..';
 
 export const createDaily = async (
    daily: CreateDailyRequest,
@@ -25,6 +25,17 @@ export const getDailies = async (
    const response = await serviceConsumer.get<
       DailyResponse[],
       AxiosResponse<DailyResponse[]>>(url, { signal });
+   return response.data;
+}
+
+export const getStatistics = async (
+   signal?: AbortSignal,
+) => {
+   let url = `/daily/statistics`;
+
+   const response = await serviceConsumer.get<
+      StatisticsResponse,
+      AxiosResponse<StatisticsResponse>>(url, { signal });
    return response.data;
 }
 

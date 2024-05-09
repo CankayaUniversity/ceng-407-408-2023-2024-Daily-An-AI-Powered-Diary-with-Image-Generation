@@ -4,16 +4,26 @@ export type CreateDailyRequest = {
    isShared: boolean
 };
 
+export type StatisticsResponse = {
+   date: string[],
+   likes: number,
+   views: number,
+   dailiesWritten: number,
+   mood: string,
+   streak: number,
+   topic: string
+};
+
 export type DailyResponse = {
    id: string,
    text: string,
    author: string,
    keywords: string[],
    emotions: {
-     anger: number,
-     happiness: number,
-     sadness: number,
-     shock: number
+      anger: number,
+      happiness: number,
+      sadness: number,
+      shock: number
    },
    image: string,
    favourites: number,
@@ -25,7 +35,7 @@ export type DailyResponse = {
 export type EditDailyImageRequest = {
    id: string,
    image: string
-}; 
+};
 
 export type ReportDailyRequest = {
    content: string,
