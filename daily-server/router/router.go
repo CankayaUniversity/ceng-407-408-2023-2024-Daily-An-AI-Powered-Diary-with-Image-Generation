@@ -48,6 +48,7 @@ func New() *gin.Engine {
 	admin := router.Group("/admin")
 	api.POST("/register", handler.Register)
 	api.POST("/login", handler.Login)
+	api.GET("/verify/:email/:token", handler.VerifyEmail)
 
 	// user and admin rights here
 	api.Use(middleware.JwtAuthMiddleware())
