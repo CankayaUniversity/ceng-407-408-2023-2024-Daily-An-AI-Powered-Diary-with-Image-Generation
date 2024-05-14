@@ -10,6 +10,7 @@ type User struct {
 	CreatedAt        primitive.DateTime   `json:"createdAt" bson:"createdAt"`
 	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies,omitempty"`
 	Role             string               `json:"role" bson:"role"`
+	IsVerified       bool                 `json:"isVerified" bson:"isVerified" binding:"required"`
 }
 
 type UserRegisterDTO struct {
@@ -20,6 +21,10 @@ type UserRegisterDTO struct {
 type UserLoginDTO struct {
 	Email    string `json:"email" bson:"email" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
+}
+
+type UserVerifyDTO struct {
+	Email string `json:"email" bson:"email" binding:"required"`
 }
 
 type UserDeleteDTO struct {

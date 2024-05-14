@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"net/http"
+	"net/smtp"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -41,9 +45,16 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "exist"})
 		return
 	}
+	mailErr := SendVerificationEmail(userRequest.Email)
+	if mailErr != nil {
+		fmt.Println("Error sending verification email:", mailErr)
+		return
+	}
+	fmt.Println("Verification email sent successfully to", userRequest.Email)
 	user.ID = primitive.NewObjectID()
 	user.Email = userRequest.Email
 	user.Role = "user"
+	user.IsVerified = false
 	user.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -82,6 +93,10 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	if !result.IsVerified {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Email address is not verified"})
+		return
+	}
 	err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(userRequest.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message1": err.Error()})
@@ -92,4 +107,79 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message2": err.Error()})
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func SendVerificationEmail(toEmail string) error {
+	// SMTP server configuration
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587" // Port for SMTP submission (587 for TLS)
+	smtpUsername := "daily2024ai@gmail.com"
+	smtpPassword := "wveb wnxa zwks sycy"
+
+	// Sender and recipient email addresses
+	from := "daily2024ai@gmail.com"
+	to := []string{toEmail}
+
+	token := generateRandomToken()
+	// Email content
+	subject := "Verification Email"
+	verificationURL := fmt.Sprintf("http://localhost:9090/api/verify/%s/&token=%s", toEmail, token)
+	body := fmt.Sprintf("Please click the link below to verify your email address:\n\n %s", verificationURL)
+
+	// Create authentication credentials
+	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+
+	// Compose the email message
+	msg := []byte("To: " + toEmail + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"\r\n" +
+		body)
+
+	// Send the email
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generateRandomToken() string {
+	// Generate a random byte slice
+	randomBytes := make([]byte, 32)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// Encode the byte slice to base64
+	token := base64.URLEncoding.EncodeToString(randomBytes)
+
+	return token
+}
+
+func VerifyEmail(c *gin.Context) {
+	var result model.User
+	email := c.Param("email")
+	token := c.Param("token")
+	fmt.Println(email, token)
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email address is required"})
+		return
+	}
+
+	err := database.Users.FindOne(c, bson.M{"email": email}).Decode(&result)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	filter := bson.M{"email": email}
+	update := bson.M{"$set": bson.M{"isVerified": true}} // Assuming you have a field "isVerified" in your user document
+	_, err = database.Users.UpdateOne(c, filter, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Email verified successfully"})
 }
