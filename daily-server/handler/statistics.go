@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"reflect"
+	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
@@ -71,6 +72,7 @@ func (controller *StatisticsController) Statistics(c *gin.Context) {
 func (controller *StatisticsController) GetDates(userId primitive.ObjectID, c *gin.Context) []string {
 	dates := bson.A{
 		bson.D{{"$match", bson.D{{"author", userId}, {"createdAt", bson.D{{"$exists", true}}}}}},
+		bson.D{{"$sort", bson.D{{"createdAt", 1}}}},
 		bson.D{{"$project", bson.D{{"createdAt", 1}, {"_id", 0}}}},
 	}
 
@@ -117,7 +119,32 @@ func (controller *StatisticsController) Views(dailies []model.Daily) int {
 func (controller *StatisticsController) Streak(dailies []model.Daily) int {
 	// gotta check how to work with dates and date conversions
 	// between mongo datetime and go datetime
-	return 0
+	current := 0
+	prev := time.Now()
+	controller.logger.Infof("prev start: %v", prev)
+	for _, daily := range dailies {
+		controller.logger.Infof("current: %v", current)
+		currentTime := daily.CreatedAt.Time()
+		controller.logger.Infof("date: %v", currentTime)
+		if current == 0 {
+			prev = daily.CreatedAt.Time()
+			controller.logger.Infof("prev time: %v, cur time: %v", prev, currentTime)
+			if time.Now().Sub(currentTime).Hours() > 36.0 {
+				controller.logger.Infof("ciktim diff: %v", time.Now().Sub(currentTime))
+				return 0
+			}
+		}
+
+		diff := prev.Sub(currentTime)
+		controller.logger.Infof("Hour diff: %v", diff.Hours())
+		if diff.Hours() < 36.0 {
+			current += 1
+			prev = daily.CreatedAt.Time()
+		} else {
+			return current
+		}
+	}
+	return current
 }
 
 func (controller *StatisticsController) DailiesWritten(dailies []model.Daily) int {

@@ -85,12 +85,61 @@ func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
 	return dailies, err
 }
 
+func (r *DailyRepository) GetSimilarDailies(dailyId primitive.ObjectID) ([]primitive.M, error) {
+	var daily model.Daily
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := r.dailies.FindOne(ctx, bson.M{"_id": dailyId}).Decode(&daily)
+
+	if err != nil {
+		return nil, err
+	}
+	embeddingField := daily.Embedding
+
+	aggregation := bson.A{
+		bson.D{
+			{"$vectorSearch",
+				bson.D{
+					{"queryVector", embeddingField},
+					{"path", "embedding"},
+					{"numCandidates", 10},
+					{"index", "embeddings_index"},
+					{"limit", 10},
+				},
+			},
+		},
+		bson.D{
+			{"$project", bson.D{
+				{"_id", 1},
+				{"text", 1}, // Replace with actual fields you want to project
+				{"score", bson.D{{"$meta", "searchScore"}}},
+			}},
+		},
+	}
+
+	cursor, err := r.dailies.Aggregate(ctx, aggregation)
+	if err != nil {
+		return nil, err
+	}
+	// Iterate over the results
+	var results []bson.M
+	for cursor.Next(ctx) {
+		var result bson.M
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, result)
+	}
+
+	return results, nil
+}
+
 func (r *DailyRepository) List(author_id primitive.ObjectID, limit int) ([]model.Daily, error) {
 	var dailies []model.Daily
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	opts := options.Find().SetLimit(int64(limit))
+	opts := options.Find().SetLimit(int64(limit)).SetSort(bson.D{{"createdAt", -1}})
 
 	cursor, err := r.dailies.Find(ctx, bson.M{"author": author_id}, opts)
 	if err != nil {

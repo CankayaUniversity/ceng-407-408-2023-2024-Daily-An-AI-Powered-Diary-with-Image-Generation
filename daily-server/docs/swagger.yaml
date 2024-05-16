@@ -18,6 +18,10 @@ definitions:
         type: string
       createdAt:
         type: integer
+      embedding:
+        items:
+          type: number
+        type: array
       emotions:
         $ref: '#/definitions/model.Emotion'
       favourites:
