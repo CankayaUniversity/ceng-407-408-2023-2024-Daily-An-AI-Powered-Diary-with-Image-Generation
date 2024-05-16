@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -11,6 +12,8 @@ import (
 	"github.com/Final-Projectors/daily-server/model"
 	"github.com/Final-Projectors/daily-server/repository"
 	"github.com/gin-gonic/gin"
+	openai "github.com/sashabaranov/go-openai"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -19,6 +22,7 @@ type DailyController struct {
 	DailyRepository  *repository.DailyRepository
 	ReportRepository *repository.ReportedDailyRepository
 	UserRepository   *repository.UserRepository
+	logger           *logrus.Logger
 }
 
 func NewDailyController(_userRepository *repository.UserRepository, _repository *repository.DailyRepository, _reports *repository.ReportedDailyRepository) *DailyController {
@@ -26,6 +30,7 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 		UserRepository:   _userRepository,
 		DailyRepository:  _repository,
 		ReportRepository: _reports,
+		logger:           logrus.New(),
 	}
 }
 
@@ -44,7 +49,7 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 // @Router /api/daily [post]
 // @Security ApiKeyAuth
 func (d *DailyController) CreateDaily(c *gin.Context) {
-
+	client := openai.NewClient(os.Getenv("OPEN_API_KEY"))
 	var daily model.Daily
 	var createDailyDTO model.CreateDailyDTO
 	err := c.ShouldBindJSON(&createDailyDTO)
@@ -64,6 +69,18 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	daily.IsShared = *createDailyDTO.IsShared
 
+	// EMBEDDINGS
+	queryReq := openai.EmbeddingRequest{
+		Input: daily.Text,
+		Model: openai.LargeEmbedding3,
+	}
+	targetResponse, err := client.CreateEmbeddings(c, queryReq)
+	if err != nil {
+		logrus.Fatalf("embedding creation failed")
+	}
+	embedding := targetResponse.Data[0].Embedding
+	daily.Embedding = embedding
+
 	if createDailyDTO.Image == "" {
 		daily.Image = "https://free-images.com/md/7687/blue_jay_bird_nature.jpg"
 	} else {
@@ -74,7 +91,6 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	if auth, ok := author.(primitive.ObjectID); ok {
 		daily.Author = auth
 	} else {
-		fmt.Println("author is not a primitive.ObjectID")
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
@@ -85,6 +101,37 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, daily)
+}
+
+// GetSimilarDailies returns a specific daily via daily.ID
+// @Summary returns an array
+// @Description returns a specific daily via daily.ID
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param id path string true "Daily ID"
+// @Success 200 {object} object
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 500 {object} object "Internal Server Error {"message': "mongo: no documents in result"}"
+// @Router /api/daily/similarity/{id} [get]
+// @Security ApiKeyAuth
+
+func (d *DailyController) GetSimilarDailies(c *gin.Context) {
+	id := c.Param("id")                            // Extract the id from the URL.
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
+		return
+	}
+	var results []primitive.M
+	results, err = d.DailyRepository.GetSimilarDailies(objectID)
+	if err != nil {
+		c.Abort()
+	}
+	for _, result := range results {
+		d.logger.Infof("%v", result)
+	}
+	c.JSON(http.StatusOK, results)
 }
 
 // GetDaily returns a specific daily via daily.ID

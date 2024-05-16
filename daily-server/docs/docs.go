@@ -645,6 +645,12 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "integer"
                 },
+                "embedding": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
                 "emotions": {
                     "$ref": "#/definitions/model.Emotion"
                 },

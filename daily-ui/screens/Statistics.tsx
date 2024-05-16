@@ -47,159 +47,163 @@ const Statistics = ({ navigation }: { navigation: any }) => {
 
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
-         <View style={styles.container}>
-            <Calendar
-               key={uuidv4()}
+         {!isLoading &&
+            <View style={{ height: '100%', width: '100%' }}>
+               <View style={styles.container}>
+                  <Calendar
+                     key={uuidv4()}
 
-               markedDates={
-                  markedDatesState
-               }
+                     markedDates={
+                        markedDatesState
+                     }
 
-               style={{
-                  backgroundColor: Colors.main_container,
-                  width: '100%',
-                  paddingLeft: 0,
-                  paddingRight: 0
-               }}
+                     style={{
+                        backgroundColor: Colors.main_container,
+                        width: '100%',
+                        paddingLeft: 0,
+                        paddingRight: 0
+                     }}
 
-               theme={{
-                  textDayFontSize: 20,
-                  textMonthFontSize: 20,
-                  selectedDayTextColor: 'white',
-                  calendarBackground: 'transparent',
-                  monthTextColor: Colors.background,
-                  dayTextColor: 'white',
-                  'stylesheet.calendar.header': {
-                     fontSize: 20,
-                     width: '100%',
-                     alignItems: 'center',
-                     marginTop: 5,
-                     flexDirection: 'row',
-                     justifyContent: 'center',
-                     dayHeader: {
-                        marginBottom: 7,
-                        width: 36,
-                        textAlign: 'center',
-                        fontSize: 16,
-                        color: "white"
-                     },
-                  },
-                  'stylesheet.calendar.main': {
-                     dayContainer: {
-                        flex: 1,
-                        alignItems: 'center'
-                     },
-                     week: {
-                        marginVertical: 3,
-                        marginHorizontal: 0,
-                        flexDirection: 'row',
-                        justifyContent: 'center'
-                     },
-                  },
-                  'stylesheet.day.basic': {
-                     selected: {
-                        color: calendarSelectedColor,
-                        backgroundColor: calendarSelectedColor,
-                        width: 40,
-                        height: 36,
-                        borderRadius: 10,
-                     },
-                  }
-               }
-               }
-               hideArrows={true}
-            />
+                     theme={{
+                        textDayFontSize: 20,
+                        textMonthFontSize: 20,
+                        selectedDayTextColor: 'white',
+                        calendarBackground: 'transparent',
+                        monthTextColor: Colors.background,
+                        dayTextColor: 'white',
+                        'stylesheet.calendar.header': {
+                           fontSize: 20,
+                           width: '100%',
+                           alignItems: 'center',
+                           marginTop: 5,
+                           flexDirection: 'row',
+                           justifyContent: 'center',
+                           dayHeader: {
+                              marginBottom: 7,
+                              width: 36,
+                              textAlign: 'center',
+                              fontSize: 16,
+                              color: "white"
+                           },
+                        },
+                        'stylesheet.calendar.main': {
+                           dayContainer: {
+                              flex: 1,
+                              alignItems: 'center'
+                           },
+                           week: {
+                              marginVertical: 3,
+                              marginHorizontal: 0,
+                              flexDirection: 'row',
+                              justifyContent: 'center'
+                           },
+                        },
+                        'stylesheet.day.basic': {
+                           selected: {
+                              color: calendarSelectedColor,
+                              backgroundColor: calendarSelectedColor,
+                              width: 40,
+                              height: 36,
+                              borderRadius: 10,
+                           },
+                        }
+                     }
+                     }
+                     hideArrows={true}
+                  />
 
-            <View style={styles.outerRow}>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Wows
-                     </Text>
-                     <View style={{ width: "100%", height: 34 }}></View>
-                     <View style={{ flexDirection: "row", alignItems: "center" }} >
-                        <Image source={require('../assets/Heart.png')} style={{ marginRight: 10 }} />
-                        <Text style={styles.innerNumber}>
-                           {statistics?.likes || "0"}
-                        </Text>
+                  <View style={styles.outerRow}>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Wows
+                           </Text>
+                           <View style={{ width: "100%", height: 34 }}></View>
+                           <View style={{ flexDirection: "row", alignItems: "center" }} >
+                              <Image source={require('../assets/Heart.png')} style={{ marginRight: 10 }} />
+                              <Text style={styles.innerNumber}>
+                                 {statistics?.likes || "0"}
+                              </Text>
+                           </View>
+                        </View>
+                     </View>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Dailies written
+                           </Text>
+                           <View style={{ width: "100%", height: 34 }}></View>
+                           <View style={{ flexDirection: "row", alignItems: "center" }} >
+                              <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
+                              <Text style={styles.innerNumber}>
+                                 {statistics?.dailiesWritten || 0}
+                              </Text>
+                           </View>
+                        </View>
                      </View>
                   </View>
-               </View>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Dailies written
-                     </Text>
-                     <View style={{ width: "100%", height: 34 }}></View>
-                     <View style={{ flexDirection: "row", alignItems: "center" }} >
-                        <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
-                        <Text style={styles.innerNumber}>
-                           {statistics?.dailiesWritten || 0}
-                        </Text>
+                  <View style={styles.outerRow}>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Views
+                           </Text>
+                           <View style={{ width: "100%", height: 34 }}></View>
+                           <View style={{ flexDirection: "row", alignItems: "center" }} >
+                              <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
+                              <Text style={styles.innerNumber}>
+                                 {statistics?.views || 0}
+                              </Text>
+                           </View>
+                        </View>
+                     </View>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Streak
+                           </Text>
+                           <View style={{ width: "100%", height: 34 }}></View>
+                           <View style={{ flexDirection: "row", alignItems: "center" }} >
+                              <Image source={require('../assets/streak.png')} style={{ marginRight: 10, marginTop: 5 }} />
+                              <Text style={styles.innerNumber}>
+                                 {statistics?.streak || 0}
+                              </Text>
+                           </View>
+                        </View>
+                     </View>
+                  </View>
+                  <View style={styles.outerRow}>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Mood
+                           </Text>
+                           <View style={{ width: "100%", height: 20 }}></View>
+                           <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
+                              <Image source={require('../assets/happy.png')} style={{ marginRight: 10, }} />
+                              <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
+                                 {statistics?.mood || "Uncalculated"}
+                              </Text>
+                           </View>
+                        </View>
+                     </View>
+                     <View style={styles.innerItem}>
+                        <View>
+                           <Text style={styles.innerText}>
+                              Topic
+                           </Text>
+                           <View style={{ width: "100%", height: 20 }}></View>
+                           <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
+                              <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
+                                 {statistics?.topic || "Uncalculated"}
+                              </Text>
+                           </View>
+                        </View>
                      </View>
                   </View>
                </View>
             </View>
-            <View style={styles.outerRow}>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Views
-                     </Text>
-                     <View style={{ width: "100%", height: 34 }}></View>
-                     <View style={{ flexDirection: "row", alignItems: "center" }} >
-                        <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
-                        <Text style={styles.innerNumber}>
-                           {statistics?.views || 0}
-                        </Text>
-                     </View>
-                  </View>
-               </View>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Streak
-                     </Text>
-                     <View style={{ width: "100%", height: 34 }}></View>
-                     <View style={{ flexDirection: "row", alignItems: "center" }} >
-                        <Image source={require('../assets/streak.png')} style={{ marginRight: 10, marginTop: 5 }} />
-                        <Text style={styles.innerNumber}>
-                           {statistics?.streak || 0}
-                        </Text>
-                     </View>
-                  </View>
-               </View>
-            </View>
-            <View style={styles.outerRow}>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Mood
-                     </Text>
-                     <View style={{ width: "100%", height: 20 }}></View>
-                     <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                        <Image source={require('../assets/happy.png')} style={{ marginRight: 10, }} />
-                        <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                           {statistics?.mood || "Uncalculated"}
-                        </Text>
-                     </View>
-                  </View>
-               </View>
-               <View style={styles.innerItem}>
-                  <View>
-                     <Text style={styles.innerText}>
-                        Topic
-                     </Text>
-                     <View style={{ width: "100%", height: 20 }}></View>
-                     <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                        <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                           {statistics?.topic || "Uncalculated"}
-                        </Text>
-                     </View>
-                  </View>
-               </View>
-            </View>
-         </View>
+         }
       </Header >
    );
 }

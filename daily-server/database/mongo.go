@@ -20,7 +20,6 @@ func Init() {
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("DB_CONNECTION")).SetServerAPIOptions(serverAPI)
-	//	opts := options.Client().ApplyURI("mongodb://fatihkapiz:1ataata1@ac-bqy1ocp-shard-00-00.48gm13x.mongodb.net:27017,ac-bqy1ocp-shard-00-01.48gm13x.mongodb.net:27017,ac-bqy1ocp-shard-00-02.48gm13x.mongodb.net:27017/?ssl=true&replicaSet=atlas-hoox84-shard-0&authSource=admin&retryWrites=true&w=majority&appName=cluster0").SetServerAPIOptions(serverAPI).
 
 	localClient, err := mongo.Connect(context.Background(), opts)
 
