@@ -6,6 +6,7 @@ import { Calendar } from 'react-native-calendars';
 import { Colors } from '../libs/colors.tsx';
 import uuidv4 from 'uuid/v4';
 import { getStatistics } from '../libs/services/dailyService';
+import { useGetStatistics } from '../libs';
 import { StatisticsResponse } from '../libs/types';
 
 const calendarSelectedColor = '#AF5C5C66';
@@ -13,37 +14,14 @@ const calendarSelectedColor = '#AF5C5C66';
 const Statistics = ({ navigation }: { navigation: any }) => {
    const [timeframe, setTimeframe] = useState("month");
    const [statistics, setStatistics] = useState<StatisticsResponse | null>(null);
-   const [isLoading, setIsLoading] = useState<boolean>(true);
    const [error, setError] = useState<string | null>(null);
-   const [markedDatesState, setMarkedDatesState] = useState<any>(null);
 
-   useEffect(() => {
-      const fetchData = async () => {
-         try {
-            const data = await getStatistics();
-            setStatistics(data);
-         } catch (err) {
-            setError("Failed to fetch statistics");
-            console.error(err);
-         } finally {
-            setIsLoading(false);
-         }
-      };
+   const { data, isLoading, isError } = useGetStatistics();
 
-      fetchData();
-   }, []);
-
-
-   const markedDatesFunc = statistics?.date.reduce((acc: any, date) => {
+   const markedDatesFunc = data?.date.reduce((acc: any, date) => {
       acc[date] = { selected: true };
       return acc;
    }, {});
-
-   useEffect(() => {
-      console.log(markedDatesFunc);
-      setMarkedDatesState(markedDatesFunc);
-   }, [statistics]);
-
 
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
@@ -54,7 +32,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      key={uuidv4()}
 
                      markedDates={
-                        markedDatesState
+                        markedDatesFunc
                      }
 
                      style={{
@@ -122,7 +100,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Image source={require('../assets/Heart.png')} style={{ marginRight: 10 }} />
                               <Text style={styles.innerNumber}>
-                                 {statistics?.likes || "0"}
+                                 {data?.likes || "0"}
                               </Text>
                            </View>
                         </View>
@@ -136,7 +114,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
-                                 {statistics?.dailiesWritten || 0}
+                                 {data?.dailiesWritten || 0}
                               </Text>
                            </View>
                         </View>
@@ -152,7 +130,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
-                                 {statistics?.views || 0}
+                                 {data?.views || 0}
                               </Text>
                            </View>
                         </View>
@@ -166,7 +144,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Image source={require('../assets/streak.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
-                                 {statistics?.streak || 0}
+                                 {data?.streak || 0}
                               </Text>
                            </View>
                         </View>
@@ -182,7 +160,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
                               <Image source={require('../assets/happy.png')} style={{ marginRight: 10, }} />
                               <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                                 {statistics?.mood || "Uncalculated"}
+                                 {data?.mood || "Uncalculated"}
                               </Text>
                            </View>
                         </View>
@@ -195,7 +173,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                            <View style={{ width: "100%", height: 20 }}></View>
                            <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
                               <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
-                                 {statistics?.topic || "Uncalculated"}
+                                 {data?.topic || "Uncalculated"}
                               </Text>
                            </View>
                         </View>
