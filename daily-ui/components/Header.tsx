@@ -6,7 +6,7 @@ const Header = ({ navigation, children, previous, homepage }: { navigation: any,
       <View style={styles.container}>
          <View style={styles.background}>
             <View style={styles.defaultpage}>
-               <View style={{ flexDirection: 'row', borderWidth: 2, justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8 }}>
+               <View style={{ flexDirection: 'row', borderWidth: 2, justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8}}>
                   {
                      homepage &&
                      <TouchableOpacity style={{ paddingTop: 30, paddingLeft: 15 }}>

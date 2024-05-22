@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, ScrollView, Text, Image, Pressable, Animated, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, Image, Pressable, Animated, StyleSheet,Dimensions } from 'react-native';
 import uuidv4 from 'uuid/v4';
 
 interface FlipCardProps {
@@ -64,9 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     justifyContent: 'center',
     backfaceVisibility: 'hidden',
-    // Add perspective for Android support:
-    transform: [{ perspective: 1000 }],
-    paddingBottom: 100,
   },
   flipCardBack: {
     position: 'absolute',
@@ -75,16 +72,10 @@ const styles = StyleSheet.create({
   },
   flipCardBackInside: {
     fontSize: 15,
-    paddingStart: 10,
-    paddingEnd: 10,
-    paddingTop: 10,
-    borderWidth: 0.5,
     opacity: 0.85,
     backgroundColor: '#0D1326',
     height: '100%',
     width: '100%',
-    marginTop: 40,
-    marginBottom: 40,
   },
   image: {
     resizeMode: 'contain',
