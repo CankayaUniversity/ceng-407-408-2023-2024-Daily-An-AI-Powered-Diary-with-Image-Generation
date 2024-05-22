@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query"
 import { queryClient } from "."
-import { CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, getStatistics deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, viewDaily } from ".."
+import { CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, getStatistics, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, viewDaily } from ".."
 import { Alert } from "react-native"
 
 export const dailyQueryKeys = {
