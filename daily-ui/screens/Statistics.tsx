@@ -44,6 +44,9 @@ const Statistics = ({ navigation }: { navigation: any }) => {
       setMarkedDatesState(markedDatesFunc);
    }, [statistics]);
 
+   const findDay = (day: number, month: number, year: number) => {
+
+   }
 
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
@@ -62,6 +65,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                         width: '100%',
                         paddingLeft: 0,
                         paddingRight: 0
+                     }}
+
+                     onDayPress={day => {
+                        console.log(day);
                      }}
 
                      theme={{
