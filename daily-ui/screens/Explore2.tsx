@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from 'uuid';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons,AntDesign,FontAwesome } from '@expo/vector-icons';
 
 const Explore2 = ({ navigation }) => {
   const [error, setError] = useState<AxiosError | null>(null);
@@ -103,14 +103,14 @@ const Explore2 = ({ navigation }) => {
                     <Text style={styles.text}>{el.text}</Text>
                   </ScrollView>
                 }
-                <TouchableOpacity style={{ position: "absolute", right: 0, top: "35%" }}>
-                  <Ionicons name="heart" size={48} color="red" />
+               <TouchableOpacity style={{width: 64,height: 64, position: "absolute",alignItems:"center",justifyContent:"center",borderRadius:32, position: "absolute", right: Dimensions.get('window').width/2+64, bottom: 98 }}>
+                  <Ionicons name="heart" size={48} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ position: "absolute", right: 0, top: "45%" }} onPress={handleReportPress}>
+                <TouchableOpacity style={{width: 64,height: 64, position: "absolute",alignItems:"center",justifyContent:"center",borderRadius:32, left: Dimensions.get('window').width/2+64, bottom: 98}} onPress={handleReportPress}>
                   <Ionicons name="flag" size={48} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ width: '90%', backgroundColor: "purple", position: "absolute", left: "5%", top: "80%", borderRadius: 8, opacity: !isVisible ? 0.3 : 1 }} onPress={() => setVisible(!isVisible)}>
-                  <Text style={{ textAlign: 'center', marginBottom: 10, marginTop: 10, fontSize: 20, fontWeight: '200', color: 'white' }}>{isVisible ? "Show Image" : "Show Text"}</Text>
+                <TouchableOpacity style={{ width: 80,height:80, position: "absolute",alignItems:"center",justifyContent:"center", left: (Dimensions.get('window').width/2)-40, bottom: 90, borderRadius: 40}} onPress={() => setVisible(!isVisible)}>
+                  <FontAwesome name="refresh" color="white" size={64}/>
                 </TouchableOpacity>
               </View>
             </View>
