@@ -42,9 +42,8 @@ export const getStatistics = async (
 export const getExplore = async (
    signal?: AbortSignal,
 ) => {
-   const params = new URLSearchParams();
    let url = `/daily/explore`;
-
+   
    const response = await serviceConsumer.get<
       DailyResponse[],
       AxiosResponse<DailyResponse[]>>(url, { signal });

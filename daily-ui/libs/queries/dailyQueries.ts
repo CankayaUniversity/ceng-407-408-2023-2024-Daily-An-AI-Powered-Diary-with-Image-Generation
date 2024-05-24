@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query"
 import { queryClient } from "."
-import { CreateDailyRequest, DailyResponse, EditDailyImageRequest, createDaily, getStatistics, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, viewDaily } from ".."
+import { CreateDailyRequest, DailyResponse,ReportDailyRequest, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, reportDaily, viewDaily } from ".."
 import { Alert } from "react-native"
 
 export const dailyQueryKeys = {
@@ -95,6 +95,15 @@ export const useEditDailyImage = () => {
       mutationFn: (editDaily: EditDailyImageRequest) => editDailyImage(editDaily),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: [dailyQueryKeys.getDailies, dailyQueryKeys.getDaily] });
+      },
+   })
+}
+
+export const useReportDaily = () => {
+   return useMutation({
+      mutationFn: (report:ReportDailyRequest) => reportDaily(report),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: [dailyQueryKeys.reportDaily] });
       },
    })
 }

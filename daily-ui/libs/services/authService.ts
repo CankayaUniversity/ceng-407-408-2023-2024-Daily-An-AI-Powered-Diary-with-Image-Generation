@@ -5,6 +5,7 @@ export const login = async (
    userInfo: UserInfo,
    signal?: AbortSignal
 ) => {
+   console.log(userInfo)
    const url = "/login";
    const response = await serviceConsumer.post<
       UserToken,

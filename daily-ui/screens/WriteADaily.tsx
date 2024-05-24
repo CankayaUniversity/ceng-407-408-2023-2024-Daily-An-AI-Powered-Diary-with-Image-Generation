@@ -23,8 +23,6 @@ const WriteADaily = ({ navigation }: { navigation: any }) => {
          return;
       }
 
-      // Here you can perform any action with the tweet, such as sending it to a server or saving it locally.
-      // For demonstration, we'll just log the tweet to the console.
       mutate({ text: daily, isShared: shared })
       console.log("Daily: " + daily + " Shared: " + shared);
    };
