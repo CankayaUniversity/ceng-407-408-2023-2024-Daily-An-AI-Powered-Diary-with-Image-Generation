@@ -17,19 +17,19 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := utils.TokenValid(c)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized token validation"})
 			c.Abort()
 			return
 		}
 		userId, err := utils.ExtractTokenID(c)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
+			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorizedfrom middleware"})
 			c.Abort()
 			return
 		}
 		objectId, err := primitive.ObjectIDFromHex(userId)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized"})
+			c.JSON(http.StatusBadGateway, gin.H{"message": "Unauthorized from middleware"})
 			c.Abort()
 			return
 		}

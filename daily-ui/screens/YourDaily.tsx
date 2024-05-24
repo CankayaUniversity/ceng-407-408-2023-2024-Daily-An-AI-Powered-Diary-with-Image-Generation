@@ -11,6 +11,7 @@ const YourDaily = ({ navigation }: { navigation: any }) => {
 
     return monthArr[date.getMonth()+1]+"\n"+date.getDay();
   };
+
   return (
     <Header navigation={navigation} previous="Home" homepage={false}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: 'flex-start', gap: 10, alignItems: 'center', marginTop: 10, paddingStart: 15, paddingBottom: 90 }}>

@@ -13,6 +13,7 @@ type Daily struct {
 	CreatedAt  primitive.DateTime   `json:"createdAt" bson:"createdAt"`
 	Viewers    []primitive.ObjectID `json:"viewers" bson:"viewers,omitempty"`
 	IsShared   bool                 `json:"isShared" bson:"isShared"`
+	Embedding  []float32            `json:"embedding" bson:"embedding"`
 }
 
 type Emotion struct {

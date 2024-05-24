@@ -39,6 +39,7 @@
     "@babel/core": "^7.20.0",
     "@types/react-native": "^0.73.0",
     "@types/uuid": "^9.0.8",
+    "react-native-calendars": "^1.1286.0",
     "react-native-swiper": "^1.6.0",
     "uuidv4": "^6.2.13"
   },

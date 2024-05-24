@@ -13,7 +13,31 @@ export const dailyQueryKeys = {
    reportDaily: '#daily/reportDaily',
    deleteDaily: '#daily/deleteDaily',
    getExplore: '#daily/getExplore',
-   getExploreInfinite: '#daily/getExploreInfinite'
+   getExploreInfinite: '#daily/getExploreInfinite',
+   getStatistics: '#daily/getStatistics'
+}
+
+export const useGetExploreInfinite = () => {
+   return useInfiniteQuery({
+      queryKey: [dailyQueryKeys.getExploreInfinite],
+      queryFn: ({ signal }) => getExplore(signal),
+      initialPageParam: 1,
+      getNextPageParam: () => null,
+   })
+}
+
+export const useGetExplore = () => {
+   return useQuery({
+      queryKey: [dailyQueryKeys.getExplore],
+      queryFn: ({ signal }) => getExplore(signal),
+   })
+}
+
+export const useGetStatistics = () => {
+   return useQuery({
+      queryKey: [dailyQueryKeys.getStatistics],
+      queryFn: ({ signal }) => getStatistics(signal),
+   })
 }
 
 export const useGetDailies = (limit?: number) => {
