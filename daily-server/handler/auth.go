@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -113,17 +114,18 @@ func SendVerificationEmail(toEmail string) error {
 	// SMTP server configuration
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587" // Port for SMTP submission (587 for TLS)
-	smtpUsername := "daily2024ai@gmail.com"
-	smtpPassword := "wveb wnxa zwks sycy"
+	smtpUsername := os.Getenv("EMAIL")
+	smtpPassword := os.Getenv("PASSWORD")
 
 	// Sender and recipient email addresses
-	from := "daily2024ai@gmail.com"
+	from := smtpUsername
 	to := []string{toEmail}
 
 	token := generateRandomToken()
 	// Email content
-	subject := "Verification Email"
-	verificationURL := fmt.Sprintf("http://localhost:9090/api/verify/%s/&token=%s", toEmail, token)
+	subject := "Daily Email Verification"
+	// use env variable for the url
+	verificationURL := fmt.Sprintf("%s/verify/%s/&token=%s", os.Getenv("API_URL"), toEmail, token)
 	body := fmt.Sprintf("Please click the link below to verify your email address:\n\n %s", verificationURL)
 
 	// Create authentication credentials
