@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "daily-ui",
-    "slug": "daily-ui",
+    "name": "daily",
+    "slug": "daily",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
