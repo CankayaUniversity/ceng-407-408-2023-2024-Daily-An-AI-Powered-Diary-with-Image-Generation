@@ -4,7 +4,7 @@ import { View, StyleSheet, Text, Image } from 'react-native';
 import Header from '../components/Header';
 import { Calendar } from 'react-native-calendars';
 import { Colors } from '../libs/colors.tsx';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { getStatistics } from '../libs/services/dailyService';
 import { useGetStatistics } from '../libs';
 import { StatisticsResponse } from '../libs/types';
