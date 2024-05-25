@@ -42,6 +42,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                         paddingRight: 0
                      }}
 
+                     onDayPress={day => {
+                        console.log(day);
+                     }}
+
                      theme={{
                         textDayFontSize: 20,
                         textMonthFontSize: 20,

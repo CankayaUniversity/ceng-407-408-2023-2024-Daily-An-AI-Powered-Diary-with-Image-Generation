@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { CommonResponse, CreateDailyRequest, DailyResponse, EditDailyImageRequest, ReportDailyRequest, StatisticsResponse, serviceConsumer } from '..';
+import { CommonResponse, CreateDailyRequest, DailyResponse, EditDailyImageRequest, ExploreResponse, ReportDailyRequest, StatisticsResponse, serviceConsumer } from '..';
 
 export const createDaily = async (
    daily: CreateDailyRequest,
@@ -42,11 +42,11 @@ export const getStatistics = async (
 export const getExplore = async (
    signal?: AbortSignal,
 ) => {
-   let url = `/daily/explore`;
-   
+   const params = new URLSearchParams();
+   let url = `/daily/explorevs`;
    const response = await serviceConsumer.get<
-      DailyResponse[],
-      AxiosResponse<DailyResponse[]>>(url, { signal });
+      ExploreResponse[],
+      AxiosResponse<ExploreResponse[]>>(url, { signal });
    return response.data;
 }
 

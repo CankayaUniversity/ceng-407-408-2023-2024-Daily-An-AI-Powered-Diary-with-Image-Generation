@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	client                          *mongo.Client
-	Users, Dailies, ReportedDailies *mongo.Collection
+	client                                           *mongo.Client
+	Users, Dailies, ReportedDailies, UserPreferences *mongo.Collection
 )
 
 func Init() {
@@ -31,6 +31,7 @@ func Init() {
 		log.Fatal("error while trying to ping mongo", err)
 	}
 	client = localClient
+	UserPreferences = client.Database("daily").Collection("user-preferences")
 	Users = client.Database("daily").Collection("users")
 	Dailies = client.Database("daily").Collection("dailies")
 	ReportedDailies = client.Database("daily").Collection("reportedDailies")

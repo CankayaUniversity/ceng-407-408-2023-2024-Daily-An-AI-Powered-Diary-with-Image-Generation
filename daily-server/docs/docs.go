@@ -121,7 +121,50 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/daily/fav": {
+        "/api/daily/explorevs": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "returns 5 shared dailies",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns 5 shared dailies",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Daily"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error {\"message': \"Failed to fetch Dailies\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway {\"message': \"No user\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/fav/{id}": {
             "put": {
                 "security": [
                     {
@@ -141,13 +184,11 @@ const docTemplate = `{
                 "summary": "update daily \u0026 user to apply fav feature",
                 "parameters": [
                     {
-                        "description": "DailyRequestDTO",
-                        "name": "daily",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DailyRequestDTO"
-                        }
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -170,7 +211,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Bad Gateway {\"message\": \"Database error\"}",
+                        "description": "Internal Server Error {\"message\": \"Database error\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -324,6 +365,55 @@ const docTemplate = `{
                     },
                     "502": {
                         "description": "Bad Gateway {\"message\": \"Failed to update daily\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/similarity/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "returns a specific daily via daily.ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns an array",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error {\"message': \"mongo: no documents in result\"}",
                         "schema": {
                             "type": "object"
                         }
@@ -675,6 +765,9 @@ const docTemplate = `{
                 "text": {
                     "type": "string"
                 },
+                "topic": {
+                    "type": "string"
+                },
                 "viewers": {
                     "type": "array",
                     "items": {
@@ -797,6 +890,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "isVerified",
                 "password"
             ],
             "properties": {
@@ -814,6 +908,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "isVerified": {
+                    "type": "boolean"
                 },
                 "password": {
                     "type": "string"
