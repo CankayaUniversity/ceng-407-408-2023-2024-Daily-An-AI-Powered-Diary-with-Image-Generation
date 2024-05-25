@@ -30,14 +30,16 @@ import (
 */
 
 type DailyRepository struct {
-	dailies *mongo.Collection
-	users   *UserRepository
+	dailies         *mongo.Collection
+	users           *UserRepository
+	userPreferences *mongo.Collection
 }
 
 func NewDailyRepository(_userRepository *UserRepository) *DailyRepository {
 	return &DailyRepository{
 		dailies: database.Dailies,
 		users:   _userRepository,
+		userPreferences: : database.userPreferences,
 	}
 }
 
@@ -185,6 +187,14 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 	err := r.users.AddToFav(userID, dailyID) // Assuming AddToFav is implemented correctly
 	return err
 }
+
+func (r *DailyRepository) UpdateUserPreferences(kewyords []string, topics []string, authorId primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	return nil
+}
+
 func (r *DailyRepository) View(dailyID primitive.ObjectID, viewerID primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
