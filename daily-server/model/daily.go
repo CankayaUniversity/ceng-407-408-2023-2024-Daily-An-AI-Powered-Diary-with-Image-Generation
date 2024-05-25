@@ -6,6 +6,7 @@ type Daily struct {
 	ID         primitive.ObjectID   `json:"id" bson:"_id"`
 	Text       string               `json:"text" bson:"text" binding:"required"`
 	Author     primitive.ObjectID   `json:"author" bson:"author"`
+	Topic      string               `json"topic" bson:"topic"`
 	Keywords   []string             `json:"keywords" bson:"keywords,omitempty"`
 	Emotions   Emotion              `json:"emotions" bson:"emotions"`
 	Image      string               `json:"image" bson:"image"`
