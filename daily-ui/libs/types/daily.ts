@@ -14,6 +14,12 @@ export type StatisticsResponse = {
    topic: string
 };
 
+export type ExploreResponse = {
+   id: string,
+   text: string,
+};
+
+
 export type DailyResponse = {
    id: string,
    text: string,
@@ -27,9 +33,9 @@ export type DailyResponse = {
    },
    image: string,
    favourites: number,
-   createdAt: string,
+   createdat: string,
    viewers: [],
-   isShared: boolean
+   isshared: boolean
 };
 
 export type EditDailyImageRequest = {
