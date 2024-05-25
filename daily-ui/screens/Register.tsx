@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     borderColor: "white",
-    border: 10
   },
   buttonText: {
     color: 'white',

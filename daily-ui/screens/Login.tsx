@@ -53,6 +53,9 @@ const Login = ({ navigation }: { navigation: any }) => {
           onPress={handleLogin}>
           <Text style={styles.loginText}>Log in</Text>
         </Pressable>
+        <Pressable style={styles.alreadyHaveAccount} onPress={() => navigation.navigate("Login")}>
+        <Text style={styles.altText}>Don't have an account? Register</Text>
+      </Pressable>
         <StatusBar style="auto" />
       </View>
     </Header >
@@ -83,6 +86,17 @@ const styles = StyleSheet.create({
     height: 50,
     color: 'black',
   },
+  alreadyHaveAccount: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+    color: 'white',
+  },
+  
+  altText: {
+    color: 'white',
+    fontSize: 15,
+  },
   loginBtn: {
     borderWidth: 1,
     backgroundColor: '#6A51BE',
@@ -95,7 +109,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     borderColor: '#6A51BE',
-    border: 10
   },
   loginText: {
     color: 'white',
