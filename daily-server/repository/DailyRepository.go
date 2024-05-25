@@ -3,10 +3,12 @@ package repository
 import (
 	"context"
 	"errors"
+	"os"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
+	openai "github.com/sashabaranov/go-openai"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,9 +39,9 @@ type DailyRepository struct {
 
 func NewDailyRepository(_userRepository *UserRepository) *DailyRepository {
 	return &DailyRepository{
-		dailies: database.Dailies,
-		users:   _userRepository,
-		userPreferences: : database.userPreferences,
+		dailies:         database.Dailies,
+		users:           _userRepository,
+		userPreferences: database.UserPreferences,
 	}
 }
 
@@ -87,22 +89,170 @@ func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
 	return dailies, err
 }
 
-func (r *DailyRepository) GetSimilarDailies(dailyId primitive.ObjectID) ([]primitive.M, error) {
-	var daily model.Daily
+func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) ([]primitive.M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	err := r.dailies.FindOne(ctx, bson.M{"_id": dailyId}).Decode(&daily)
 
+	filter := bson.M{"author": userId}
+	var userPref model.UserPreference
+
+	err := r.userPreferences.FindOne(context.Background(), filter).Decode(&userPref)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return []primitive.M{}, errors.New("no user preference found")
+		} else {
+			return []primitive.M{}, err
+		}
+	}
+	var interests string
+	for _, topics := range userPref.Topic {
+		interests += topics
+		interests += ", "
+	}
+	for _, keywords := range userPref.Keywords {
+		interests += keywords
+		interests += ", "
+	}
+
+	// EMBEDDINGS
+	client := openai.NewClient(os.Getenv("OPEN_API_KEY"))
+
+	queryReq := openai.EmbeddingRequest{
+		Input: interests,
+		Model: openai.LargeEmbedding3,
+	}
+	targetResponse, err := client.CreateEmbeddings(ctx, queryReq)
+	if err != nil {
+		return []primitive.M{}, errors.New("preferences could not be embedded")
+	}
+	embedding := targetResponse.Data[0].Embedding
+
+	vs_aggregation := bson.A{
+		bson.D{
+			{"$vectorSearch",
+				bson.D{
+					{"queryVector", embedding},
+					{"path", "embedding"},
+					{"numCandidates", 10},
+					{"index", "embeddings_index"},
+					{"limit", 3},
+				},
+			},
+		},
+		bson.D{
+			{"$match", bson.D{
+				{"viewers", bson.D{
+					{"$ne", userId}, // Replace userId with the actual user's ObjectId
+				}},
+			}},
+		},
+		bson.D{
+			{"$project", bson.D{
+				{"_id", 1},
+				{"text", 1}, // Replace with actual fields you want to project
+			}},
+		},
+	}
+
+	cursor, err := r.dailies.Aggregate(ctx, vs_aggregation)
 	if err != nil {
 		return nil, err
 	}
-	embeddingField := daily.Embedding
+	// Iterate over the results
+	var results []bson.M
+	for cursor.Next(ctx) {
+		var result bson.M
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, result)
+	}
+
+	matchNotViewedStage := bson.D{
+		{"$match", bson.D{
+			{"viewers", bson.D{
+				{"$ne", userId},
+			}},
+		}},
+	}
+	sortByFavoritesStage := bson.D{
+		{"$sort", bson.D{
+			{"favourites", -1},
+		}},
+	}
+	limitStage := bson.D{
+		{"$limit", 2},
+	}
+	projectStage := bson.D{
+		{"$project", bson.D{
+			{"_id", 1},
+			{"text", 1}, // Replace with actual fields you want to project
+		}},
+	}
+
+	randomDailiesPipeline := mongo.Pipeline{
+		matchNotViewedStage,
+		sortByFavoritesStage,
+		limitStage,
+		projectStage,
+	}
+	cursor, err = r.dailies.Aggregate(ctx, randomDailiesPipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var randomDailiesResults []bson.M
+	if err := cursor.All(ctx, &randomDailiesResults); err != nil {
+		return nil, err
+	}
+	combinedResults := append(results, randomDailiesResults...)
+
+	return combinedResults, nil
+}
+
+func (r *DailyRepository) GetSimilarDailies(userId primitive.ObjectID) ([]primitive.M, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"author": userId}
+	var userPref model.UserPreference
+
+	err := r.userPreferences.FindOne(context.Background(), filter).Decode(&userPref)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return []primitive.M{}, errors.New("no user preference found")
+		} else {
+			return []primitive.M{}, err
+		}
+	}
+	var interests string
+	for _, topics := range userPref.Topic {
+		interests += topics
+		interests += ", "
+	}
+	for _, keywords := range userPref.Keywords {
+		interests += keywords
+		interests += ", "
+	}
+
+	// EMBEDDINGS
+	client := openai.NewClient(os.Getenv("OPEN_API_KEY"))
+
+	queryReq := openai.EmbeddingRequest{
+		Input: interests,
+		Model: openai.LargeEmbedding3,
+	}
+	targetResponse, err := client.CreateEmbeddings(ctx, queryReq)
+	if err != nil {
+		return []primitive.M{}, errors.New("preferences could not be embedded")
+	}
+	embedding := targetResponse.Data[0].Embedding
 
 	aggregation := bson.A{
 		bson.D{
 			{"$vectorSearch",
 				bson.D{
-					{"queryVector", embeddingField},
+					{"queryVector", embedding},
 					{"path", "embedding"},
 					{"numCandidates", 10},
 					{"index", "embeddings_index"},
@@ -180,17 +330,36 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 	defer cancel()
 
 	updateFavourites := bson.M{"$inc": bson.M{"favourites": 1}}
-	if _, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, updateFavourites); err != nil {
+	opts := options.Update().SetUpsert(true)
+
+	if _, err := r.dailies.UpdateOne(ctx, bson.M{"_id": dailyID}, updateFavourites, opts); err != nil {
 		return err
 	}
 
 	err := r.users.AddToFav(userID, dailyID) // Assuming AddToFav is implemented correctly
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *DailyRepository) UpdateUserPreferences(kewyords []string, topics []string, authorId primitive.ObjectID) error {
+func (r *DailyRepository) UpdateUserPreferences(keywords []string, topic string, authorId primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	filter := bson.M{"author": authorId}
+	update := bson.M{
+		"$addToSet": bson.M{
+			"keywords": bson.M{"$each": keywords},
+			"topics":   topic,
+		},
+	}
+	opts := options.Update().SetUpsert(true)
+
+	_, err := r.userPreferences.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

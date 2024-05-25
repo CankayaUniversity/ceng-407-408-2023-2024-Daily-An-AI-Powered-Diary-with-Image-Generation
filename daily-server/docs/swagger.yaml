@@ -38,6 +38,8 @@ definitions:
         type: array
       text:
         type: string
+      topic:
+        type: string
       viewers:
         items:
           type: string
@@ -131,6 +133,8 @@ definitions:
         type: array
       id:
         type: string
+      isVerified:
+        type: boolean
       password:
         type: string
       role:
@@ -141,6 +145,7 @@ definitions:
         type: array
     required:
     - email
+    - isVerified
     - password
     type: object
   model.UserLoginDTO:
@@ -298,18 +303,44 @@ paths:
       summary: returns a list of shared dailies
       tags:
       - Daily
-  /api/daily/fav:
+  /api/daily/explorevs:
+    get:
+      consumes:
+      - application/json
+      description: returns 5 shared dailies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Daily'
+            type: array
+        "500":
+          description: 'Internal Server Error {"message'': "Failed to fetch Dailies"}'
+          schema:
+            type: object
+        "502":
+          description: 'Bad Gateway {"message'': "No user"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns 5 shared dailies
+      tags:
+      - Daily
+  /api/daily/fav/{id}:
     put:
       consumes:
       - application/json
       description: fav a daily
       parameters:
-      - description: DailyRequestDTO
-        in: body
-        name: daily
+      - description: Daily ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/model.DailyRequestDTO'
+        type: string
       produces:
       - application/json
       responses:
@@ -326,7 +357,7 @@ paths:
           schema:
             type: object
         "500":
-          description: 'Bad Gateway {"message": "Database error"}'
+          description: 'Internal Server Error {"message": "Database error"}'
           schema:
             type: object
       security:
@@ -428,6 +459,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: update daily to apply report feature
+      tags:
+      - Daily
+  /api/daily/similarity/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a specific daily via daily.ID
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "500":
+          description: 'Internal Server Error {"message'': "mongo: no documents in
+            result"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns an array
       tags:
       - Daily
   /api/daily/statistics:

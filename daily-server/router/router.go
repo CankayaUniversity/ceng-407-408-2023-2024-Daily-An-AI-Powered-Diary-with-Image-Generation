@@ -55,7 +55,7 @@ func New() *gin.Engine {
 	api.POST("/daily", dailyHandler.CreateDaily)
 	api.GET("/daily/:id", dailyHandler.GetDaily)
 	api.GET("/daily/list", dailyHandler.GetDailies)
-	api.POST("/daily/fav/:id", dailyHandler.FavDaily)
+	api.PUT("/daily/fav/:id", dailyHandler.FavDaily)
 	api.POST("/daily/view/:id", dailyHandler.ViewDaily)
 	api.POST("/daily/report", dailyHandler.ReportDaily)
 	api.PUT("/daily/image", dailyHandler.EditDailyImage)
@@ -63,6 +63,7 @@ func New() *gin.Engine {
 	api.GET("/daily/explore", dailyHandler.GetExplore)
 	api.GET("/daily/statistics", statisticsHandler.Statistics)
 	api.GET("/daily/similarity/:id", dailyHandler.GetSimilarDailies)
+	api.GET("/daily/explorevs", dailyHandler.GetExploreVS)
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
 	admin.DELETE("/deleteUser", handler.DeleteUserAdmin)

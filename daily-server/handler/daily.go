@@ -103,6 +103,33 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	c.JSON(http.StatusOK, daily)
 }
 
+// GetExploreVS returns a list of shared dailies utilizing Vector Search
+// @Summary returns 5 shared dailies
+// @Description returns 5 shared dailies
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Daily
+// @Failure 500 {object} object "Internal Server Error {"message': "Failed to fetch Dailies"}"
+// @Failure 502 {object} object "Bad Gateway {"message': "No user"}"
+// @Router /api/daily/explorevs [get]
+// @Security ApiKeyAuth
+func (d *DailyController) GetExploreVS(c *gin.Context) {
+	author, _ := c.Get("user_id")
+
+	dailies, err := d.DailyRepository.GetSimilarDailiesUnviewed(author.(primitive.ObjectID))
+	if err != nil {
+		// Assuming err would not be nil if there's an error, you can expose the error message.
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to fetch Dailies: %s", err.Error())})
+		return
+	}
+	if len(dailies) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No Dailies found"})
+		return
+	}
+	c.JSON(http.StatusOK, dailies)
+}
+
 // GetSimilarDailies returns a specific daily via daily.ID
 // @Summary returns an array
 // @Description returns a specific daily via daily.ID
@@ -115,16 +142,15 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 // @Failure 500 {object} object "Internal Server Error {"message': "mongo: no documents in result"}"
 // @Router /api/daily/similarity/{id} [get]
 // @Security ApiKeyAuth
-
 func (d *DailyController) GetSimilarDailies(c *gin.Context) {
 	id := c.Param("id")                            // Extract the id from the URL.
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
+	authorId, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + authorId.String()})
 		return
 	}
 	var results []primitive.M
-	results, err = d.DailyRepository.GetSimilarDailies(objectID)
+	results, err = d.DailyRepository.GetSimilarDailies(authorId)
 	if err != nil {
 		c.Abort()
 	}
@@ -239,17 +265,20 @@ func (d *DailyController) GetExplore(c *gin.Context) {
 // @Tags Daily
 // @Accept json
 // @Produce json
-// @Param daily body model.DailyRequestDTO true "DailyRequestDTO"
+// @Param id path string true "Daily ID"
 // @Success 200 {object} object "Success {"message": "Favourite Success"}"
 // @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
 // @Failure 401 {object} object "Bad Gateway {"message": "Unauthorized"}"
-// @Failure 500 {object} object "Bad Gateway {"message": "Database error"}"
-// @Router /api/daily/fav [put]
+// @Failure 500 {object} object "Internal Server Error {"message": "Database error"}"
+// @Router /api/daily/fav/{id} [put]
 // @Security ApiKeyAuth
 func (d *DailyController) FavDaily(c *gin.Context) {
+	d.logger.Infof("FavDaily function executing")
+
 	id := c.Param("id")                            // Extract the id from the URL.
 	objectID, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
 	if err != nil {
+		d.logger.Infof("couldn't convert daily id string to primitive.ObjectID")
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + objectID.String()})
 		return
 	}
@@ -257,9 +286,29 @@ func (d *DailyController) FavDaily(c *gin.Context) {
 	user, _ := c.Get("user_id")
 	err = d.DailyRepository.FavouriteDaily(objectID, user.(primitive.ObjectID))
 	if err != nil {
+		d.logger.Infof("error in FavouriteDaily function")
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+
+	daily, err := d.DailyRepository.FindById(objectID)
+	if err != nil {
+		d.logger.Infof("no daily found with the given ObjectID")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	var keywords []string
+	if daily.Keywords != nil && len(daily.Keywords) > 0 {
+		keywords = daily.Keywords
+	}
+	topic := daily.Topic
+
+	err = d.DailyRepository.UpdateUserPreferences(keywords, topic, user.(primitive.ObjectID))
+	if err != nil {
+		d.logger.Infof("Error in UpdateUserPreferences function")
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Favourite success"})
 }
 
