@@ -53,7 +53,7 @@ const Login = ({ navigation }: { navigation: any }) => {
           onPress={handleLogin}>
           <Text style={styles.loginText}>Log in</Text>
         </Pressable>
-        <Pressable style={styles.alreadyHaveAccount} onPress={() => navigation.navigate("Login")}>
+        <Pressable style={styles.alreadyHaveAccount} onPress={() => navigation.navigate("Register")}>
         <Text style={styles.altText}>Don't have an account? Register</Text>
       </Pressable>
         <StatusBar style="auto" />
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: 'white',
   },
-  
+
   altText: {
     color: 'white',
     fontSize: 15,
