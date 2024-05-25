@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from 'uuid';
-import { Ionicons,AntDesign,FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Dropdown } from 'react-native-element-dropdown';
 
 const Explore2 = ({ navigation }) => {
   const [error, setError] = useState<AxiosError | null>(null);
@@ -17,14 +18,20 @@ const Explore2 = ({ navigation }) => {
   const [contentOffset, setContentOffset] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
   const [reportText, setReportText] = useState('');
-  const {mutate} = useReportDaily();
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const { mutate } = useReportDaily();
+
+  const reportCategories = [
+    { label: "Inappropriate Content", value: "Inappropriate Content" },
+    { label: "Privacy Violations", value: "Privacy Violations" },
+    { label: "Spam and Scams", value: "Spam and Scams" },
+    { label: "Illegal Activities", value: "Illegal Activities" },
+    { label: "Self-Harm and Suicide", value: "Self-Harm and Suicide" },
+    { label: "Other Violations", value: "Other Violations" }
+  ];
 
   const handleSwipe = () => {
     setCurrentPage((currentPage) => currentPage + 1);
-  };
-
-  const handleDoubleTap = () => {
-    console.log(contentOffset / Dimensions.get('window').height);
   };
 
   useEffect(() => {
@@ -64,14 +71,22 @@ const Explore2 = ({ navigation }) => {
   };
 
   const handleModalSubmit = () => {
-    console.log('Report submitted:', reportText);
+    console.log('Report submitted:', selectedCategory, reportText);
+    const reportDaily:ReportDailyRequest={
+      dailyId: data[contentOffset / Dimensions.get('window').height].id,
+      content: reportText,
+      title: selectedCategory
+    }
+    mutate(reportDaily);
     setModalVisible(false);
     setReportText('');
+    setSelectedCategory("");
   };
 
   const handleModalCancel = () => {
     setModalVisible(false);
     setReportText('');
+    setSelectedCategory("");
   };
 
   return (
@@ -89,32 +104,28 @@ const Explore2 = ({ navigation }) => {
         onMomentumScrollBegin={({ nativeEvent }) => {
           setVisible(true);
         }}>
-        {data?.length != 0 && data?.map((el, index) => {
+        {data?.length !== 0 && data?.map((el, index) => {
           return (
             <View key={uuidv4()} style={{ height: Dimensions.get('window').height, width: Dimensions.get('window').width, opacity: 1.0, backgroundColor: '#0D1326' }}>
               <View style={{ height: '100%', width: '100%' }}>
-                {
-                  isVisible &&
-                  <Image source={{ uri: el.image }} style={styles.image}></Image>
-                }
-                {
-                  !isVisible &&
+                {isVisible && <Image source={{ uri: el.image }} style={styles.image}></Image>}
+                {!isVisible && (
                   <ScrollView scrollEnabled={true}>
                     <Text style={styles.text}>{el.text}</Text>
                   </ScrollView>
-                }
-               <TouchableOpacity style={{width: 64,height: 64, position: "absolute",alignItems:"center",justifyContent:"center",borderRadius:32, position: "absolute", right: Dimensions.get('window').width/2+64, bottom: 98 }}>
+                )}
+                <TouchableOpacity style={styles.heartButton}>
                   <Ionicons name="heart" size={48} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity style={{width: 64,height: 64, position: "absolute",alignItems:"center",justifyContent:"center",borderRadius:32, left: Dimensions.get('window').width/2+64, bottom: 98}} onPress={handleReportPress}>
+                <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
                   <Ionicons name="flag" size={48} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ width: 80,height:80, position: "absolute",alignItems:"center",justifyContent:"center", left: (Dimensions.get('window').width/2)-40, bottom: 90, borderRadius: 40}} onPress={() => setVisible(!isVisible)}>
-                  <FontAwesome name="refresh" color="white" size={64}/>
+                <TouchableOpacity style={styles.refreshButton} onPress={() => setVisible(!isVisible)}>
+                  <FontAwesome name="refresh" color="white" size={64} />
                 </TouchableOpacity>
               </View>
             </View>
-          )
+          );
         })}
       </ScrollView>
       <Modal
@@ -124,9 +135,20 @@ const Explore2 = ({ navigation }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{height:"100%",width:"100%"}}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Report</Text>
+              <Dropdown
+                style={styles.dropdown}
+                data={reportCategories}
+                labelField="label"
+                valueField="value"
+                placeholder="Select a category"
+                value={selectedCategory}
+                onChange={item => {
+                  setSelectedCategory(item.value);
+                }}
+              />
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter your report"
@@ -179,6 +201,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20
   },
+  dropdown: {
+    width: '100%',
+    marginBottom: 20,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10
+  },
   textInput: {
     width: '100%',
     height: 100,
@@ -193,6 +223,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%'
+  },
+  heartButton: {
+    width: 64,
+    height: 64,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 32,
+    right: Dimensions.get('window').width / 2 + 64,
+    bottom: 98
+  },
+  flagButton: {
+    width: 64,
+    height: 64,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 32,
+    left: Dimensions.get('window').width / 2 + 64,
+    bottom: 98
+  },
+  refreshButton: {
+    width: 80,
+    height: 80,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: Dimensions.get('window').width / 2 - 40,
+    bottom: 90,
+    borderRadius: 40
   }
 });
 
