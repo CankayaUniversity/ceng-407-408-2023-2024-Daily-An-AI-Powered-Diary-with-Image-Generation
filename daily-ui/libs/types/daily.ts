@@ -46,8 +46,5 @@ export type EditDailyImageRequest = {
 export type ReportDailyRequest = {
    content: string,
    dailyId: string,
-   id: string,
-   reportedAt: number,
-   reports: number,
    title: string
 };

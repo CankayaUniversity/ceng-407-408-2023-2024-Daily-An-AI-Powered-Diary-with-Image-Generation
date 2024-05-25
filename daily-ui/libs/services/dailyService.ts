@@ -44,7 +44,6 @@ export const getExplore = async (
 ) => {
    const params = new URLSearchParams();
    let url = `/daily/explorevs`;
-
    const response = await serviceConsumer.get<
       ExploreResponse[],
       AxiosResponse<ExploreResponse[]>>(url, { signal });
