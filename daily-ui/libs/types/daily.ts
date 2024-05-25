@@ -17,6 +17,7 @@ export type StatisticsResponse = {
 export type ExploreResponse = {
    id: string,
    text: string,
+   image: string,
 };
 
 

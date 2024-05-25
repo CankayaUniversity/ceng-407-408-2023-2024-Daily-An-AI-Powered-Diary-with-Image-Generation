@@ -32,7 +32,6 @@ export const getStatistics = async (
    signal?: AbortSignal,
 ) => {
    let url = `/daily/statistics`;
-
    const response = await serviceConsumer.get<
       StatisticsResponse,
       AxiosResponse<StatisticsResponse>>(url, { signal });

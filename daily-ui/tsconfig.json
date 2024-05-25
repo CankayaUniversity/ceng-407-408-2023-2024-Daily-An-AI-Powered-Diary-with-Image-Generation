@@ -5,6 +5,7 @@
     "typeRoots": [
       "./libs/types"
     ],
+    "allowImportingTsExtensions": true,
   },
   "extends": "expo/tsconfig.base"
 }

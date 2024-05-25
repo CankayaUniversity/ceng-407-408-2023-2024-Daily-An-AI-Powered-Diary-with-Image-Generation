@@ -150,6 +150,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 			{"$project", bson.D{
 				{"_id", 1},
 				{"text", 1}, // Replace with actual fields you want to project
+				{"image", 1},
 			}},
 		},
 	}
@@ -187,6 +188,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 		{"$project", bson.D{
 			{"_id", 1},
 			{"text", 1}, // Replace with actual fields you want to project
+			{"image", 1},
 		}},
 	}
 
