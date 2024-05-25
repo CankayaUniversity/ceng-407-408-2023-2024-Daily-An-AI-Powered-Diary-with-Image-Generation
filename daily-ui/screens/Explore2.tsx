@@ -99,14 +99,15 @@ const Explore2 = ({ navigation }) => {
           }
         }}
         showsVerticalScrollIndicator={false}
-        pagingEnabled
+        snapToInterval={Dimensions.get('screen').height}
+        decelerationRate="fast"
         scrollEnabled={isVisible}
         onMomentumScrollBegin={({ nativeEvent }) => {
           setVisible(true);
         }}>
         {data?.length !== 0 && data?.map((el, index) => {
           return (
-            <View key={uuidv4()} style={{ height: Dimensions.get('window').height, width: Dimensions.get('window').width, opacity: 1.0, backgroundColor: '#0D1326' }}>
+            <View key={uuidv4()} style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width, opacity: 1.0, backgroundColor: '#0D1326' }}>
               <View style={{ height: '100%', width: '100%' }}>
                 {isVisible && <Image source={{ uri: el.image }} style={styles.image}></Image>}
                 {!isVisible && (
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 32,
-    right: Dimensions.get('window').width / 2 + 64,
+    right: Dimensions.get('screen').width / 2 + 64,
     bottom: 98
   },
   flagButton: {
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 32,
-    left: Dimensions.get('window').width / 2 + 64,
+    left: Dimensions.get('screen').width / 2 + 64,
     bottom: 98
   },
   refreshButton: {
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    left: Dimensions.get('window').width / 2 - 40,
+    left: Dimensions.get('screen').width / 2 - 40,
     bottom: 90,
     borderRadius: 40
   }
