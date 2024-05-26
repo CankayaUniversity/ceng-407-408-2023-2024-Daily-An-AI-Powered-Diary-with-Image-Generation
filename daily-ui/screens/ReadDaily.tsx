@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, Pressable, Image, ScrollView,TouchableOpacity }
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import { DailyResponse } from '../libs'
+import { Colors } from '../libs/colors.tsx';
 
 export default function ReadDaily({ route, navigation }: { route: any, navigation: any }) {
    const data: DailyResponse = route.params.data
@@ -11,6 +12,7 @@ export default function ReadDaily({ route, navigation }: { route: any, navigatio
 
    for (const [emotion, value] of Object.entries(data.emotions)) {
       if (value > maxEmotionValue) {
+         maxEmotionValue = value;
          maxEmotion = emotion;
       }
    }
@@ -23,10 +25,10 @@ export default function ReadDaily({ route, navigation }: { route: any, navigatio
                      isVisible &&
                      <View>
                         <Image source={{ uri: data.image }} style={styles.image}></Image>
-                        <TouchableOpacity style={{position:"absolute",bottom:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 1 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                        <TouchableOpacity style={{position:"absolute",bottom:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 1 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: Colors.main_container }}>
                            <Text style={styles.cardText}>{maxEmotion.toUpperCase()}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{position:"absolute",bottom:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 1 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                        <TouchableOpacity style={{position:"absolute",bottom:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 1 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: Colors.main_container }}>
                            <Text style={styles.cardText}>{"Topic".toUpperCase()}</Text>
                         </TouchableOpacity>
                      </View>

@@ -30,6 +30,19 @@ const Explore2 = ({ navigation }) => {
     { label: "Other Violations", value: "Other Violations" }
   ];
 
+  const getMaxEmotion = (data:any) => {
+    let maxEmotionValue = -Infinity;
+    let maxEmotion = "";
+ 
+    for (const [emotion, value] of Object.entries(data.emotions)) {
+       if (value as number > maxEmotionValue) {
+          maxEmotionValue= value as number;
+          maxEmotion = emotion;
+       }
+    }
+    return maxEmotion;
+  }
+
   const handleSwipe = () => {
     setCurrentPage((currentPage) => currentPage + 1);
   };
@@ -116,7 +129,7 @@ const Explore2 = ({ navigation }) => {
                   </ScrollView>
                 )}
                 <TouchableOpacity style={{position:"absolute",top:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
-                    <Text style={styles.cardText}>{"hello"}</Text>
+                    <Text style={styles.cardText}>{getMaxEmotion(el.emotions)}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
                     <Text style={styles.cardText}>{"Topic".toUpperCase()}</Text>
