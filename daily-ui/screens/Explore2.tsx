@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import {Pressable, View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard, Alert, ImageBackground } from 'react-native';
 import Header from '../components/Header';
 import { DailyResponse, ReportDailyRequest, getExplore, useFavDaily, useReportDaily } from '../libs';
 import { useState, useEffect } from 'react';
@@ -118,6 +118,7 @@ const Explore2 = ({ navigation }) => {
 
   return (
     <Header navigation={navigation} previous="Home" homepage={false}>
+     <ImageBackground source={require('../assets/background-main.png')} resizeMode="cover" imageStyle={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }} blurRadius={20} style={{ height: '100%', width: '100%'}}>
       <ScrollView
         onScroll={({ nativeEvent }) => {
           setContentOffset(nativeEvent.contentOffset.y);
@@ -135,34 +136,44 @@ const Explore2 = ({ navigation }) => {
         }}>
         {data?.length !== 0 && data?.map((el, index) => {
           return (
-            <View key={uuidv4()} style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width, opacity: 1.0, backgroundColor: '#0D1326' }}>
-              <View style={{ height: '100%', width: '100%' }}>
+            <View key={uuidv4()} style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width, opacity: 1.0}}>
+                  <View style={{ height: '100%', width: '100%'}}>
                 {isVisible && <Image source={{ uri: el.image }} style={styles.image}></Image>}
-                {!isVisible && (
-                  <ScrollView scrollEnabled={true}>
-                    <Text style={styles.text}>{el.text}</Text>
-                  </ScrollView>
-                )}
-                <TouchableOpacity style={{position:"absolute",top:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
-                    <Text style={styles.cardText}>{getMaxEmotion(el.emotions)}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
-                    <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
-                </TouchableOpacity>
+                {
+                     !isVisible &&
+                     <View style={{height:Dimensions.get("screen").height-160,width:'100%',opacity:0.7,justifyContent:'center',alignItems:'center'}}>
+                      <View style={{height:'20%', width:'85%',flexDirection:'row',justifyContent:'space-between'}}>
+                        <View style={{justifyContent:"space-between",padding:10 , borderWidth:1 ,height:'100%', width: '49%', opacity: 0.95, marginTop: 5, borderRadius: 10, backgroundColor: "black" }}>
+                           <Text style={styles.cardText}>{"MOOD"}</Text>
+                           <Text style={styles.cardText}>{getMaxEmotion(el.emotions)}</Text>
+                        </View>
+                        <View style={{justifyContent:"space-between",padding:10,borderWidth:1,height:'100%', width: '49%', opacity: 0.95, marginTop: 5, borderRadius: 10, backgroundColor: "black" }}>
+                           <Text style={styles.cardText}>{"TOPIC".toUpperCase()}</Text>
+                           <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
+                        </View>
+                        </View>
+                        <View  style={{height:'75%',width:'85%',borderRadius:10,borderWidth:1,backgroundColor:"black",marginTop:10}}>
+                        <ScrollView showsVerticalScrollIndicator={false} scrollEnabled>
+                        <Text style={styles.text}>{el.text}</Text>
+                        </ScrollView>
+                        </View>
+                     </View>
+                  }
                 <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
-                  <Ionicons name="heart" size={48} color={favList.includes(el.id)? "red":"white"} />
+                  <Ionicons name="heart" style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} size={48} color={favList.includes(el.id)? "red":"white"} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
-                  <Ionicons name="flag" size={48} color="white" />
+                  <Ionicons style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} name="flag" size={48} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.refreshButton} onPress={() => setVisible(!isVisible)}>
-                  <FontAwesome name="refresh" color="white" size={64} />
+                  <FontAwesome style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} name="refresh" color="white" size={64} />
                 </TouchableOpacity>
               </View>
             </View>
           );
         })}
       </ScrollView>
+      </ImageBackground>
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -216,13 +227,16 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   cardText: {
-    textAlign: 'center',
     fontSize: 25,
     fontWeight: '200',
     color: 'white'
  },
   image: {
     resizeMode: 'contain',
+    paddingTop: Dimensions.get('screen').height-100
+  },
+  imageBackground: {
+    resizeMode: 'cover',
     paddingTop: 570
   },
   modalOverlay: {
