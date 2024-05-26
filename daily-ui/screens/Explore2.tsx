@@ -115,6 +115,12 @@ const Explore2 = ({ navigation }) => {
                     <Text style={styles.text}>{el.text}</Text>
                   </ScrollView>
                 )}
+                <TouchableOpacity style={{position:"absolute",top:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                    <Text style={styles.cardText}>{"hello"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                    <Text style={styles.cardText}>{"Topic".toUpperCase()}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.heartButton}>
                   <Ionicons name="heart" size={48} color="white" />
                 </TouchableOpacity>
@@ -181,6 +187,12 @@ const styles = StyleSheet.create({
     fontWeight: '200',
     color: 'white'
   },
+  cardText: {
+    textAlign: 'center',
+    fontSize: 25,
+    fontWeight: '200',
+    color: 'white'
+ },
   image: {
     resizeMode: 'contain',
     paddingTop: 570

@@ -34,7 +34,7 @@ export type DailyResponse = {
    },
    image: string,
    favourites: number,
-   createdat: string,
+   createdAt: string,
    viewers: [],
    isshared: boolean
 };
