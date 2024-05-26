@@ -95,86 +95,56 @@ const Statistics = ({ navigation }: { navigation: any }) => {
 
                   <View style={styles.outerRow}>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Wows:
                            </Text>
-                           <View style={{ width: "100%", height: "31%" }}></View>
-                           <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Text style={styles.innerNumber}>
                                  {data?.likes || "0"}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Dailies written:
                            </Text>
-                           <View style={{ width: "100%", height: "31%" }}></View>
-                           <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Text style={styles.innerNumber}>
                                  {data?.dailiesWritten || 0}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                   </View>
                   <View style={styles.outerRow}>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Views:
                            </Text>
-                           <View style={{ width: "100%", height: "31%" }}></View>
-                           <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Text style={styles.innerNumber}>
                                  {data?.views || 0}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Streak:
                            </Text>
-                           <View style={{ width: "100%", height: "31%" }}></View>
-                           <View style={{ flexDirection: "row", alignItems: "center" }} >
                               <Text style={styles.innerNumber}>
                                  {data?.streak || 0}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                   </View>
                   <View style={styles.outerRow}>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Mood:
                            </Text>
-                           <View style={{ width: "100%", height: "20%" }}></View>
-                           <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
                               <Text style={[styles.innerNumber, { fontSize: 20}]}>
                                  {data?.mood || "Uncalculated"}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                      <View style={styles.innerItem}>
-                        <View>
                            <Text style={styles.innerText}>
                               Topic:
                            </Text>
-                           <View style={{ width: "100%", height: "20%" }}></View>
-                           <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                              <Text style={[styles.innerNumber],{ fontSize: 20}}>
+                              <Text style={[styles.innerNumber,{fontSize:20}]}>
                                  {data?.topic || "Uncalculated"}
                               </Text>
-                           </View>
-                        </View>
                      </View>
                   </View>
                </View>
@@ -209,7 +179,7 @@ const styles = StyleSheet.create({
       backgroundColor: "rgba(0,0,0,0.6)",
       flexDirection: "column",
       height: '100%',
-      justifyContent:"space-evenly"
+      justifyContent:'space-between'
    },
    innerText: {
       fontSize: 20,
@@ -217,10 +187,10 @@ const styles = StyleSheet.create({
       fontWeight:'200'
    },
    innerNumber: {
-      fontSize: 40,
+      fontSize:32,
       color: "white",
       textAlign:"left",
-      fontWeight:'200'
+      fontWeight:'200',
    }
 
 })
