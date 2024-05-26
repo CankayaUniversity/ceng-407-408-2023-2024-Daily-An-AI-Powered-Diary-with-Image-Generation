@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
+import { View, StyleSheet, Text, Image, ScrollView } from 'react-native';
 import Header from '../components/Header';
 import { Calendar } from 'react-native-calendars';
 import { Colors } from '../libs/colors.tsx';
@@ -25,7 +25,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
    return (
       <Header navigation={navigation} previous="Home" homepage={false}>
          {!isLoading &&
-            <View style={{ height: '100%', width: '100%' }}>
+            <ScrollView style={{ height: '100%', width: '100%' }}>
                <View style={styles.container}>
                   <Calendar
                      key={uuidv4()}
@@ -97,11 +97,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Wows
+                              Wows:
                            </Text>
                            <View style={{ width: "100%", height: "31%" }}></View>
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
-                              <Image source={require('../assets/Heart.png')} style={{ marginRight: 10 }} />
                               <Text style={styles.innerNumber}>
                                  {data?.likes || "0"}
                               </Text>
@@ -111,11 +110,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Dailies written
+                              Dailies written:
                            </Text>
                            <View style={{ width: "100%", height: "31%" }}></View>
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
-                              <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
                                  {data?.dailiesWritten || 0}
                               </Text>
@@ -127,11 +125,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Views
+                              Views:
                            </Text>
                            <View style={{ width: "100%", height: "31%" }}></View>
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
-                              <Image source={require('../assets/increase.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
                                  {data?.views || 0}
                               </Text>
@@ -141,11 +138,10 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Streak
+                              Streak:
                            </Text>
                            <View style={{ width: "100%", height: "31%" }}></View>
                            <View style={{ flexDirection: "row", alignItems: "center" }} >
-                              <Image source={require('../assets/streak.png')} style={{ marginRight: 10, marginTop: 5 }} />
                               <Text style={styles.innerNumber}>
                                  {data?.streak || 0}
                               </Text>
@@ -157,12 +153,11 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Mood
+                              Mood:
                            </Text>
                            <View style={{ width: "100%", height: "20%" }}></View>
                            <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                              <Image source={require('../assets/happy.png')} style={{ marginRight: 10, }} />
-                              <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
+                              <Text style={[styles.innerNumber, { fontSize: 20}]}>
                                  {data?.mood || "Uncalculated"}
                               </Text>
                            </View>
@@ -171,11 +166,11 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      <View style={styles.innerItem}>
                         <View>
                            <Text style={styles.innerText}>
-                              Topic
+                              Topic:
                            </Text>
                            <View style={{ width: "100%", height: "20%" }}></View>
                            <View style={{ flexDirection: "row", width: "70%", height: "56%", alignItems: "flex-end" }} >
-                              <Text style={[styles.innerNumber, { fontSize: 20, fontWeight: "bold" }]}>
+                              <Text style={[styles.innerNumber],{ fontSize: 20}}>
                                  {data?.topic || "Uncalculated"}
                               </Text>
                            </View>
@@ -183,7 +178,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                      </View>
                   </View>
                </View>
-            </View>
+            </ScrollView>
          }
       </Header >
    );
@@ -191,8 +186,9 @@ const Statistics = ({ navigation }: { navigation: any }) => {
 
 const styles = StyleSheet.create({
    container: {
-      flex: 1, alignItems: 'center',
-      padding: "2%",
+      alignItems: 'center',
+      padding: "3%",
+      paddingBottom:30,
       margin: "3%",
       borderRadius: 20,
       backgroundColor: Colors.main_container,
@@ -212,18 +208,19 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
       backgroundColor: "rgba(0,0,0,0.6)",
       flexDirection: "column",
-      justifyContent: "space-between",
       height: '100%',
+      justifyContent:"space-evenly"
    },
    innerText: {
-      fontFamily: "Helvetica",
       fontSize: 20,
       color: "rgba(255, 255, 255, 1)",
+      fontWeight:'200'
    },
    innerNumber: {
-      marginTop: "3%",
       fontSize: 40,
       color: "white",
+      textAlign:"left",
+      fontWeight:'200'
    }
 
 })
