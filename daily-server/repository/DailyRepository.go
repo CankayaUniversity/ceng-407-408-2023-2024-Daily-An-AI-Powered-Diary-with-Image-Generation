@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -99,12 +100,14 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 	err := r.userPreferences.FindOne(context.Background(), filter).Decode(&userPref)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			newUser := bson.M{"author": userId, "keywords": []string{}, "topics": []string{}}
+			r.userPreferences.InsertOne(context.Background(), newUser)
 			return []primitive.M{}, errors.New("no user preference found")
 		} else {
 			return []primitive.M{}, err
 		}
 	}
-	var interests string
+	interests := ""
 	for _, topics := range userPref.Topic {
 		interests += topics
 		interests += ", "
@@ -123,6 +126,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 	}
 	targetResponse, err := client.CreateEmbeddings(ctx, queryReq)
 	if err != nil {
+		fmt.Println(err.Error())
 		return []primitive.M{}, errors.New("preferences could not be embedded")
 	}
 	embedding := targetResponse.Data[0].Embedding
@@ -151,6 +155,8 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 				{"_id", 1},
 				{"text", 1}, // Replace with actual fields you want to project
 				{"image", 1},
+				{"emotions", 1},
+				{"topic", 1},
 			}},
 		},
 	}
@@ -189,6 +195,8 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 			{"_id", 1},
 			{"text", 1}, // Replace with actual fields you want to project
 			{"image", 1},
+			{"emotions", 1},
+			{"topic", 1},
 		}},
 	}
 

@@ -37,7 +37,7 @@ const YourDaily = ({ navigation }: { navigation: any }) => {
             }}
           >
             <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: "white", fontSize: 48, textAlign:"center", }}>{dateDict(el.createdAt)}</Text>
+              <Text style={{ color: "white", fontSize: 42, textAlign:"center", fontWeight: '200'}}>{dateDict(el.createdAt)}</Text>
             </View>
             <Image
               source={{ uri: el.image }}
