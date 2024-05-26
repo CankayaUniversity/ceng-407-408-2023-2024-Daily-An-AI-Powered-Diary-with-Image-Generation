@@ -100,7 +100,7 @@ const Explore2 = ({ navigation }) => {
   const handleModalSubmit = () => {
     console.log('Report submitted:', selectedCategory, reportText);
     const reportDaily:ReportDailyRequest={
-      dailyId: data[contentOffset / Dimensions.get('window').height].id,
+      dailyId: data[contentOffset / Dimensions.get('screen').height].id,
       content: reportText,
       title: selectedCategory
     }
@@ -130,7 +130,6 @@ const Explore2 = ({ navigation }) => {
         snapToInterval={Dimensions.get('screen').height}
         decelerationRate="fast"
         scrollEnabled={isVisible}
-        pagingEnabled
         onMomentumScrollBegin={({ nativeEvent }) => {
           setVisible(true);
         }}>
@@ -150,8 +149,8 @@ const Explore2 = ({ navigation }) => {
                 <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
                     <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el._id)}>
-                  <Ionicons name="heart" size={48} color={favList.includes(el._id)? "red":"white"} />
+                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
+                  <Ionicons name="heart" size={48} color={favList.includes(el.id)? "red":"white"} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
                   <Ionicons name="flag" size={48} color="white" />
