@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Header from '../components/Header';
-import { DailyResponse, ReportDailyRequest, getExplore, useReportDaily } from '../libs';
+import { DailyResponse, ReportDailyRequest, getExplore, useFavDaily, useReportDaily } from '../libs';
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
 import "react-native-get-random-values";
@@ -20,6 +20,15 @@ const Explore2 = ({ navigation }) => {
   const [reportText, setReportText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState("");
   const { mutate } = useReportDaily();
+  const favDaily = useFavDaily()
+  const [favList,setFavList] = useState<any[]>([])
+
+  const setFavDaily= (id:string)=>{
+    if(favList.includes(id)) return;
+    favDaily.mutate(id);
+    favList.push(id)
+    setFavList(favList)
+  }
 
   const reportCategories = [
     { label: "Inappropriate Content", value: "Inappropriate Content" },
@@ -33,14 +42,13 @@ const Explore2 = ({ navigation }) => {
   const getMaxEmotion = (data:any) => {
     let maxEmotionValue = -Infinity;
     let maxEmotion = "";
- 
-    for (const [emotion, value] of Object.entries(data.emotions)) {
+    for (const [emotion, value] of Object.entries(data)) {
        if (value as number > maxEmotionValue) {
           maxEmotionValue= value as number;
           maxEmotion = emotion;
        }
     }
-    return maxEmotion;
+    return maxEmotion.toUpperCase();
   }
 
   const handleSwipe = () => {
@@ -128,14 +136,14 @@ const Explore2 = ({ navigation }) => {
                     <Text style={styles.text}>{el.text}</Text>
                   </ScrollView>
                 )}
-                <TouchableOpacity style={{position:"absolute",top:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                <TouchableOpacity style={{position:"absolute",top:0,left:5,borderWidth:1,alignItems:"center",justifyContent:"center", aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
                     <Text style={styles.cardText}>{getMaxEmotion(el.emotions)}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '35%', opacity: 0.95, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
-                    <Text style={styles.cardText}>{"Topic".toUpperCase()}</Text>
+                <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
+                    <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.heartButton}>
-                  <Ionicons name="heart" size={48} color="white" />
+                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el._id)}>
+                  <Ionicons name="heart" size={48} color={favList.includes(el._id)? "red":"white"} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
                   <Ionicons name="flag" size={48} color="white" />
