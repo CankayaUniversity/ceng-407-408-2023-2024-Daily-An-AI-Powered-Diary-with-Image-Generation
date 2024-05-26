@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import Header from '../components/Header';
 import { DailyResponse, ReportDailyRequest, getExplore, useFavDaily, useReportDaily } from '../libs';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ const Explore2 = ({ navigation }) => {
   const [isLoading, setLoading] = useState(false);
   const [contentOffset, setContentOffset] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isFetched, setFetched] = useState(true);
   const [reportText, setReportText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState("");
   const { mutate } = useReportDaily();
@@ -52,22 +53,27 @@ const Explore2 = ({ navigation }) => {
   }
 
   const handleSwipe = () => {
-    setCurrentPage((currentPage) => currentPage + 1);
+    if(isFetched){
+      setCurrentPage((currentPage) => currentPage + 1);
+    }
   };
 
   useEffect(() => {
     const abortController = new AbortController();
     const fetchData = async () => {
       try {
+        setFetched(false)
         const newData = await getExplore();
+        if(newData.length>0)
         setData(data => [...data, ...newData]);
         setError(null);
         setLoading(true);
+        setFetched(true)
       } catch (error: any) {
-        setError(error);
-        console.error('Failed to fetch', error);
+        navigation.navigate("Home")
       }
     };
+    if(isFetched)
     fetchData();
     return () => abortController.abort();
   }, [currentPage]);
@@ -94,7 +100,7 @@ const Explore2 = ({ navigation }) => {
   const handleModalSubmit = () => {
     console.log('Report submitted:', selectedCategory, reportText);
     const reportDaily:ReportDailyRequest={
-      dailyId: data[contentOffset / Dimensions.get('window').height].id,
+      dailyId: data[contentOffset / Dimensions.get('screen').height].id,
       content: reportText,
       title: selectedCategory
     }
@@ -116,6 +122,7 @@ const Explore2 = ({ navigation }) => {
         onScroll={({ nativeEvent }) => {
           setContentOffset(nativeEvent.contentOffset.y);
           if (isCloseToBottom(nativeEvent)) {
+            console.log(currentPage)
             handleSwipe();
           }
         }}
@@ -142,8 +149,8 @@ const Explore2 = ({ navigation }) => {
                 <TouchableOpacity style={{position:"absolute",top:0,right:5,alignItems:"center",justifyContent:"center",borderWidth:1, aspectRatio: 2 / 1, width: '40%', opacity: isVisible? 0.95:0, marginTop: 10, borderRadius: 10, backgroundColor: '#2D1C40' }}>
                     <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el._id)}>
-                  <Ionicons name="heart" size={48} color={favList.includes(el._id)? "red":"white"} />
+                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
+                  <Ionicons name="heart" size={48} color={favList.includes(el.id)? "red":"white"} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
                   <Ionicons name="flag" size={48} color="white" />

@@ -44,3 +44,11 @@ type EditDailyImageDTO struct {
 	ID    primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
 	Image string             `json:"image" bson:"image"`
 }
+
+type ExploreDailyDTO struct {
+	ID       primitive.ObjectID `json:"id" bson:"_id"`
+	Text     string             `json:"text" bson:"text" binding:"required"`
+	Topic    string             `json"topic" bson:"topic"`
+	Emotions Emotion            `json:"emotions" bson:"emotions"`
+	Image    string             `json:"image" bson:"image"`
+}
