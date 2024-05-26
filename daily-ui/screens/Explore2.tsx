@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, TextInput, Button, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import Header from '../components/Header';
 import { DailyResponse, ReportDailyRequest, getExplore, useFavDaily, useReportDaily } from '../libs';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ const Explore2 = ({ navigation }) => {
   const [isLoading, setLoading] = useState(false);
   const [contentOffset, setContentOffset] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isFetched, setFetched] = useState(true);
   const [reportText, setReportText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState("");
   const { mutate } = useReportDaily();
@@ -52,22 +53,27 @@ const Explore2 = ({ navigation }) => {
   }
 
   const handleSwipe = () => {
-    setCurrentPage((currentPage) => currentPage + 1);
+    if(isFetched){
+      setCurrentPage((currentPage) => currentPage + 1);
+    }
   };
 
   useEffect(() => {
     const abortController = new AbortController();
     const fetchData = async () => {
       try {
+        setFetched(false)
         const newData = await getExplore();
+        if(newData.length>0)
         setData(data => [...data, ...newData]);
         setError(null);
         setLoading(true);
+        setFetched(true)
       } catch (error: any) {
-        setError(error);
-        console.error('Failed to fetch', error);
+        navigation.navigate("Home")
       }
     };
+    if(isFetched)
     fetchData();
     return () => abortController.abort();
   }, [currentPage]);
@@ -116,6 +122,7 @@ const Explore2 = ({ navigation }) => {
         onScroll={({ nativeEvent }) => {
           setContentOffset(nativeEvent.contentOffset.y);
           if (isCloseToBottom(nativeEvent)) {
+            console.log(currentPage)
             handleSwipe();
           }
         }}
@@ -123,6 +130,7 @@ const Explore2 = ({ navigation }) => {
         snapToInterval={Dimensions.get('screen').height}
         decelerationRate="fast"
         scrollEnabled={isVisible}
+        pagingEnabled
         onMomentumScrollBegin={({ nativeEvent }) => {
           setVisible(true);
         }}>

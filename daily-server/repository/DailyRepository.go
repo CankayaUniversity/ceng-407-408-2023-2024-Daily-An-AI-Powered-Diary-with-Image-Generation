@@ -90,7 +90,7 @@ func (r *DailyRepository) GetExplore() ([]model.Daily, error) {
 	return dailies, err
 }
 
-func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) ([]primitive.M, error) {
+func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) ([]model.ExploreDailyDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -102,9 +102,9 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 		if err == mongo.ErrNoDocuments {
 			newUser := bson.M{"author": userId, "keywords": []string{}, "topics": []string{}}
 			r.userPreferences.InsertOne(context.Background(), newUser)
-			return []primitive.M{}, errors.New("no user preference found")
+			return nil, errors.New("no user preference found")
 		} else {
-			return []primitive.M{}, err
+			return nil, err
 		}
 	}
 	interests := ""
@@ -127,7 +127,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 	targetResponse, err := client.CreateEmbeddings(ctx, queryReq)
 	if err != nil {
 		fmt.Println(err.Error())
-		return []primitive.M{}, errors.New("preferences could not be embedded")
+		return nil, errors.New("preferences could not be embedded")
 	}
 	embedding := targetResponse.Data[0].Embedding
 
@@ -166,9 +166,9 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 		return nil, err
 	}
 	// Iterate over the results
-	var results []bson.M
+	var results []model.ExploreDailyDTO
 	for cursor.Next(ctx) {
-		var result bson.M
+		var result model.ExploreDailyDTO
 		if err := cursor.Decode(&result); err != nil {
 			return nil, err
 		}
@@ -211,11 +211,24 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 		return nil, err
 	}
 
-	var randomDailiesResults []bson.M
+	var randomDailiesResults []model.ExploreDailyDTO
 	if err := cursor.All(ctx, &randomDailiesResults); err != nil {
 		return nil, err
 	}
 	combinedResults := append(results, randomDailiesResults...)
+
+	for _, daily := range combinedResults {
+		// Add the viewer to the daily's viewers list
+		updateViewers := bson.M{"$addToSet": bson.M{"viewers": userId}}
+		if _, err = r.dailies.UpdateOne(ctx, bson.M{"_id": daily.ID}, updateViewers); err != nil {
+			return nil, err
+		}
+
+		err := r.users.AddToViewed(userId, daily.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return combinedResults, nil
 }
@@ -346,10 +359,24 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 		return err
 	}
 
-	err := r.users.AddToFav(userID, dailyID) // Assuming AddToFav is implemented correctly
+	var daily struct {
+		Keywords []string `bson:"keywords"`
+		Topic    string   `bson:"topic"`
+	}
+	if err := r.dailies.FindOne(ctx, bson.M{"_id": dailyID}).Decode(&daily); err != nil {
+		fmt.Println("1:", err.Error())
+		return err
+	}
+
+	err := r.UpdateUserPreferences(daily.Keywords, daily.Topic, userID)
 	if err != nil {
 		return err
 	}
+	err = r.users.AddToFav(userID, dailyID) // Assuming AddToFav is implemented correctly
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
