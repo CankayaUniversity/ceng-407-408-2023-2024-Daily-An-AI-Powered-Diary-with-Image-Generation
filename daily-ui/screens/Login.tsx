@@ -28,6 +28,7 @@ const Login = ({ navigation }: { navigation: any }) => {
         </Image>
         <View style={styles.inputView}>
           <TextInput
+            testID="loginUserId"
             style={styles.inputText}
             placeholder="username@mailprovider.com"
             placeholderTextColor="#003f5c"
@@ -37,6 +38,7 @@ const Login = ({ navigation }: { navigation: any }) => {
         </View>
         <View style={styles.inputView}>
           <TextInput
+            testID="loginPassword"
             style={styles.inputText}
             placeholder="Password"
             placeholderTextColor="#003f5c"
@@ -46,6 +48,7 @@ const Login = ({ navigation }: { navigation: any }) => {
           />
         </View>
         <Pressable
+          testID="loginButton"
           style={({ pressed }) => [
             styles.loginBtn,
             { opacity: pressed ? 0.5 : 1 }
@@ -53,7 +56,11 @@ const Login = ({ navigation }: { navigation: any }) => {
           onPress={handleLogin}>
           <Text style={styles.loginText}>Log in</Text>
         </Pressable>
-        <Pressable style={styles.alreadyHaveAccount} onPress={() => navigation.navigate("Register")}>
+        <Pressable
+          testID="registerLink"
+          style={styles.alreadyHaveAccount}
+          onPress={() => navigation.navigate("Register")}
+        >
         <Text style={styles.altText}>Don't have an account? Register</Text>
       </Pressable>
         <StatusBar style="auto" />

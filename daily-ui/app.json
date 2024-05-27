@@ -25,7 +25,8 @@
     "web": {
     },
     "plugins": [
-      "expo-build-properties"
+      "expo-build-properties",
+      "@config-plugins/detox"
     ]
   }
 }
