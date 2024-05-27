@@ -62,7 +62,6 @@ func New() *gin.Engine {
 	api.DELETE("/daily/:id", dailyHandler.DeleteDaily)
 	api.GET("/daily/explore", dailyHandler.GetExplore)
 	api.GET("/daily/statistics", statisticsHandler.Statistics)
-	api.GET("/daily/similarity/:id", dailyHandler.GetSimilarDailies)
 	api.GET("/daily/explorevs", dailyHandler.GetExploreVS)
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))

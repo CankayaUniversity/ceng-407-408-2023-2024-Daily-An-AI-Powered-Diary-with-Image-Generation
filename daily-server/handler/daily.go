@@ -27,8 +27,7 @@ type DailyController struct {
 
 func NewDailyController(_userRepository *repository.UserRepository, _repository *repository.DailyRepository, _reports *repository.ReportedDailyRepository) *DailyController {
 	return &DailyController{
-		UserRepository:   _userRepository,
-		DailyRepository:  _repository,
+		UserRepository: _userRepository, DailyRepository: _repository,
 		ReportRepository: _reports,
 		logger:           logrus.New(),
 	}
@@ -128,36 +127,6 @@ func (d *DailyController) GetExploreVS(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, dailies)
-}
-
-// GetSimilarDailies returns a specific daily via daily.ID
-// @Summary returns an array
-// @Description returns a specific daily via daily.ID
-// @Tags Daily
-// @Accept json
-// @Produce json
-// @Param id path string true "Daily ID"
-// @Success 200 {object} object
-// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
-// @Failure 500 {object} object "Internal Server Error {"message': "mongo: no documents in result"}"
-// @Router /api/daily/similarity/{id} [get]
-// @Security ApiKeyAuth
-func (d *DailyController) GetSimilarDailies(c *gin.Context) {
-	id := c.Param("id")                            // Extract the id from the URL.
-	authorId, err := primitive.ObjectIDFromHex(id) // Convert string id to MongoDB ObjectID
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error() + authorId.String()})
-		return
-	}
-	var results []primitive.M
-	results, err = d.DailyRepository.GetSimilarDailies(authorId)
-	if err != nil {
-		c.Abort()
-	}
-	for _, result := range results {
-		d.logger.Infof("%v", result)
-	}
-	c.JSON(http.StatusOK, results)
 }
 
 // GetDaily returns a specific daily via daily.ID
@@ -302,9 +271,9 @@ func (d *DailyController) FavDaily(c *gin.Context) {
 	if daily.Keywords != nil && len(daily.Keywords) > 0 {
 		keywords = daily.Keywords
 	}
-	topic := daily.Topic
+	topics := daily.Topics
 
-	err = d.DailyRepository.UpdateUserPreferences(keywords, topic, user.(primitive.ObjectID))
+	err = d.DailyRepository.UpdateUserPreferences(keywords, topics, user.(primitive.ObjectID))
 	if err != nil {
 		d.logger.Infof("Error in UpdateUserPreferences function")
 	}

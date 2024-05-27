@@ -108,7 +108,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 		}
 	}
 	interests := ""
-	for _, topics := range userPref.Topic {
+	for _, topics := range userPref.Topics {
 		interests += topics
 		interests += ", "
 	}
@@ -156,7 +156,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 				{"text", 1}, // Replace with actual fields you want to project
 				{"image", 1},
 				{"emotions", 1},
-				{"topic", 1},
+				{"topics", 1},
 			}},
 		},
 	}
@@ -196,7 +196,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 			{"text", 1}, // Replace with actual fields you want to project
 			{"image", 1},
 			{"emotions", 1},
-			{"topic", 1},
+			{"topics", 1},
 		}},
 	}
 
@@ -231,82 +231,6 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 	}
 
 	return combinedResults, nil
-}
-
-func (r *DailyRepository) GetSimilarDailies(userId primitive.ObjectID) ([]primitive.M, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	filter := bson.M{"author": userId}
-	var userPref model.UserPreference
-
-	err := r.userPreferences.FindOne(context.Background(), filter).Decode(&userPref)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return []primitive.M{}, errors.New("no user preference found")
-		} else {
-			return []primitive.M{}, err
-		}
-	}
-	var interests string
-	for _, topics := range userPref.Topic {
-		interests += topics
-		interests += ", "
-	}
-	for _, keywords := range userPref.Keywords {
-		interests += keywords
-		interests += ", "
-	}
-
-	// EMBEDDINGS
-	client := openai.NewClient(os.Getenv("OPEN_API_KEY"))
-
-	queryReq := openai.EmbeddingRequest{
-		Input: interests,
-		Model: openai.LargeEmbedding3,
-	}
-	targetResponse, err := client.CreateEmbeddings(ctx, queryReq)
-	if err != nil {
-		return []primitive.M{}, errors.New("preferences could not be embedded")
-	}
-	embedding := targetResponse.Data[0].Embedding
-
-	aggregation := bson.A{
-		bson.D{
-			{"$vectorSearch",
-				bson.D{
-					{"queryVector", embedding},
-					{"path", "embedding"},
-					{"numCandidates", 10},
-					{"index", "embeddings_index"},
-					{"limit", 10},
-				},
-			},
-		},
-		bson.D{
-			{"$project", bson.D{
-				{"_id", 1},
-				{"text", 1}, // Replace with actual fields you want to project
-				{"score", bson.D{{"$meta", "searchScore"}}},
-			}},
-		},
-	}
-
-	cursor, err := r.dailies.Aggregate(ctx, aggregation)
-	if err != nil {
-		return nil, err
-	}
-	// Iterate over the results
-	var results []bson.M
-	for cursor.Next(ctx) {
-		var result bson.M
-		if err := cursor.Decode(&result); err != nil {
-			return nil, err
-		}
-		results = append(results, result)
-	}
-
-	return results, nil
 }
 
 func (r *DailyRepository) List(author_id primitive.ObjectID, limit int) ([]model.Daily, error) {
@@ -361,14 +285,15 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 
 	var daily struct {
 		Keywords []string `bson:"keywords"`
-		Topic    string   `bson:"topic"`
+		Topics   []string `bson:"topics"`
 	}
+
 	if err := r.dailies.FindOne(ctx, bson.M{"_id": dailyID}).Decode(&daily); err != nil {
 		fmt.Println("1:", err.Error())
 		return err
 	}
 
-	err := r.UpdateUserPreferences(daily.Keywords, daily.Topic, userID)
+	err := r.UpdateUserPreferences(daily.Keywords, daily.Topics, userID)
 	if err != nil {
 		return err
 	}
@@ -380,7 +305,7 @@ func (r *DailyRepository) FavouriteDaily(dailyID primitive.ObjectID, userID prim
 	return nil
 }
 
-func (r *DailyRepository) UpdateUserPreferences(keywords []string, topic string, authorId primitive.ObjectID) error {
+func (r *DailyRepository) UpdateUserPreferences(keywords []string, topics []string, authorId primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -388,7 +313,7 @@ func (r *DailyRepository) UpdateUserPreferences(keywords []string, topic string,
 	update := bson.M{
 		"$addToSet": bson.M{
 			"keywords": bson.M{"$each": keywords},
-			"topics":   topic,
+			"topics":   bson.M{"$each": topics},
 		},
 	}
 	opts := options.Update().SetUpsert(true)

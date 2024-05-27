@@ -372,55 +372,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/daily/similarity/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "returns a specific daily via daily.ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Daily"
-                ],
-                "summary": "returns an array",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Daily ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error {\"message': \"mongo: no documents in result\"}",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/api/daily/statistics": {
             "get": {
                 "security": [
@@ -765,8 +716,11 @@ const docTemplate = `{
                 "text": {
                     "type": "string"
                 },
-                "topic": {
-                    "type": "string"
+                "topics": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "viewers": {
                     "type": "array",
@@ -876,9 +830,12 @@ const docTemplate = `{
                     "description": "Current streak of daily entries",
                     "type": "integer"
                 },
-                "topic": {
+                "topics": {
                     "description": "Currently focused topic",
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "views": {
                     "description": "Number of views",

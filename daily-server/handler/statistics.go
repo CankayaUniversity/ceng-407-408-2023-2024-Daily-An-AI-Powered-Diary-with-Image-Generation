@@ -64,7 +64,7 @@ func (controller *StatisticsController) Statistics(c *gin.Context) {
 		statistics.Mood = "None"
 	}
 	statistics.Streak = controller.Streak(dailies)
-	statistics.Topic = controller.Topics(dailies)
+	statistics.Topics = controller.Topics(dailies)
 	statistics.Dates = controller.GetDates(author, c)
 	c.JSON(http.StatusOK, statistics)
 }
@@ -209,8 +209,19 @@ func (controller *StatisticsController) UserMood(userId primitive.ObjectID, c *g
 	return mostProminentEmotion, nil
 }
 
-func (controller *StatisticsController) Topics(dailies []model.Daily) string {
-	return "Friends"
+func (controller *StatisticsController) Topics(dailies []model.Daily) []string {
+	/*
+		var topicList []string
+
+		for _, daily := range dailies {
+			topicList = append(topicList, daily.Topics[0])
+		}
+	*/
+
+	var a []string
+	a = append(a, "Hello")
+	a = append(a, "World")
+	return a
 }
 
 func (controller *StatisticsController) Likes(dailies []model.Daily) int {
