@@ -38,7 +38,7 @@ const WriteADaily = ({ navigation }: { navigation: any }) => {
                <Text style={{ alignItems: 'center', justifyContent: 'center', fontSize: 40, color: 'white' }}>Loading</Text>
             }
 
-            <Pressable onPress={Keyboard.dismiss} style={{ flex: 1, alignItems: "center", height: "100%", width: "100%" }}>
+            <Pressable onPress={Keyboard.dismiss} style={{ flex: 1, alignItems: "center", height: "100%", width: "100%"}}>
                <Text style={{ fontSize: 40, fontWeight: '200', color: 'white', paddingBottom: 12 }}>Write a Daily</Text>
                <TextInput
                   multiline
@@ -52,7 +52,7 @@ const WriteADaily = ({ navigation }: { navigation: any }) => {
                <View style={styles.save}>
                   {isPending == false &&
                      <Pressable style={{backgroundColor: '#6A51BE', width:"100%",borderRadius:12,paddingVertical:10}} onPress={() => { setModalVisible(!isModalVisible); console.log(isPending); }}>
-                        <Text style={{color: 'white',fontSize: 20,fontWeight:"bold",textAlign:"center"}}>Submit</Text>
+                        <Text style={{color: 'white',fontSize: 24,fontWeight:"200",textAlign:"center"}}>Submit</Text>
                      </Pressable>
                   }
                </View>
@@ -111,8 +111,6 @@ const styles = StyleSheet.create({
    },
 
    input: {
-      borderColor: '#ccc',
-      borderWidth: 1,
       padding: 10,
       marginBottom: 20,
       color: "white",

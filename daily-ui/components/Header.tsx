@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image, Text, ImageBackground } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { storageKeys, storageUtils } from '../libs';
 
 const Header = ({ navigation, children, previous, homepage }: { navigation: any, children: any, previous: any, homepage: any }) => {
    return (
@@ -9,8 +11,8 @@ const Header = ({ navigation, children, previous, homepage }: { navigation: any,
                <View style={{ flexDirection: 'row', borderWidth: 2, justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8}}>
                   {
                      homepage &&
-                     <TouchableOpacity style={{ paddingTop: 30, paddingLeft: 15 }}>
-                        <Image source={require("../assets/menu.png")}></Image>
+                     <TouchableOpacity style={{ paddingTop: 30, paddingLeft: 15 }} onPress={() => {storageUtils.removeItem(storageKeys.bearerToken);navigation.navigate("Login")}}>
+                        <AntDesign name="logout" color="white" size={32} style={{transform: [{rotateY: '180deg'}]}}></AntDesign>
                      </TouchableOpacity>
                   }
                   {
@@ -20,9 +22,6 @@ const Header = ({ navigation, children, previous, homepage }: { navigation: any,
                      </TouchableOpacity>
                   }
 
-                  <TouchableOpacity style={{ paddingTop: 30, paddingLeft: 15 }} onPress={() => navigation.navigate("Login")}>
-                     <Text style={{ fontSize: 20, fontWeight: '400', color: 'white' }}>logout</Text>
-                  </TouchableOpacity>
                   <TouchableOpacity style={{ paddingTop: 30, paddingRight: 15 }} onPress={() => navigation.navigate("Home")}>
                      <Image source={require("../assets/main-logo-small.png")}></Image>
                   </TouchableOpacity>

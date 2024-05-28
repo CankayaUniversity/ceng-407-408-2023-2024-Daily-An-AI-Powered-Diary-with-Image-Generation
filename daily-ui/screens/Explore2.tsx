@@ -136,12 +136,12 @@ const Explore2 = ({ navigation }) => {
         }}>
         {data?.length !== 0 && data?.map((el, index) => {
           return (
-            <View key={uuidv4()} style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width, opacity: 1.0}}>
+            <View key={uuidv4()} style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width, opacity: 1.0,shadowOffset:{width:0,height:0},shadowRadius:20,shadowColor:'black',shadowOpacity:1}}>
                   <View style={{ height: '100%', width: '100%'}}>
                 {isVisible && <Image source={{ uri: el.image }} style={styles.image}></Image>}
                 {
                      !isVisible &&
-                     <View style={{height:Dimensions.get("screen").height-160,width:'100%',opacity:0.7,justifyContent:'center',alignItems:'center'}}>
+                     <View style={{height:Dimensions.get("screen").height-160,width:'100%',opacity:0.4,justifyContent:'center',alignItems:'center'}}>
                       <View style={{height:'20%', width:'85%',flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{justifyContent:"space-between",padding:10 , borderWidth:1 ,height:'100%', width: '49%', opacity: 0.95, marginTop: 5, borderRadius: 10, backgroundColor: "black" }}>
                            <Text style={styles.cardText}>{"MOOD"}</Text>
@@ -159,15 +159,17 @@ const Explore2 = ({ navigation }) => {
                         </View>
                      </View>
                   }
-                <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
-                  <Ionicons name="heart" style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} size={48} color={favList.includes(el.id)? "red":"white"} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
-                  <Ionicons style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} name="flag" size={48} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.refreshButton} onPress={() => setVisible(!isVisible)}>
-                  <FontAwesome style={{shadowColor: 'pink',shadowOpacity:1,shadowRadius:10,shadowOffset:{width:0, height:0}}} name="refresh" color="white" size={64} />
-                </TouchableOpacity>
+                <View style={{position:'absolute',width:'100%',bottom:80,backgroundColor:"black",justifyContent:'space-evenly',alignItems:'flex-end',flexDirection:'row',borderTopLeftRadius:200,borderTopRightRadius:200}}>  
+                  <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
+                    <Ionicons name="heart" style={styles.iconStyle} size={32} color={favList.includes(el.id)? "red":"white"} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.refreshButton} onPress={() => setVisible(!isVisible)}>
+                    <FontAwesome style={styles.iconStyle} name="refresh" color="white" size={44} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.flagButton} onPress={handleReportPress}>
+                    <Ionicons style={styles.iconStyle} name="flag" size={32} color="white" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           );
@@ -282,32 +284,28 @@ const styles = StyleSheet.create({
   heartButton: {
     width: 64,
     height: 64,
-    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 32,
-    right: Dimensions.get('screen').width / 2 + 64,
-    bottom: 98
   },
   flagButton: {
     width: 64,
     height: 64,
-    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 32,
-    left: Dimensions.get('screen').width / 2 + 64,
-    bottom: 98
   },
   refreshButton: {
-    width: 80,
-    height: 80,
-    position: 'absolute',
+    width: 64,
+    height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    left: Dimensions.get('screen').width / 2 - 40,
-    bottom: 90,
-    borderRadius: 40
+  },
+  iconStyle: {
+    shadowColor: '#6A51BE',
+    shadowOpacity:0.5,
+    shadowRadius:5,
+    shadowOffset:{width:0, height:0}
   }
 });
 

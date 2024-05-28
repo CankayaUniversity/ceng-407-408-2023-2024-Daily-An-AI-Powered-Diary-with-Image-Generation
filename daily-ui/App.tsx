@@ -30,8 +30,8 @@ const App = () => {
           <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="Statistics" component={Statistics} />
           <Stack.Screen name="WriteADaily" component={WriteADaily} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Login" component={Login} options={{gestureEnabled: false}}/>
+          <Stack.Screen name="Register" component={Register}/>
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
