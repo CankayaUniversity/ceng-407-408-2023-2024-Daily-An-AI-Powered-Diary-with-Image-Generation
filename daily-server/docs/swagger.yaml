@@ -6,6 +6,8 @@ definitions:
         type: string
       isShared:
         type: boolean
+      prompt:
+        type: string
       text:
         type: string
     required:
@@ -68,17 +70,17 @@ definitions:
   model.Emotion:
     properties:
       anger:
-        type: integer
+        type: number
       fear:
-        type: integer
+        type: number
       joy:
-        type: integer
+        type: number
       love:
-        type: integer
+        type: number
       sadness:
-        type: integer
+        type: number
       surprise:
-        type: integer
+        type: number
     type: object
   model.ReportedDaily:
     properties:

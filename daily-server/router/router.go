@@ -63,6 +63,7 @@ func New() *gin.Engine {
 	api.GET("/daily/explore", dailyHandler.GetExplore)
 	api.GET("/daily/statistics", statisticsHandler.Statistics)
 	api.GET("/daily/explorevs", dailyHandler.GetExploreVS)
+
 	// moderator rights here
 	admin.Use(middleware.JwtAuthMiddlewareRole("moderator"))
 	admin.DELETE("/deleteUser", handler.DeleteUserAdmin)

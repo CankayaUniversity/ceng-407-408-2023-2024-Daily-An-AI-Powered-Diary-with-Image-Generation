@@ -669,6 +669,9 @@ const docTemplate = `{
                 "isShared": {
                     "type": "boolean"
                 },
+                "prompt": {
+                    "type": "string"
+                },
                 "text": {
                     "type": "string"
                 }
@@ -759,22 +762,22 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "anger": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "fear": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "joy": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "love": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "sadness": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "surprise": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },

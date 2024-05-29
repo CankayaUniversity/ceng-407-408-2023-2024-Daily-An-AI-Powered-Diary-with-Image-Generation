@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
 	"github.com/Final-Projectors/daily-server/repository"
+	"github.com/Final-Projectors/daily-server/utils"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
@@ -31,6 +33,16 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 		ReportRepository: _reports,
 		logger:           logrus.New(),
 	}
+}
+
+func (d *DailyController) GetImage(prompt string) (string, error) {
+	var image repository.TextToImageImage
+	image, err := repository.GenerateImage(prompt)
+	if err != nil {
+		return "", err
+	}
+
+	return image.Base64, nil
 }
 
 // Create accepts a body request to POST a daily
@@ -57,8 +69,6 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 		return
 	}
 
-	daily.Keywords = []string{} // assuming Keywords is a string slice.
-	daily.Emotions = model.Emotion{}
 	daily.Favourites = 0                   // assuming Favourites is an integer.
 	daily.Viewers = []primitive.ObjectID{} // assuming Viewers is an integer.
 
@@ -67,6 +77,28 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	daily.Text = createDailyDTO.Text
 	daily.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	daily.IsShared = *createDailyDTO.IsShared
+
+	prediction, err := utils.GetAIPrediction(daily.Text)
+	d.logger.Infof("prediction: %v", prediction)
+	if err != nil {
+		d.logger.Infof(err.Error())
+	}
+
+	daily.Keywords = prediction.Keywords
+	daily.Topics = prediction.Topics
+	daily.Emotions = prediction.Emotions
+	keyword_string := strings.Join(prediction.Keywords, ", ")
+
+	if createDailyDTO.Prompt != "" {
+		keyword_string = "prompt style: " + createDailyDTO.Prompt + ", prompt keywords:" + keyword_string
+	}
+	d.logger.Infof("keywords: %v", keyword_string)
+
+	image, err := d.GetImage(keyword_string)
+	var imageSuccess bool
+	if err == nil {
+		imageSuccess = true
+	}
 
 	// EMBEDDINGS
 	queryReq := openai.EmbeddingRequest{
@@ -79,12 +111,14 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	}
 	embedding := targetResponse.Data[0].Embedding
 	daily.Embedding = embedding
+	baseImage := "data:image/jpg;base64," + image
 
-	if createDailyDTO.Image == "" {
-		daily.Image = "https://free-images.com/md/7687/blue_jay_bird_nature.jpg"
+	if imageSuccess == true {
+		daily.Image = baseImage
 	} else {
-		daily.Image = createDailyDTO.Image
+		daily.Image = "https://free-images.com/md/7687/blue_jay_bird_nature.jpg"
 	}
+
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")
 	if auth, ok := author.(primitive.ObjectID); ok {

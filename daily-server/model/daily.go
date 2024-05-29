@@ -18,22 +18,40 @@ type Daily struct {
 }
 
 type Emotion struct {
-	Sadness  int `json:"sadness" bson:"sadness"`
-	Joy      int `json:"joy" bson:"joy"`
-	Love     int `json:"love" bson:"love"`
-	Anger    int `json:"anger" bson:"anger"`
-	Fear     int `json:"fear" bson:"fear"`
-	Surprise int `json:"surprise" bson:"surprise"`
+	Surprise float64 `json:"surprise"`
+	Love     float64 `json:"love"`
+	Anger    float64 `json:"anger"`
+	Joy      float64 `json:"joy"`
+	Sadness  float64 `json:"sadness"`
+	Fear     float64 `json:"fear"`
+}
+
+type Prediction struct {
+	Topics   []string `json:"topics"`
+	Emotions Emotion  `json:"emotions"`
+	Keywords []string `json:"keywords"`
+}
+
+type PredictionResponse struct {
+	Predictions       []Prediction `json:"predictions"`
+	DeployedModelID   string       `json:"deployed_model_id"`
+	ModelVersionID    string       `json:"model_version_id"`
+	ModelResourceName string       `json:"model_resource_name"`
 }
 
 type DailyRequestDTO struct {
 	ID primitive.ObjectID `json:"id" bson:"_id" binding:"required"`
 }
 
+type Prompt2ImgDTO struct {
+	Text string `json:"text" bson:"text" binding:"required"`
+}
+
 type CreateDailyDTO struct {
 	Text     string `json:"text" bson:"text" binding:"required"`
 	Image    string `json:"image" bson:"image"`
 	IsShared *bool  `json:"isShared" bson:"isShared" binding:"required"`
+	Prompt   string `json:"prompt" bson:"prompt"`
 }
 
 type DeleteDailyDTO struct {
