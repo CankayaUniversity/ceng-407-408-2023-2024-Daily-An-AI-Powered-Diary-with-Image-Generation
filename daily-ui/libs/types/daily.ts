@@ -1,7 +1,8 @@
 export type CreateDailyRequest = {
    image?: string,
    text: string,
-   isShared: boolean
+   isShared: boolean,
+   prompt: string
 };
 
 export type StatisticsResponse = {

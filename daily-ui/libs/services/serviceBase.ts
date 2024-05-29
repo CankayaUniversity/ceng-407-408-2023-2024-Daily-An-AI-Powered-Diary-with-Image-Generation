@@ -3,7 +3,7 @@ import { API_BASE_URL } from "@env";
 import { storageUtils, storageKeys, login } from "..";
 import { UserInfo, UserToken } from "..";
 
-const defaultRequestTimeout = 30000;
+const defaultRequestTimeout = 1200000;
 
 export const serviceConsumer = axios.create({
    baseURL: API_BASE_URL,

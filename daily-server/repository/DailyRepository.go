@@ -235,7 +235,7 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 
 func (r *DailyRepository) List(author_id primitive.ObjectID, limit int) ([]model.Daily, error) {
 	var dailies []model.Daily
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	opts := options.Find().SetLimit(int64(limit)).SetSort(bson.D{{"createdAt", -1}})
