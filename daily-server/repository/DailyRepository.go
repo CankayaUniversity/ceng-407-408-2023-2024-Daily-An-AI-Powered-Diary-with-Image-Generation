@@ -46,6 +46,50 @@ func NewDailyRepository(_userRepository *UserRepository) *DailyRepository {
 	}
 }
 
+type TopicsAndKeywords struct {
+	Topics   []string `bson:"topics"`
+	Keywords []string `bson:"keywords"`
+}
+
+func (r *DailyRepository) GetTopics(author primitive.ObjectID) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	filter := bson.M{"author": author}
+	opts := options.Find().SetSort(bson.D{{"createdAt", -1}})
+
+	cursor, err := r.dailies.Find(ctx, filter, opts)
+	if err != nil {
+		return []string{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var topics []string
+	for cursor.Next(ctx) {
+		var daily model.Daily
+		if err := cursor.Decode(&daily); err != nil {
+			return nil, err
+		}
+		topics = append(topics, daily.Topics...)
+	}
+
+	return topics, nil
+}
+
+func (r *DailyRepository) GetTopicKeywords(id primitive.ObjectID) (TopicsAndKeywords, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": id}
+	var info TopicsAndKeywords
+	err := r.dailies.FindOne(ctx, filter).Decode(&info)
+	if err != nil {
+		return TopicsAndKeywords{}, err
+	}
+
+	return info, nil
+}
+
 func (r *DailyRepository) Create(daily *model.Daily) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

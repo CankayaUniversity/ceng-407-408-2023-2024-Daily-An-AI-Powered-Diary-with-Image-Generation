@@ -129,6 +129,10 @@ definitions:
     type: object
   model.User:
     properties:
+      badges:
+        items:
+          type: string
+        type: array
       createdAt:
         type: integer
       email:
@@ -403,6 +407,38 @@ paths:
       summary: update daily image
       tags:
       - Daily
+  /api/daily/image/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a specific daily via daily.ID
+      parameters:
+      - description: Daily ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Daily'
+        "400":
+          description: 'Bad Request {"message": "Invalid JSON data"}'
+          schema:
+            type: object
+        "500":
+          description: 'Internal Server Error {"message'': "mongo: no documents in
+            result"}'
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: returns a daily
+      tags:
+      - Daily
   /api/daily/list:
     get:
       consumes:
@@ -494,6 +530,29 @@ paths:
       summary: Get user statistics
       tags:
       - Statistics
+  /api/daily/statistics/topics:
+    get:
+      consumes:
+      - application/json
+      description: topics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: bad request - error message
+          schema:
+            type: string
+        "401":
+          description: unauthorized - error message
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get user statistics
+      tags:
+      - topics
   /api/daily/view:
     put:
       consumes:

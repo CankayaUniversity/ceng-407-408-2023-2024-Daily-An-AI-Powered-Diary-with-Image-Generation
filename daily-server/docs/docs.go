@@ -270,6 +270,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/daily/image/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "returns a specific daily via daily.ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Daily"
+                ],
+                "summary": "returns a daily",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Daily ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Daily"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request {\"message\": \"Invalid JSON data\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error {\"message': \"mongo: no documents in result\"}",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/api/daily/list": {
             "get": {
                 "security": [
@@ -396,6 +445,43 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.StatisticsDTO"
                         }
+                    },
+                    "400": {
+                        "description": "bad request - error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daily/statistics/topics": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "topics",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "topics"
+                ],
+                "summary": "Get user statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "bad request - error message",
@@ -854,6 +940,12 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
+                "badges": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "createdAt": {
                     "type": "integer"
                 },

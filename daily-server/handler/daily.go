@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -35,14 +37,71 @@ func NewDailyController(_userRepository *repository.UserRepository, _repository 
 	}
 }
 
-func (d *DailyController) GetImage(prompt string) (string, error) {
+// DownloadImage returns a specific daily via daily.ID
+// @Summary returns a daily
+// @Description returns a specific daily via daily.ID
+// @Tags Daily
+// @Accept json
+// @Produce json
+// @Param id path string true "Daily ID"
+// @Success 200 {object} model.Daily
+// @Failure 400 {object} object "Bad Request {"message": "Invalid JSON data"}"
+// @Failure 500 {object} object "Internal Server Error {"message': "mongo: no documents in result"}"
+// @Router /api/daily/image/{id} [get]
+// @Security ApiKeyAuth
+func (d *DailyController) DownloadImage(c *gin.Context) {
+	// Define the location of the music file on the server
+	id := c.Param("id")
+
+	filename := id // Change this path to where your music file is located
+	filename = "./image/" + filename
+
+	// Check if the file exists
+	_, err := os.Stat(filename)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "File not found",
+		})
+		return
+	}
+
+	// Set headers for download
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Header("Content-Type", "image/jpeg") // Adjust the MIME type according to your music file format
+
+	// Send the file as a response
+	c.File(filename)
+}
+
+func (d *DailyController) GetImage(prompt string, dailyId primitive.ObjectID) error {
 	var image repository.TextToImageImage
 	image, err := repository.GenerateImage(prompt)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return image.Base64, nil
+	// Decode the base64 string
+	data, err := base64.StdEncoding.DecodeString(image.Base64)
+	if err != nil {
+		fmt.Println("Error decoding base64 string:", err)
+		return err
+	}
+
+	// Define the directory and file path
+	dir := "image"
+	fileName := fmt.Sprintf("%v.jpg", dailyId)
+	filePath := filepath.Join(dir, fileName)
+
+	// Write the decoded bytes to the JPEG file
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		fmt.Println("Error writing file:", err)
+		return err
+	}
+
+	fmt.Println("File saved successfully to", filePath)
+	return err
 }
 
 // Create accepts a body request to POST a daily
@@ -94,11 +153,10 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	}
 	d.logger.Infof("keywords: %v", keyword_string)
 
-	image, err := d.GetImage(keyword_string)
-	var imageSuccess bool
-	if err == nil {
-		imageSuccess = true
-	}
+	err = d.GetImage(keyword_string, dailyID)
+
+	image := fmt.Sprintf("http://localhost:9090/api/daily/image/%v", dailyID.Hex())
+	daily.Image = image
 
 	// EMBEDDINGS
 	queryReq := openai.EmbeddingRequest{
@@ -111,13 +169,6 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 	}
 	embedding := targetResponse.Data[0].Embedding
 	daily.Embedding = embedding
-	baseImage := "data:image/jpg;base64," + image
-
-	if imageSuccess == true {
-		daily.Image = baseImage
-	} else {
-		daily.Image = "https://free-images.com/md/7687/blue_jay_bird_nature.jpg"
-	}
 
 	// getting the user_id from context and running checks
 	author, _ := c.Get("user_id")

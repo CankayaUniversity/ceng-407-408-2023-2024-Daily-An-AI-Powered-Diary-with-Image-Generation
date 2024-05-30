@@ -49,6 +49,7 @@ func New() *gin.Engine {
 	api.POST("/register", handler.Register)
 	api.POST("/login", handler.Login)
 	api.GET("/verify/:email/:token", handler.VerifyEmail)
+	api.GET("/daily/image/:id", dailyHandler.DownloadImage)
 
 	// user and admin rights here
 	api.Use(middleware.JwtAuthMiddleware())
@@ -62,6 +63,7 @@ func New() *gin.Engine {
 	api.DELETE("/daily/:id", dailyHandler.DeleteDaily)
 	api.GET("/daily/explore", dailyHandler.GetExplore)
 	api.GET("/daily/statistics", statisticsHandler.Statistics)
+	api.GET("/daily/statistics/topics", statisticsHandler.GetTopics)
 	api.GET("/daily/explorevs", dailyHandler.GetExploreVS)
 	api.GET("/daily/badges", statisticsHandler.CheckForBadges)
 

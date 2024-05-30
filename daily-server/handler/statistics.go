@@ -65,9 +65,30 @@ func (controller *StatisticsController) Statistics(c *gin.Context) {
 		statistics.Mood = "None"
 	}
 	statistics.Streak = controller.Streak(dailies)
-	statistics.Topics = controller.Topics(dailies)
+	statistics.Topics = controller.Topics(author)
 	statistics.Dates = controller.GetDates(author, c)
 	c.JSON(http.StatusOK, statistics)
+}
+
+// GetTopics returns user statistics
+// @Summary      Get user statistics
+// @Description  topics
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Success      200
+// @Failure      400  {string}  string  "bad request - error message"
+// @Failure      401  {string}  string  "unauthorized - error message"
+// @Router       /api/daily/statistics/topics [get]
+// @Security ApiKeyAuth
+func (controller *StatisticsController) GetTopics(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+
+	topics, err := controller.DailyRepository.GetTopics(userId.(primitive.ObjectID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, topics)
 }
 
 func (controller *StatisticsController) GetDates(userId primitive.ObjectID, c *gin.Context) []string {
@@ -210,19 +231,12 @@ func (controller *StatisticsController) UserMood(userId primitive.ObjectID, c *g
 	return mostProminentEmotion, nil
 }
 
-func (controller *StatisticsController) Topics(dailies []model.Daily) []string {
-	/*
-		var topicList []string
-
-		for _, daily := range dailies {
-			topicList = append(topicList, daily.Topics[0])
-		}
-	*/
-
-	var a []string
-	a = append(a, "Hello")
-	a = append(a, "World")
-	return a
+func (controller *StatisticsController) Topics(author primitive.ObjectID) []string {
+	topics, err := controller.DailyRepository.GetTopics(author)
+	if err != nil {
+		return []string{}
+	}
+	return topics
 }
 
 func (controller *StatisticsController) Likes(dailies []model.Daily) int {
