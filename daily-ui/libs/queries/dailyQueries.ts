@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query"
 import { queryClient } from "."
-import { CreateDailyRequest, getStatistics, ReportDailyRequest, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, reportDaily, viewDaily } from ".."
+import { CreateDailyRequest, getStatistics, ReportDailyRequest, EditDailyImageRequest, createDaily, deleteDaily, editDailyImage, favDaily, getDailies, getDaily, getExplore, reportDaily, viewDaily, getBadges } from ".."
 import { Alert } from "react-native"
 
 export const dailyQueryKeys = {
@@ -14,7 +14,8 @@ export const dailyQueryKeys = {
    deleteDaily: '#daily/deleteDaily',
    getExplore: '#daily/getExplore',
    getExploreInfinite: '#daily/getExploreInfinite',
-   getStatistics: '#daily/getStatistics'
+   getStatistics: '#daily/getStatistics',
+   getBadges: '#daily/getBadges'
 }
 
 export const useGetExploreInfinite = () => {
@@ -37,6 +38,13 @@ export const useGetStatistics = () => {
    return useQuery({
       queryKey: [dailyQueryKeys.getStatistics],
       queryFn: ({ signal }) => getStatistics(signal),
+   })
+}
+
+export const useGetBadges = () => {
+   return useQuery({
+      queryKey: [dailyQueryKeys.getBadges],
+      queryFn: ({ signal }) => getBadges(signal),
    })
 }
 

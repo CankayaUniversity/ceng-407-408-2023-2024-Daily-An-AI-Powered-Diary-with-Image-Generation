@@ -38,6 +38,16 @@ export const getStatistics = async (
    return response.data;
 }
 
+export const getBadges = async (
+   signal?: AbortSignal,
+) => {
+   let url = `/daily/badges`;
+   const response = await serviceConsumer.get<
+      StatisticsResponse,
+      AxiosResponse<string[]>>(url, { signal });
+   return response.data;
+}
+
 export const getExplore = async (
    signal?: AbortSignal,
 ) => {
