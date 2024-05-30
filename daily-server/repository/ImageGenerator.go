@@ -91,11 +91,14 @@ func GenerateImage(prompt string) (TextToImageImage, error) {
 
 	// Execute the request & read all the bytes of the body
 	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return TextToImageImage{}, errors.New(string(res.StatusCode))
+	}
+
 	defer res.Body.Close()
-	logger.Infof("%v\n%v", res, err)
 
 	if res.StatusCode != 200 {
-		return TextToImageImage{}, errors.New("response not 200")
+		return TextToImageImage{}, errors.New(string(res.StatusCode))
 	}
 
 	// Decode the JSON body

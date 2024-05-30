@@ -192,6 +192,10 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 				{"viewers", bson.D{
 					{"$ne", userId}, // Replace userId with the actual user's ObjectId
 				}},
+				{"author", bson.D{
+					{"$ne", userId},
+				}},
+				{"isShared", true},
 			}},
 		},
 		bson.D{
@@ -224,6 +228,10 @@ func (r *DailyRepository) GetSimilarDailiesUnviewed(userId primitive.ObjectID) (
 			{"viewers", bson.D{
 				{"$ne", userId},
 			}},
+			{"author", bson.D{
+				{"$ne", userId},
+			}},
+			{"isShared", true},
 		}},
 	}
 	sortByFavoritesStage := bson.D{
