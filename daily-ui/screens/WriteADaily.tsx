@@ -39,7 +39,7 @@ const WriteADaily = ({ navigation }: { navigation: any }) => {
             }
 
             <Pressable onPress={Keyboard.dismiss} style={{ flex: 1, alignItems: "center", height: "100%", width: "100%" }}>
-               <Text style={{ fontSize: 40, fontWeight: '200', color: 'white', paddingBottom: 12 }}>Write a Daily</Text>
+               <Text style={{ fontSize: 40, fontWeight: '200', color: 'white', paddingBottom: 12 }}>write a daily</Text>
                <TextInput
                   multiline
                   style={styles.input}
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
       height: "80%",
       width: "100%",
       borderRadius: 10,
-      backgroundColor: "#0D1326",
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       opacity: 0.75,
       fontSize: 20,
       fontWeight: "200"
