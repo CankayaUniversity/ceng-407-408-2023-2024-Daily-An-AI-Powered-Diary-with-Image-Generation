@@ -91,7 +91,7 @@ func (d *DailyController) GetImage(prompt string, dailyId primitive.ObjectID) er
 
 	// Define the directory and file path
 	dir := "image"
-	fileName := fmt.Sprintf("%v.jpg", dailyId)
+	fileName := fmt.Sprintf("%v.jpg", dailyId.Hex())
 	filePath := filepath.Join(dir, fileName)
 
 	// Write the decoded bytes to the JPEG file
@@ -155,7 +155,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 
 	err = d.GetImage(keyword_string, dailyID)
 
-	image := fmt.Sprintf("http://localhost:9090/api/daily/image/%v", dailyID.Hex())
+	image := fmt.Sprintf("http://localhost:9090/api/daily/image/%v.jpg", dailyID.Hex())
 	daily.Image = image
 
 	// EMBEDDINGS
