@@ -12,7 +12,7 @@ export type StatisticsResponse = {
    dailiesWritten: number,
    mood: string,
    streak: number,
-   topic: string
+   topics: string[]
 };
 
 export type ExploreResponse = {
@@ -26,6 +26,7 @@ export type DailyResponse = {
    id: string,
    text: string,
    author: string,
+   topics: string[],
    keywords: string[],
    emotions: {
       anger: number,
