@@ -254,12 +254,21 @@ func (controller *StatisticsController) GetCalendar(c *gin.Context) int {
 	return 0
 }
 
+// Statistics returns user statistics
+// @Summary      Get user statistics
+// @Description  provides statistical data about a user's activity including likes, views, number of dailies written, current mood, streak, and a predefined topic
+// @Tags         Statistics
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  []string
+// @Failure      400  {string}  string  "bad request - error message"
+// @Failure      401  {string}  string  "unauthorized - error message"
+// @Router       /api/daily/badges [get]
+// @Security ApiKeyAuth
 func (controller *StatisticsController) CheckForBadges(c *gin.Context) {
 	badges := []string{}
 
 	userId, exists := c.Get("user_id")
-
-	statistics := model.StatisticsDTO{}
 
 	controller.logger.Infof("%v, %v", exists, userId)
 
@@ -280,9 +289,11 @@ func (controller *StatisticsController) CheckForBadges(c *gin.Context) {
 
 	if dailiesWritten >= 100 {
 		badges = append(badges, "Master Writer")
-	} else if dailiesWritten >= 10 {
+	}
+	if dailiesWritten >= 10 {
 		badges = append(badges, "Prolific Writer")
-	} else if statistics.DailiesWritten >= 1 {
+	}
+	if dailiesWritten >= 1 {
 		badges = append(badges, "Beginner Writer")
 	}
 	if streak >= 7 {
@@ -290,14 +301,17 @@ func (controller *StatisticsController) CheckForBadges(c *gin.Context) {
 	}
 	if likes >= 1000 {
 		badges = append(badges, "Influence")
-	} else if likes >= 100 {
+	}
+	if likes >= 100 {
 		badges = append(badges, "Liked by Many")
-	} else if likes >= 1 {
+	}
+	if likes >= 1 {
 		badges = append(badges, "Admired")
 	}
 	if views >= 1000 {
 		badges = append(badges, "Popular Author")
-	} else if views >= 1 {
+	}
+	if views >= 1 {
 		badges = append(badges, "They Look Here")
 	}
 

@@ -286,6 +286,34 @@ paths:
       summary: returns a daily
       tags:
       - Daily
+  /api/daily/badges:
+    get:
+      consumes:
+      - application/json
+      description: provides statistical data about a user's activity including likes,
+        views, number of dailies written, current mood, streak, and a predefined topic
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: bad request - error message
+          schema:
+            type: string
+        "401":
+          description: unauthorized - error message
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get user statistics
+      tags:
+      - Statistics
   /api/daily/explore:
     get:
       consumes:

@@ -178,7 +178,7 @@ func (d *DailyController) CreateDaily(c *gin.Context) {
 
 	err = d.GetImage(keyword_string, dailyID)
 
-	image := fmt.Sprintf("http://localhost:9090/api/daily/image/%v.jpg", dailyID.Hex())
+	image := fmt.Sprintf("%v/api/daily/image/%v.jpg", os.Getenv("API_URL"), dailyID.Hex())
 	daily.Image = image
 
 	// EMBEDDINGS
