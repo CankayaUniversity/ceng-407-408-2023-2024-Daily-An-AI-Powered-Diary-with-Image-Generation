@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Final-Projectors/daily-server/database"
@@ -47,7 +46,6 @@ func (r *UserRepository) AddToViewed(userId primitive.ObjectID, dailyId primitiv
 	var userRecord model.User
 	err := r.users.FindOne(ctx, bson.M{"_id": userId, "viewedDailies": bson.M{"$exists": true}}).Decode(&userRecord)
 	if err == mongo.ErrNoDocuments {
-		fmt.Println("Buraya girdim")
 		// If viewedDailies doesn't exist, initialize it
 		_, err = r.users.UpdateOne(ctx, bson.M{"_id": userId}, bson.M{"$set": bson.M{"viewedDailies": []primitive.ObjectID{}}})
 		if err != nil {

@@ -2,10 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/Final-Projectors/daily-server/database"
 	"github.com/Final-Projectors/daily-server/model"
@@ -237,4 +238,54 @@ func (controller *StatisticsController) Likes(dailies []model.Daily) int {
 
 func (controller *StatisticsController) GetCalendar(c *gin.Context) int {
 	return 0
+}
+
+func (controller *StatisticsController) CheckForBadges(c *gin.Context) {
+	badges := []string{}
+
+	userId, exists := c.Get("user_id")
+
+	statistics := model.StatisticsDTO{}
+
+	controller.logger.Infof("%v, %v", exists, userId)
+
+	if !exists {
+		controller.logger.Infof("%v, %v", exists, userId)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": fmt.Sprintf("user_id: %v, exists: %v", userId, exists)})
+	}
+	author := userId.(primitive.ObjectID)
+	dailies, err := controller.DailyRepository.List(author, 0)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "List failed"})
+	}
+
+	dailiesWritten := controller.DailiesWritten(dailies)
+	streak := controller.Streak(dailies)
+	likes := controller.Likes(dailies)
+	views := controller.Views(dailies)
+
+	if dailiesWritten >= 100 {
+		badges = append(badges, "Master Writer")
+	} else if dailiesWritten >= 10 {
+		badges = append(badges, "Prolific Writer")
+	} else if statistics.DailiesWritten >= 1 {
+		badges = append(badges, "Beginner Writer")
+	}
+	if streak >= 7 {
+		badges = append(badges, "One Week Obsessed")
+	}
+	if likes >= 1000 {
+		badges = append(badges, "Influence")
+	} else if likes >= 100 {
+		badges = append(badges, "Liked by Many")
+	} else if likes >= 1 {
+		badges = append(badges, "Admired")
+	}
+	if views >= 1000 {
+		badges = append(badges, "Popular Author")
+	} else if views >= 1 {
+		badges = append(badges, "They Look Here")
+	}
+
+	c.JSON(http.StatusOK, badges)
 }
