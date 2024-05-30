@@ -11,6 +11,7 @@ type User struct {
 	ViewedDailies    []primitive.ObjectID `json:"viewedDailies" bson:"viewedDailies,omitempty"`
 	Role             string               `json:"role" bson:"role"`
 	IsVerified       bool                 `json:"isVerified" bson:"isVerified" binding:"required"`
+	Badges           []string             `json:"badges" bson:"badges,omitempty"`
 }
 
 type UserRegisterDTO struct {
