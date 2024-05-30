@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -89,19 +91,40 @@ func (d *DailyController) GetImage(prompt string, dailyId primitive.ObjectID) er
 		return err
 	}
 
+	pngImage, err := png.Decode(strings.NewReader(string(data)))
+	if err != nil {
+		// Handle error
+		return errors.New("could not decode to png")
+	}
+
 	// Define the directory and file path
 	dir := "image"
 	fileName := fmt.Sprintf("%v.jpg", dailyId.Hex())
 	filePath := filepath.Join(dir, fileName)
 
-	// Write the decoded bytes to the JPEG file
-	if err := os.WriteFile(filePath, data, 0644); err != nil {
-		fmt.Println("Error writing file:", err)
+	jpgFile, err := os.Create(filePath)
+	if err != nil {
+		// Handle error
+		return err
+	}
+	defer jpgFile.Close()
+
+	// Convert the PNG image to JPEG format and write it to the file
+	err = jpeg.Encode(jpgFile, pngImage, &jpeg.Options{Quality: 90}) // Adjust quality as needed
+	if err != nil {
 		return err
 	}
 
+	// Write the decoded bytes to the JPEG file
+	/*
+		if err := os.WriteFile(filePath, jpgFile, 0644); err != nil {
+			fmt.Println("Error writing file:", err)
+			return err
+		}
+	*/
+
 	fmt.Println("File saved successfully to", filePath)
-	return err
+	return nil
 }
 
 // Create accepts a body request to POST a daily
