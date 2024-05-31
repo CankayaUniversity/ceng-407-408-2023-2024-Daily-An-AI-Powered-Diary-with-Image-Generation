@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     outerRow: {
         marginTop: "6%",
         width: '92%',
-        height:'15%',
+        height:100,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
