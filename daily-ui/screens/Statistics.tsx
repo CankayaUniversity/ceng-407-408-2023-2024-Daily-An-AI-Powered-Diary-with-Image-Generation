@@ -25,7 +25,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
 
     return (
         <Header navigation={navigation} previous="Home" homepage={false}>
-            {(!isLoading && data?.date != null) && (
+            {(!isLoading) && (
                 <View style={styles.scrollView}>
                     <View style={styles.container}>
                         <Calendar
@@ -59,14 +59,14 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                                 <Text style={styles.innerNumber}>{data?.streak || 0}</Text>
                             </View>
                         </View>
-                        <View style={[styles.outerRow,{height:'15%'}]}>
+                        <View style={[styles.outerRow, { height: '15%' }]}>
                             <View style={styles.innerItem}>
                                 <Text style={styles.innerText}>Mood:</Text>
-                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.mood.toUpperCase() || "Uncalculated"}</Text>
+                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.mood != "None" ? data?.mood.toUpperCase() : "Uncalculated"}</Text>
                             </View>
                             <Pressable onPress={() => setModalVisible(!isModalVisible)} style={styles.innerItem}>
                                 <Text style={styles.innerText}>Topic:</Text>
-                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.topics[0].toUpperCase() || "Uncalculated"}</Text>
+                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.topics != null ? data?.topics[0].toUpperCase() : "Uncalculated"}</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: 'center',
-        padding:15,
+        padding: 15,
         margin: "2%",
         borderRadius: 20,
         backgroundColor: Colors.main_container,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         width: '45%',
-        height:'100%',
+        height: '100%',
         marginHorizontal: 10,
         backgroundColor: "rgba(0,0,0,0.6)",
         flexDirection: "column",
