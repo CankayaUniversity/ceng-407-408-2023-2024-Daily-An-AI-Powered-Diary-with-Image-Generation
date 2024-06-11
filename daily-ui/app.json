@@ -22,10 +22,14 @@
       },
       "package": "com.anonymous.dailyui"
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       "expo-build-properties"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9e657c1c-807a-4915-9df2-d4e16aa6a969"
+      }
+    }
   }
 }

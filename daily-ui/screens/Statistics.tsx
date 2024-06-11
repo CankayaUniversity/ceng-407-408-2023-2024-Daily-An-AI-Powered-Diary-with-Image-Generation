@@ -18,15 +18,15 @@ const Statistics = ({ navigation }: { navigation: any }) => {
 
     const { data, isLoading, isError } = useGetStatistics();
 
-    const markedDatesFunc = data?.date.reduce((acc: any, date: any) => {
+    const markedDatesFunc = data?.date?.reduce((acc: any, date: any) => {
         acc[date] = { selected: true };
         return acc;
     }, {});
 
     return (
         <Header navigation={navigation} previous="Home" homepage={false}>
-            {!isLoading && (
-                <ScrollView style={styles.scrollView}>
+            {(!isLoading && data?.date != null) && (
+                <View style={styles.scrollView}>
                     <View style={styles.container}>
                         <Calendar
                             key={uuidv4()}
@@ -62,15 +62,15 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                         <View style={[styles.outerRow,{height:'15%'}]}>
                             <View style={styles.innerItem}>
                                 <Text style={styles.innerText}>Mood:</Text>
-                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.mood || "Uncalculated"}</Text>
+                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.mood.toUpperCase() || "Uncalculated"}</Text>
                             </View>
                             <Pressable onPress={() => setModalVisible(!isModalVisible)} style={styles.innerItem}>
                                 <Text style={styles.innerText}>Topic:</Text>
-                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.topics[0] || "Uncalculated"}</Text>
+                                <Text style={[styles.innerNumber, { fontSize: 20 }]}>{data?.topics[0].toUpperCase() || "Uncalculated"}</Text>
                             </Pressable>
                         </View>
                     </View>
-                </ScrollView>
+                </View>
             )}
             <Modal
                 visible={isModalVisible}
@@ -82,7 +82,7 @@ const Statistics = ({ navigation }: { navigation: any }) => {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContentWrapper}>
                         <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
-                            {data?.topics.map((el, index) => (
+                            {data?.topics?.map((el, index) => (
                                 <TouchableOpacity key={index} activeOpacity={1} onPress={() => setModalVisible(!isModalVisible)} style={styles.modalItem}>
                                     <Text style={styles.modalItemText}>{el.toUpperCase()}</Text>
                                 </TouchableOpacity>
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: 'center',
-        padding:20,
-        margin: "3%",
+        padding:15,
+        margin: "2%",
         borderRadius: 20,
         backgroundColor: Colors.main_container,
         opacity: 0.90,
@@ -111,13 +111,14 @@ const styles = StyleSheet.create({
     calendar: {
         backgroundColor: Colors.main_container,
         width: '100%',
+        borderRadius: 20,
         paddingLeft: 0,
         paddingRight: 0,
     },
     outerRow: {
         marginTop: "6%",
         width: '92%',
-        height:100,
+        height: '15%',
         flexDirection: 'row',
         justifyContent: 'space-between',
     },

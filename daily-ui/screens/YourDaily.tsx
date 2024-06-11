@@ -43,14 +43,14 @@ const YourDaily = ({ navigation }: { navigation: any }) => {
           (isLoading || isPending) &&
           <Text style={{ alignItems: 'center', justifyContent: 'center', fontSize: 40, color: 'white' }}>Loading</Text>
         }
-        {(!isLoading && !isPending) && data?.map((el, index) => {
+        {(!isLoading && !isPending && data?.length > 0) && data?.map((el, index) => {
           return (
             <Pressable
             key={index}
             onPress={() => navigation.navigate("ReadDaily", { data: el })}
             onLongPress={()=>Alert.alert(
               '',
-              'Do you want to change the image?',  
+              'Do you want to change the image?',
               [
                  {text: 'Yes', onPress: () => pickImage(el.id), style: 'cancel'},
                  {text: 'No'},
