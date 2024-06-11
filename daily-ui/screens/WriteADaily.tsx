@@ -120,7 +120,8 @@ const styles = StyleSheet.create({
       backgroundColor: "#0D1326",
       opacity: 0.75,
       fontSize: 20,
-      fontWeight: "200"
+      fontWeight: "200",
+      textAlignVertical:'top'
    },
 
    tickIcon: {

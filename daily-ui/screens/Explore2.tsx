@@ -141,7 +141,7 @@ const Explore2 = ({ navigation }) => {
                 {isVisible && <Image source={{ uri: el.image }} style={styles.image}></Image>}
                 {
                      !isVisible &&
-                     <View style={{height:Dimensions.get("screen").height-160,width:'100%',opacity:0.4,justifyContent:'center',alignItems:'center'}}>
+                     <View style={{height:Dimensions.get("screen").height-160,width:'100%',opacity:0.7,justifyContent:'center',alignItems:'center'}}>
                       <View style={{height:'20%', width:'85%',flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{justifyContent:"space-between",padding:10 , borderWidth:1 ,height:'100%', width: '49%', opacity: 0.95, marginTop: 5, borderRadius: 10, backgroundColor: "black" }}>
                            <Text style={styles.cardText}>{"MOOD"}</Text>
@@ -149,7 +149,7 @@ const Explore2 = ({ navigation }) => {
                         </View>
                         <View style={{justifyContent:"space-between",padding:10,borderWidth:1,height:'100%', width: '49%', opacity: 0.95, marginTop: 5, borderRadius: 10, backgroundColor: "black" }}>
                            <Text style={styles.cardText}>{"TOPIC".toUpperCase()}</Text>
-                           <Text style={styles.cardText}>{el?.topic != undefined? el.topic.toString().toUpperCase() : "Topic".toUpperCase()}</Text>
+                           <Text style={styles.cardText}>{el?.Topics[0] != undefined? el.Topics[0].toString().toUpperCase() : "Topic".toUpperCase()}</Text>
                         </View>
                         </View>
                         <View  style={{height:'75%',width:'85%',borderRadius:10,borderWidth:1,backgroundColor:"black",marginTop:10}}>
@@ -159,7 +159,7 @@ const Explore2 = ({ navigation }) => {
                         </View>
                      </View>
                   }
-                <View style={{position:'absolute',width:'100%',bottom:80,backgroundColor:"black",justifyContent:'space-evenly',alignItems:'flex-end',flexDirection:'row',borderTopLeftRadius:200,borderTopRightRadius:200}}>  
+                <View style={{position:'absolute',width:'100%',bottom:80,backgroundColor:"black",justifyContent:'space-evenly',alignItems:'flex-end',flexDirection:'row',borderTopLeftRadius:200,borderTopRightRadius:200}}>
                   <TouchableOpacity style={styles.heartButton} onPress={()=>setFavDaily(el.id)}>
                     <Ionicons name="heart" style={styles.iconStyle} size={32} color={favList.includes(el.id)? "red":"white"} />
                   </TouchableOpacity>
